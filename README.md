@@ -27,7 +27,7 @@ Ensure you have [Node.js](https://nodejs.org/) installed on your local machine.
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/your-username/tdi500-kpi-dashboard.git](https://github.com/your-username/tdi500-kpi-dashboard.git)
+   git clone [https://github.com/Marvel-School/tdi500-kpi-dashboard]
 Navigate to the project directory:
 
 Bash
