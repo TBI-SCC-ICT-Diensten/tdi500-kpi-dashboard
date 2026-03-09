@@ -13,8 +13,8 @@ Specifically, Activity 3.4 focuses on optimizing the "contingentenaanpak" (conti
 
 ## Architecture & Tech Stack
 * **Frontend Framework:** React 18 with TypeScript (Component-based architecture)
-* **Visualization:** Recharts (Declarative charting for React)
-* **Styling:** Tailwind CSS
+* **Visualization:** ApexCharts (via react-apexcharts)
+* **Styling:** Material UI (MUI v5)
 * **Data Fetching:** Axios (HTTP client for SPARQL queries)
 * **Data Layer:** SPARQL via HTTP POST/GET interacting with the Hupie API
 * **Ontology:** Heatpump Common Ontology (HCO) & ETSI SAREF core extensions
