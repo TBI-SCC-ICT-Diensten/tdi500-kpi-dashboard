@@ -1,0 +1,44 @@
+{
+  "name": "tdi500-kpi-dashboard",
+  "version": "1.0.0",
+  "description": "This repository contains the frontend application for Activity 3.4 of the TDI 500 project.The overarching goal of the TDI 500 consortium is to accelerate the installation of (hybrid) heat pumps to 500 per day.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marvel-School/tdi500-kpi-dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Marvel-School/tdi500-kpi-dashboard/issues"
+  },
+  "homepage": "https://github.com/Marvel-School/tdi500-kpi-dashboard#readme",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^5.18.0",
+    "@mui/material": "^5.18.0",
+    "apexcharts": "^5.10.4",
+    "axios": "^1.13.6",
+    "react": "^18.3.1",
+    "react-apexcharts": "^2.1.0",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.3"
+  }
+}
