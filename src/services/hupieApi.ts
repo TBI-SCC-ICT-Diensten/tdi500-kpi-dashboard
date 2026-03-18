@@ -45,8 +45,6 @@ export const executeSparqlQuery = async (query: string): Promise<SparqlResponse>
 
 export const executeSparqlQueryGet = async (query: string): Promise<SparqlResponse> => {
   try {
-    // For GET requests, the query might need to be passed as a param.
-    // Assuming the Hupie API expects the query parameter named 'query'.
     const response = await hupieAxios.get('', {
       params: {
         ...hupieAxios.defaults.params,
