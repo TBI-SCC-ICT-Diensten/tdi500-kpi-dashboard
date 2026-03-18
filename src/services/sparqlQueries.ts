@@ -1,4 +1,3 @@
-// Simple test query — just get list of heat pumps
 export const SPARQL_LIST_HEATPUMPS = `
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX hco: <https://www.tno.nl/building/ontology/heatpump-common-ontology#>
@@ -11,7 +10,6 @@ WHERE {
 }
 `;
 
-// Full query — all heat pump data 
 export const SPARQL_ALL_HEATPUMP_DATA = `
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
 PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/> 

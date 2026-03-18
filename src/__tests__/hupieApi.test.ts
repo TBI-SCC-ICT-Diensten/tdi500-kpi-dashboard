@@ -2,7 +2,6 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as hupieApi from '../services/hupieApi';
 import { config } from '../config';
 
-// Mock axios since we don't want to make live API calls
 vi.mock('axios', () => {
   return {
     default: {
