@@ -70,7 +70,7 @@ describe('fetchHeatPumpDetails', () => {
     mockPost.mockResolvedValueOnce(makeDetailResponse(1));
     await fetchHeatPumpDetails('https://example.com/hp/abc');
     expect(mockPost).toHaveBeenCalledTimes(1);
-    expect(typeof mockPost.mock.calls[0][1]).toBe('string');
+    expect(typeof mockPost.mock.calls[0]?.[1]).toBe('string');
   });
 });
 
