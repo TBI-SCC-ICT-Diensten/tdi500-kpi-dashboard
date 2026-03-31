@@ -17,6 +17,25 @@ const hupieAxios = axios.create({
   }
 });
 
+/**
+ * Separate Axios instance for SPARQL UPDATE queries.
+ * SPARQL UPDATE requires Content-Type: application/sparql-update,
+ * which is different from the SELECT client (application/sparql-query).
+ * These cannot share an instance because Axios does not support
+ * per-request Content-Type overrides cleanly with interceptors.
+ */
+const hupieUpdateAxios = axios.create({
+  baseURL: config.api.baseUrl,
+  timeout: config.api.timeout,
+  headers: {
+    'Content-Type': 'application/sparql-update',
+    'Accept': 'application/json',
+  },
+  params: {
+    token: config.api.apiKey,
+  },
+});
+
 const handleApiError = (error: unknown, endpoint: string): ApiError => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError;
@@ -112,4 +131,19 @@ export const fetchAllHeatPumpData = async (): Promise<HeatPumpSystem[]> => {
 
   console.log(`[TDI500] fetchAllHeatPumpData: mapped ${heatPumps.length} heat pumps`);
   return heatPumps;
+};
+
+/**
+ * Executes a SPARQL UPDATE query against the Hupie endpoint.
+ * Used for write operations: SET heating curve, SET temperature setpoint.
+ *
+ * SPARQL UPDATE returns no result body on success (HTTP 200/204).
+ * Returns Promise<void>.
+ */
+export const executeSparqlUpdate = async (query: string): Promise<void> => {
+  try {
+    await hupieUpdateAxios.post('', query);
+  } catch (error) {
+    throw handleApiError(error, 'POST sparql-update');
+  }
 };
