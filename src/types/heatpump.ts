@@ -100,3 +100,19 @@ export type KpiCategory =
   | 'commissioning';
 // 'commissioning' covers official TDI 500 KPIs: inregelsnelheid and storingen
 export type KpiStatus = 'good' | 'warning' | 'critical';
+
+// ── Hupie Write Commands ─────────────────────────────────────────────────────
+// Types for SPARQL UPDATE operations (SET heating curve, SET temperature setpoint)
+
+export interface HeatingCurveCommand {
+  heatPumpId: string;   // the string identifier (e.g. "bdgp0cbmq2t7uke")
+  baseValue: number;    // °C — the base temperature of the heating curve
+  slopeValue: number;   // °C/°C — the slope of the heating curve
+}
+
+export interface TemperatureSetpointCommand {
+  heatPumpId: string;   // the string identifier
+  value: number;        // °C — the desired room temperature setpoint
+}
+
+export type CommandStatus = 'idle' | 'pending' | 'success' | 'error';
