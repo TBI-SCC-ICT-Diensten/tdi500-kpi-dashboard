@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
-import { executeSparqlQuery } from '../services/hupieApi';
-import { SPARQL_LIST_HEATPUMPS, SPARQL_ALL_HEATPUMP_DATA } from '../services/sparqlQueries';
-import { mapSparqlToHeatPumps } from '../services/dataMapper';
+import { executeSparqlQuery, fetchAllHeatPumpData } from '../services/hupieApi';
+import { SPARQL_LIST_HEATPUMPS } from '../services/sparqlQueries';
 import type { SparqlResponse, ApiError } from '../types/api';
 import type { HeatPumpSystem } from '../types/heatpump';
 
@@ -33,10 +32,7 @@ const DashboardPage = () => {
     setMappedData(null);
     setError(null);
     try {
-      const data = await executeSparqlQuery(SPARQL_ALL_HEATPUMP_DATA);
-      setResult(data);
-
-      const heatPumps = mapSparqlToHeatPumps(data);
+      const heatPumps = await fetchAllHeatPumpData();
       setMappedData(heatPumps);
       console.log('Mapped HeatPumpSystem[]:', heatPumps);
     } catch (err) {
