@@ -1,109 +1,84 @@
-import { useState } from 'react';
-import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
-import { executeSparqlQuery, fetchAllHeatPumpData } from '../services/hupieApi';
-import { SPARQL_LIST_HEATPUMPS } from '../services/sparqlQueries';
-import type { SparqlResponse, ApiError } from '../types/api';
-import type { HeatPumpSystem } from '../types/heatpump';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import Divider from '@mui/material/Divider';
+import useDashboardData from '../hooks/useDashboardData';
+import { useDashboardContext } from '../context/DashboardContext';
+import ContingentSelector from '../components/dashboard/ContingentSelector';
+import KpiOverviewPanel from '../components/dashboard/KpiOverviewPanel';
+import KpiChartPanel from '../components/dashboard/KpiChartPanel';
+import DecisionSupportCard from '../components/dashboard/DecisionSupportCard';
+import Spinner from '../components/common/Spinner';
+import EmptyState from '../components/common/EmptyState';
 
 const DashboardPage = () => {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<SparqlResponse | null>(null);
-  const [mappedData, setMappedData] = useState<HeatPumpSystem[] | null>(null);
-  const [error, setError] = useState<ApiError | null>(null);
-
-  const testConnection = async () => {
-    setLoading(true);
-    setResult(null);
-    setMappedData(null);
-    setError(null);
-    try {
-      const data = await executeSparqlQuery(SPARQL_LIST_HEATPUMPS);
-      setResult(data);
-    } catch (err) {
-      setError(err as ApiError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const testFullDataMapping = async () => {
-    setLoading(true);
-    setResult(null);
-    setMappedData(null);
-    setError(null);
-    try {
-      const heatPumps = await fetchAllHeatPumpData();
-      setMappedData(heatPumps);
-      console.log('Mapped HeatPumpSystem[]:', heatPumps);
-    } catch (err) {
-      setError(err as ApiError);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const totalMeasurements = mappedData?.reduce((sum, hp) => sum + hp.measurements.length, 0) ?? 0;
-  const totalErrorCodes = mappedData?.reduce((sum, hp) => sum + hp.errorCodes.length, 0) ?? 0;
+  const { state, setSelectedContingentId } = useDashboardContext();
+  const {
+    contingents,
+    selectedContingent,
+    kpis,
+    isLoading,
+    error,
+  } = useDashboardData();
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom>
-        Dashboard
-      </Typography>
-
-      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-        <Button
-          variant="contained"
-          onClick={testConnection}
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
-          Test Hupie API
-        </Button>
-
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={testFullDataMapping}
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
-          Test Data Mapping
-        </Button>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h5" fontWeight={600} gutterBottom>
+          Installateursportaal — KPI Dashboard
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          TDI 500 — Activiteit 3.4 | Warmtepomp monitoring en inregeling
+        </Typography>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error.message} {error.statusCode ? `(${error.statusCode})` : ''}
+      <Divider sx={{ mb: 3 }} />
+
+      {isLoading && (
+        <Spinner message="Warmtepompdata ophalen via Hupie API..." />
+      )}
+
+      {!isLoading && error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
         </Alert>
       )}
 
-      {mappedData && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          {mappedData.length} warmtepompen gevonden, {totalMeasurements} metingen, {totalErrorCodes} foutcodes
-        </Alert>
+      {!isLoading && !error && contingents.length === 0 && (
+        <EmptyState
+          message="Geen warmtepompen gevonden"
+          subMessage="Controleer de Hupie API verbinding en probeer opnieuw."
+        />
       )}
 
-      {result && (
-        <Box>
-          <Alert severity="success" sx={{ mb: 2 }}>
-            Verbinding geslaagd — {result.results.bindings.length} bindings ontvangen
-            {mappedData ? ` → ${mappedData.length} warmtepompen gemapped` : ''}
-          </Alert>
-          <Box
-            component="pre"
-            sx={{
-              p: 2,
-              bgcolor: 'grey.100',
-              borderRadius: 1,
-              overflow: 'auto',
-              maxHeight: 400,
-              fontSize: '0.8rem',
-            }}
-          >
-            {JSON.stringify(mappedData ?? result, null, 2)}
-          </Box>
-        </Box>
+      {!isLoading && !error && contingents.length > 0 && (
+        <>
+          <ContingentSelector
+            contingents={contingents}
+            selectedContingentId={state.selectedContingentId}
+            onSelect={setSelectedContingentId}
+            isLoading={isLoading}
+          />
+
+          {selectedContingent && (
+            <>
+              <KpiOverviewPanel kpis={kpis} />
+              <Box sx={{ mt: 3 }}>
+                <KpiChartPanel />
+              </Box>
+              <Box sx={{ mt: 3 }}>
+                <DecisionSupportCard />
+              </Box>
+            </>
+          )}
+
+          {!selectedContingent && (
+            <EmptyState
+              message="Selecteer een contingent"
+              subMessage="Kies een contingent hierboven om de KPI's te bekijken."
+            />
+          )}
+        </>
       )}
     </Box>
   );
