@@ -28,7 +28,7 @@ const DashboardPage = () => {
           Installateursportaal — KPI Dashboard
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          TDI 500 — Activiteit 3.4 | Warmtepomp monitoring en inregeling
+          TDI 500 — | Warmtepomp monitoring en inregeling
         </Typography>
       </Box>
 
