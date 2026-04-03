@@ -16,10 +16,10 @@ const Header = () => {
       <Toolbar sx={{ gap: 2 }}>
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h6" fontWeight={600} color="text.primary" sx={{ lineHeight: 1.2 }}>
-            TDI 500 — Installateursportaal
+            Installateursportaal
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Activiteit 3.4 | Hupie API via Heatpump Common Ontology
+            Hupie API via Heatpump Common Ontology
           </Typography>
         </Box>
         <Chip
