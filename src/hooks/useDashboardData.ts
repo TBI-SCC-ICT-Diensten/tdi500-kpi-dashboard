@@ -31,16 +31,35 @@ const useDashboardData = (): DashboardData => {
       setError(null);
 
       try {
-        const pumps = await fetchAllHeatPumpData();
-        if (cancelled) return;
-        setHeatPumps(pumps);
+        // Stream pumps into state as each one resolves.
+        // setIsLoading stays true until the first pump arrives,
+        // then turns false so the UI renders partial results immediately.
+        let firstPumpReceived = false;
+
+        await fetchAllHeatPumpData((pump) => {
+          if (!cancelled) {
+            if (!firstPumpReceived) {
+              firstPumpReceived = true;
+              setIsLoading(false);
+            }
+            setHeatPumps((prev) => {
+              // Avoid duplicates if pump already in state
+              if (prev.some((p) => p.id === pump.id)) return prev;
+              return [...prev, pump];
+            });
+          }
+        });
+
+        if (!cancelled && !firstPumpReceived) {
+          // No pumps loaded at all
+          setIsLoading(false);
+        }
       } catch (err) {
         if (cancelled) return;
         const message = err instanceof Error ? err.message : String(err);
         console.error('[useDashboardData] Failed to load heat pump data:', message);
         setError(`Kon warmtepompdata niet ophalen: ${message}`);
-      } finally {
-        if (!cancelled) setIsLoading(false);
+        setIsLoading(false);
       }
     };
 
