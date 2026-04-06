@@ -67,6 +67,7 @@ const DashboardPage = () => {
                 <KpiChartPanel
                   kpis={kpis}
                   heatPumps={selectedContingent?.heatPumps}
+                  kruisProfielCode={selectedContingent?.kruisProfiel.code}
                 />
               </Box>
               <Box sx={{ mt: 3 }}>
