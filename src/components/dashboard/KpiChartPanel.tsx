@@ -1,98 +1,57 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import ShowChartIcon from '@mui/icons-material/ShowChart';
-import SpeedIcon from '@mui/icons-material/Speed';
 import type { KeyPerformanceIndicator, HeatPumpSystem } from '../../types/heatpump';
+import TemperatureTrend from '../charts/TemperatureTrend';
+import CopGauge from '../charts/CopGauge';
+import EnergyComparison from '../charts/EnergyComparison';
+import { SCORING_THRESHOLDS_BY_PROFIEL } from '../../services/scoringConfig';
+import type { KruisProfielCode } from '../../types/heatpump';
+import EmptyState from '../common/EmptyState';
 
 interface KpiChartPanelProps {
   kpis?: KeyPerformanceIndicator[];
   heatPumps?: HeatPumpSystem[];
+  kruisProfielCode?: KruisProfielCode;
 }
 
-interface PlaceholderChartProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  height?: number;
-}
+const KpiChartPanel = ({
+  kpis = [],
+  heatPumps = [],
+  kruisProfielCode = 'B2',
+}: KpiChartPanelProps) => {
+  if (heatPumps.length === 0) {
+    return (
+      <Box>
+        <Typography variant="overline" color="text.secondary"
+          sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
+          KPI Visualisaties
+        </Typography>
+        <EmptyState
+          message="Geen data voor grafieken"
+          subMessage="Er zijn geen warmtepompen geladen om te visualiseren."
+        />
+      </Box>
+    );
+  }
 
-const PlaceholderChart = ({ title, description, icon, height = 200 }: PlaceholderChartProps) => (
-  <Paper
-    variant="outlined"
-    sx={{
-      p: 3,
-      height,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 1.5,
-      bgcolor: 'grey.50',
-      borderStyle: 'dashed',
-    }}
-  >
-    <Box sx={{ color: 'primary.light', opacity: 0.5 }}>{icon}</Box>
-    <Typography variant="subtitle2" fontWeight={600} color="text.secondary">
-      {title}
-    </Typography>
-    <Typography variant="caption" color="text.disabled" textAlign="center">
-      {description}
-    </Typography>
-    <Typography
-      variant="caption"
-      sx={{
-        px: 1.5,
-        py: 0.5,
-        bgcolor: 'primary.main',
-        color: 'primary.contrastText',
-        borderRadius: 1,
-        fontSize: '0.65rem',
-        fontWeight: 600,
-        letterSpacing: 0.5,
-      }}
-    >
-      ISSUE #6
-    </Typography>
-  </Paper>
-);
+  const thresholds = SCORING_THRESHOLDS_BY_PROFIEL[kruisProfielCode];
 
-const KpiChartPanel = ({ kpis, heatPumps }: KpiChartPanelProps) => {
   return (
     <Box>
-      <Typography
-        variant="overline"
-        color="text.secondary"
-        sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}
-      >
+      <Typography variant="overline" color="text.secondary"
+        sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
         KPI Visualisaties
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
-          <PlaceholderChart
-            title="Temperatuurtrend"
-            description="Lijn/vlakgrafiek — ruimtetemperatuur en setpoint over tijd per warmtepomp"
-            icon={<ShowChartIcon sx={{ fontSize: 48 }} />}
-            height={240}
-          />
+          <TemperatureTrend heatPumps={heatPumps} />
         </Grid>
         <Grid item xs={12} md={4}>
-          <PlaceholderChart
-            title="COP Gauge"
-            description="Radialgrafiek — gemiddelde COP t.o.v. profieldrempel"
-            icon={<SpeedIcon sx={{ fontSize: 48 }} />}
-            height={240}
-          />
+          <CopGauge kpis={kpis} minCop={thresholds.minCop} />
         </Grid>
         <Grid item xs={12}>
-          <PlaceholderChart
-            title="Energieverbruik vergelijking"
-            description="Staafdiagram — kWh per warmtepomp in dit contingent (Y-as altijd vanaf 0)"
-            icon={<BarChartIcon sx={{ fontSize: 48 }} />}
-            height={200}
-          />
+          <EnergyComparison heatPumps={heatPumps} />
         </Grid>
       </Grid>
     </Box>
