@@ -8,6 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
@@ -54,6 +55,21 @@ const Sidebar = ({ width }: SidebarProps) => {
               <DashboardIcon />
             </ListItemIcon>
             <ListItemText primary="Dashboard" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            selected={location.pathname.startsWith('/contingent')}
+            onClick={() => navigate('/contingent/default-b2')}
+            sx={{
+              '&.Mui-selected': { bgcolor: 'primary.light' },
+              '&:hover': { bgcolor: 'primary.light' },
+            }}
+          >
+            <ListItemIcon sx={{ color: 'white', minWidth: 36 }}>
+              <HomeRepairServiceIcon />
+            </ListItemIcon>
+            <ListItemText primary="Contingent detail" />
           </ListItemButton>
         </ListItem>
       </List>

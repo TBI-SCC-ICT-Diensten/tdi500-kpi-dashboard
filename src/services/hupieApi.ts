@@ -18,6 +18,23 @@ const hupieAxios = axios.create({
 });
 
 /**
+ * Separate Axios instance for per-pump detail queries.
+ * Uses a shorter timeout (30s) than the default so that unresponsive
+ * pumps fail fast instead of blocking for 100s.
+ */
+const hupieDetailAxios = axios.create({
+  baseURL: config.api.baseUrl,
+  timeout: config.api.detailTimeout,
+  headers: {
+    'Content-Type': 'application/sparql-query',
+    'Accept': 'application/json',
+  },
+  params: {
+    token: config.api.apiKey,
+  },
+});
+
+/**
  * Separate Axios instance for SPARQL UPDATE queries.
  * SPARQL UPDATE requires Content-Type: application/sparql-update,
  * which is different from the SELECT client (application/sparql-query).
@@ -87,20 +104,28 @@ export const executeSparqlQueryGet = async (query: string): Promise<SparqlRespon
 export const fetchHeatPumpDetails = async (
   heatpumpUri: string
 ): Promise<SparqlResponse> => {
-  return executeSparqlQuery(SPARQL_HEATPUMP_DETAILS(heatpumpUri));
+  try {
+    const response = await hupieDetailAxios.post('', SPARQL_HEATPUMP_DETAILS(heatpumpUri));
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error, `POST sparql-detail [${heatpumpUri}]`);
+  }
 };
 
 /**
- * Two-phase data fetcher — replaces the timed-out SPARQL_ALL_HEATPUMP_DATA approach.
+ * Two-phase data fetcher with streaming support.
  *
  * Phase 1: fetch all heat pump URIs via SPARQL_LIST_HEATPUMPS
- * Phase 2: fetch details for each URI in parallel via Promise.allSettled()
- * Phase 3: map each successful response and flatten into HeatPumpSystem[]
+ * Phase 2: fire fetchHeatPumpDetails() for each URI concurrently
  *
- * Uses Promise.allSettled (not Promise.all) so a single failed detail query
- * does not abort the entire fetch — that pump is skipped with a warning.
+ * onPumpLoaded callback fires as each pump resolves — callers can
+ * update the UI immediately instead of waiting for all pumps.
+ * If no callback is provided, falls back to returning the full array
+ * after all pumps settle (original behavior, used in tests).
  */
-export const fetchAllHeatPumpData = async (): Promise<HeatPumpSystem[]> => {
+export const fetchAllHeatPumpData = async (
+  onPumpLoaded?: (pump: HeatPumpSystem) => void
+): Promise<HeatPumpSystem[]> => {
   const listResponse = await executeSparqlQuery(SPARQL_LIST_HEATPUMPS);
   const uris = listResponse.results.bindings
     .map((b) => b['heatpump']?.value)
@@ -113,24 +138,28 @@ export const fetchAllHeatPumpData = async (): Promise<HeatPumpSystem[]> => {
 
   console.log(`[TDI500] fetchAllHeatPumpData: fetching details for ${uris.length} heat pumps`);
 
-  const detailResults = await Promise.allSettled(
-    uris.map((uri) => fetchHeatPumpDetails(uri))
-  );
+  const allPumps: HeatPumpSystem[] = [];
 
-  const heatPumps: HeatPumpSystem[] = [];
-  detailResults.forEach((result, i) => {
-    if (result.status === 'fulfilled') {
-      heatPumps.push(...mapSparqlToHeatPumps(result.value));
-    } else {
+  const promises = uris.map(async (uri) => {
+    try {
+      const response = await fetchHeatPumpDetails(uri);
+      const mapped = mapSparqlToHeatPumps(response);
+      mapped.forEach((pump) => {
+        allPumps.push(pump);
+        if (onPumpLoaded) onPumpLoaded(pump);
+      });
+    } catch (error) {
       console.warn(
-        `[TDI500] fetchAllHeatPumpData: failed for ${uris[i]}:`,
-        result.reason
+        `[TDI500] fetchAllHeatPumpData: failed for ${uri}:`,
+        error
       );
     }
   });
 
-  console.log(`[TDI500] fetchAllHeatPumpData: mapped ${heatPumps.length} heat pumps`);
-  return heatPumps;
+  await Promise.allSettled(promises);
+
+  console.log(`[TDI500] fetchAllHeatPumpData: mapped ${allPumps.length} heat pumps`);
+  return allPumps;
 };
 
 /**
