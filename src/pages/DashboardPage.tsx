@@ -25,10 +25,10 @@ const DashboardPage = () => {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" fontWeight={600} gutterBottom>
-          Installateursportaal — KPI Dashboard
+          KPI Dashboard
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          TDI 500 — | Warmtepomp monitoring en inregeling
+          Warmtepomp monitoring en inregeling
         </Typography>
       </Box>
 
@@ -64,10 +64,14 @@ const DashboardPage = () => {
             <>
               <KpiOverviewPanel kpis={kpis} />
               <Box sx={{ mt: 3 }}>
-                <KpiChartPanel />
+                <KpiChartPanel
+                  kpis={kpis}
+                  heatPumps={selectedContingent?.heatPumps}
+                  kruisProfielCode={selectedContingent?.kruisProfiel.code}
+                />
               </Box>
               <Box sx={{ mt: 3 }}>
-                <DecisionSupportCard />
+                <DecisionSupportCard kpis={kpis} />
               </Box>
             </>
           )}
