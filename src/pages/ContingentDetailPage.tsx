@@ -9,6 +9,7 @@ import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import useDashboardData from '../hooks/useDashboardData';
+import { PROPERTY_LABEL_MAP } from '../types/units';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
 
@@ -132,7 +133,7 @@ const ContingentDetailPage = () => {
                   {hp.measurements.map((m) => (
                     <Box key={m.property} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="caption" color="text.secondary">
-                        {m.property}
+                        {PROPERTY_LABEL_MAP[m.property] ?? m.property}
                       </Typography>
                       <Typography variant="caption" fontWeight={500}>
                         {m.value} {m.unit}

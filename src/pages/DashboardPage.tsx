@@ -71,7 +71,11 @@ const DashboardPage = () => {
                 />
               </Box>
               <Box sx={{ mt: 3 }}>
-                <DecisionSupportCard kpis={kpis} />
+                <DecisionSupportCard
+                  kpis={kpis}
+                  kruisProfielCode={selectedContingent?.kruisProfiel.code}
+
+                />
               </Box>
             </>
           )}

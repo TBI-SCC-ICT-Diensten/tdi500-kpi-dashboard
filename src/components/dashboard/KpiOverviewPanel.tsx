@@ -96,7 +96,7 @@ const KpiOverviewPanel = ({ kpis }: KpiOverviewPanelProps) => {
                 </Box>
 
                 <Typography variant="h4" fontWeight={700} color="text.primary" sx={{ lineHeight: 1.2 }}>
-                  {kpi.value === 0 && kpi.category === 'commissioning'
+                  {kpi.name === 'Inregelsnelheid' && kpi.value === 0
                     ? '\u2014'
                     : kpi.unit === '%'
                     ? `${kpi.value}%`

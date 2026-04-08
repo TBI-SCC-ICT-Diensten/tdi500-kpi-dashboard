@@ -37,7 +37,7 @@ export type MeasurementProperty =
 export interface ErrorCode {
   code: string;
   message: string;
-  severity: string;
+  severity: 'low' | 'warning' | 'high' | 'critical' | 'error' | string;
 }
 
 export type ConnectionState = 'connected' | 'disconnected' | 'unknown';
