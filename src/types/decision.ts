@@ -1,9 +1,3 @@
-// Existing type kept for backwards compatibility
-export interface Decision {
-  id: string;
-  label: string;
-}
-
 // ── TDI 500 Decision Support Types ──────────────────────────────────────────
 
 export type OverallScore = 'good' | 'acceptable' | 'poor' | 'insufficient-data';
