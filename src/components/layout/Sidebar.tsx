@@ -60,6 +60,8 @@ const Sidebar = ({ width }: SidebarProps) => {
         <ListItem disablePadding>
           <ListItemButton
             selected={location.pathname.startsWith('/contingent')}
+            // TODO: navigate to selectedContingentId when multiple contingents
+            // are supported. Currently hardcoded to the single default contingent.
             onClick={() => navigate('/contingent/default-b2')}
             sx={{
               '&.Mui-selected': { bgcolor: 'primary.light' },
