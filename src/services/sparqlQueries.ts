@@ -12,8 +12,12 @@ WHERE {
 
 /** @deprecated Use fetchAllHeatPumpData() from hupieApi.ts instead.
  *  This query times out on the Hupie endpoint due to 11 OPTIONAL blocks.
- *  Also contains two known bugs: ?heatpump/?heatPump casing mismatch and
- *  malformed energy use OPTIONAL block. */
+ *  Known bugs (fixed in SPARQL_HEATPUMP_DETAILS):
+ *  1. Variable casing: outer WHERE uses ?heatpump, OPTIONALs use ?heatPump
+ *     (two different SPARQL variables — OPTIONALs never join)
+ *  2. Energy use OPTIONAL: uses ?heatPump saref:observes instead of
+ *     ?observation saref:observes (wrong subject — returns no data)
+ */
 export const SPARQL_ALL_HEATPUMP_DATA = `
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
 PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/> 
