@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { config } from '../config';
 import { SparqlResponse, ApiError } from '../types/api';
 import { SPARQL_LIST_HEATPUMPS, SPARQL_HEATPUMP_DETAILS } from './sparqlQueries';
@@ -55,13 +55,12 @@ const hupieUpdateAxios = axios.create({
 
 const handleApiError = (error: unknown, endpoint: string): ApiError => {
   if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError;
     const apiError: ApiError = {
-      message: axiosError.message,
-      statusCode: axiosError.response?.status,
+      message: error.message,
+      statusCode: error.response?.status,
       endpoint,
     };
-    console.error(`[TDI500 API Error] ${endpoint} (${apiError.statusCode || 'Network/Timeout'}):`, axiosError.message);
+    console.error(`[TDI500 API Error] ${endpoint} (${apiError.statusCode || 'Network/Timeout'}):`, error.message);
     return apiError;
   }
   
