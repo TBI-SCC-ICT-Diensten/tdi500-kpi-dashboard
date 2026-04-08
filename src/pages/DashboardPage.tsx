@@ -74,7 +74,7 @@ const DashboardPage = () => {
                 <DecisionSupportCard
                   kpis={kpis}
                   kruisProfielCode={selectedContingent?.kruisProfiel.code}
-                  isLoading={isLoading}
+
                 />
               </Box>
             </>

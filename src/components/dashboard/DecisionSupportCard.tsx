@@ -16,7 +16,7 @@ import { evaluateContingent } from '../../services/decisionEngine';
 interface DecisionSupportCardProps {
   kpis?: KeyPerformanceIndicator[];
   kruisProfielCode?: KruisProfielCode;
-  isLoading?: boolean;
+
 }
 
 const scoreColor: Record<OverallScore, string> = {
@@ -65,7 +65,7 @@ const factorScoreLabel: Record<DecisionScore['score'], string> = {
 const DecisionSupportCard = ({
   kpis = [],
   kruisProfielCode = 'B2',
-  isLoading = false,
+
 }: DecisionSupportCardProps) => {
   const recommendation = evaluateContingent(kpis, kruisProfielCode);
   const { overallScore, summary, details, suggestedAction } = recommendation;
