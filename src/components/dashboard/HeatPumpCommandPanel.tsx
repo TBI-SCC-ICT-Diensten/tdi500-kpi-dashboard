@@ -96,8 +96,8 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       setCurveError('Voer een geldige hellingswaarde in.');
       return;
     }
-    if (base < 15 || base > 60) {
-      setCurveError('Basiswaarde moet tussen 15°C en 60°C liggen.');
+    if (base < -10 || base > 30) {
+      setCurveError('Voetpunt moet een getal in graden Celsius zijn (typisch 15–25°C).');
       return;
     }
     if (slope < 0.1 || slope > 4.0) {
@@ -208,13 +208,13 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             Stooklijn
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-            Basiswaarde: aanvoertemperatuur bij 0°C buitentemperatuur.
-            Hellingswaarde: toename aanvoertemperatuur per graad buitentemperatuurdaling.
+            Voetpunt: de buitentemperatuur waarbij de aanvoertemperatuur 20°C is.
+            Stooklijn: toename aanvoertemperatuur wanneer buitentemperatuur met één graad afneemt.
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', flexWrap: 'wrap', mb: 0.5 }}>
             <TextField
-              label="Basis (°C)"
+              label="Voetpunt (°C)"
               value={curveBase}
               onChange={(e) => {
                 setCurveBase(e.target.value);
@@ -225,7 +225,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               sx={{ width: 110 }}
               disabled={isOffline || curveStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.5' }}
-              helperText="15–60°C"
+              helperText="bijv. 20°C"
             />
             <TextField
               label="Helling"
