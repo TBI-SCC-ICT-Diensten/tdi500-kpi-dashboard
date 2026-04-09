@@ -120,10 +120,14 @@ export const fetchBagData = async (
     const firstFeature = features?.[0];
     if (firstFeature) {
       const props = firstFeature.properties;
-      bouwjaar = props['bouwjaar'] != null ? Number(props['bouwjaar']) : null;
-      oppervlakte = props['oppervlakte'] != null
-        ? Number(props['oppervlakte'])
-        : null;
+      // NOTE: bouwjaar and oppervlakte from WFS are unreliable —
+      // the WFS returns the first matching verblijfsobject which may
+      // not be the correct one. These fields require the official
+      // BAG Individuele Bevragingen API (api.bag.kadaster.nl) with
+      // a Kadaster API key for accurate results.
+      // TODO: replace with BAG Individuele Bevragingen when key is available.
+      bouwjaar = null;
+      oppervlakte = null;
       gebruiksdoel = props['gebruiksdoel'] != null
         ? String(props['gebruiksdoel'])
         : null;
