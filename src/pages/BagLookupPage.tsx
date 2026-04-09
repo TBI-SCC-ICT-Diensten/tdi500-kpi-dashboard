@@ -169,7 +169,7 @@ const BagLookupPage = () => {
         </Box>
 
         <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-          Gegevens worden opgehaald via de PDOK Locatieserver (BAG) — gratis, geen API-sleutel vereist.
+          Adres via PDOK Locatieserver (gratis). Bouwjaar via BAG Individuele Bevragingen (API-sleutel in aanvraag). Energielabel via EP-online (API-sleutel vereist).
         </Typography>
       </Paper>
 
