@@ -96,12 +96,12 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       setCurveError('Voer een geldige hellingswaarde in.');
       return;
     }
-    if (base < -10 || base > 30) {
-      setCurveError('Voetpunt moet tussen −10°C en 30°C liggen (buitentemperatuur).');
+    if (base < 20 || base > 60) {
+      setCurveError('Basiswaarde moet tussen 20°C en 60°C liggen (aanvoertemperatuur).');
       return;
     }
-    if (slope < 0.1 || slope > 4.0) {
-      setCurveError('Hellingswaarde moet tussen 0,1 en 4,0 liggen.');
+    if (slope < -4.0 || slope > -0.1) {
+      setCurveError('Hellingswaarde moet tussen −4,0 en −0,1 liggen (Hupie-conventie).');
       return;
     }
 
@@ -208,13 +208,13 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             Stooklijn
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-            Voetpunt: de buitentemperatuur waarbij de aanvoertemperatuur 20°C is.
-            Stooklijn: toename aanvoertemperatuur wanneer buitentemperatuur met één graad afneemt.
+            Basiswaarde: de aanvoertemperatuur bij 0°C buitentemperatuur (bijv. 40°C).
+            Stooklijn: wiskundige helling — negatieve waarde (bijv. −0,6 betekent 0,6°C toename aanvoer per graad daling buiten).
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', flexWrap: 'wrap', mb: 0.5 }}>
             <TextField
-              label="Voetpunt (°C)"
+              label="Basiswaarde (°C)"
               value={curveBase}
               onChange={(e) => {
                 setCurveBase(e.target.value);
@@ -225,7 +225,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               sx={{ width: 110 }}
               disabled={isOffline || curveStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.5' }}
-              helperText="bijv. 20°C (−10 tot 30)"
+              helperText="bijv. 40°C (20–60)"
             />
             <TextField
               label="Helling"
@@ -239,7 +239,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               sx={{ width: 110 }}
               disabled={isOffline || curveStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.1' }}
-              helperText="0,1–4,0"
+              helperText="bijv. −0,6"
             />
             <Button
               variant="contained"
