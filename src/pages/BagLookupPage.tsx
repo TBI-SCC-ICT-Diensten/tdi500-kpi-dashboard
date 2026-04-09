@@ -24,8 +24,10 @@ import Spinner from '../components/common/Spinner';
 import {
   fetchBagData,
   mapBouwjaarToInsulation,
+  mapEnergielabelToInsulation,
   deriveKruisProfielCode,
   type BagResult,
+  type LookupProgress,
 } from '../services/bagService';
 import { getKruisProfiel } from '../config/kruisProfielen';
 import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
@@ -54,16 +56,25 @@ const BagLookupPage = () => {
   const [bagResult, setBagResult] = useState<BagResult | null>(null);
   const [kruisProfielCode, setKruisProfielCode] = useState<KruisProfielCode | null>(null);
   const [manualBouwjaar, setManualBouwjaar] = useState<string>('');
+  const [progress, setProgress] = useState<LookupProgress | null>(null);
 
-  const effectiveBouwjaar =
-    bagResult?.bouwjaar ??
-    (manualBouwjaar !== '' && !isNaN(Number(manualBouwjaar))
-      ? Number(manualBouwjaar)
-      : null);
-
-  const insulation = effectiveBouwjaar != null
-    ? mapBouwjaarToInsulation(effectiveBouwjaar)
-    : null;
+  const insulation = (() => {
+    if (bagResult?.energielabel) {
+      const level = mapEnergielabelToInsulation(bagResult.energielabel);
+      return {
+        level,
+        reason: `Energielabel ${bagResult.energielabel} → isolatieklasse ${level} (nauwkeuriger dan bouwjaar-schatting)`,
+        confidence: 'hoog' as const,
+      };
+    }
+    if (bagResult?.bouwjaar != null) {
+      return mapBouwjaarToInsulation(bagResult.bouwjaar);
+    }
+    if (manualBouwjaar !== '' && !isNaN(Number(manualBouwjaar))) {
+      return mapBouwjaarToInsulation(Number(manualBouwjaar));
+    }
+    return null;
+  })();
 
   const handleSearch = async () => {
     if (!postcode.trim() || !huisnummer.trim()) return;
@@ -75,12 +86,17 @@ const BagLookupPage = () => {
     setManualBouwjaar('');
 
     try {
-      const result = await fetchBagData(postcode.trim(), huisnummer.trim());
+      const result = await fetchBagData(
+        postcode.trim(),
+        huisnummer.trim(),
+        setProgress
+      );
       setBagResult(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Onbekende fout bij ophalen BAG-data.');
     } finally {
       setLoading(false);
+      setProgress(null);
     }
   };
 
@@ -157,7 +173,9 @@ const BagLookupPage = () => {
         </Typography>
       </Paper>
 
-      {loading && <Spinner message="BAG-gegevens ophalen via PDOK..." />}
+      {loading && (
+        <Spinner message={progress?.message ?? 'Gegevens ophalen...'} />
+      )}
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
@@ -188,7 +206,7 @@ const BagLookupPage = () => {
               { label: 'Bouwjaar', value: bagResult.bouwjaar?.toString() ?? 'Niet beschikbaar' },
               { label: 'Postcode', value: bagResult.postcode },
               { label: 'Woonplaats', value: bagResult.woonplaatsnaam },
-              { label: 'Woningtype', value: bagResult.woningtype ?? 'Niet beschikbaar' },
+              { label: 'Gebruiksdoel', value: bagResult.gebruiksdoel ?? 'Niet beschikbaar' },
             ].map(({ label, value }) => (
               <Grid item xs={6} sm={3} key={label}>
                 <Box sx={{ p: 1.5, bgcolor: 'grey.50', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
@@ -202,6 +220,40 @@ const BagLookupPage = () => {
                 </Box>
               </Grid>
             ))}
+            {bagResult.energielabel && (
+              <Grid item xs={6} sm={3}>
+                <Box sx={{ p: 1.5, bgcolor: 'grey.50', borderRadius: 1,
+                  border: '1px solid', borderColor: 'divider' }}>
+                  <Typography variant="caption" color="text.secondary"
+                    sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
+                    Energielabel
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600} sx={{ mt: 0.25 }}>
+                    {bagResult.energielabel}
+                    {bagResult.energielabelGeldigTot && (
+                      <Typography component="span" variant="caption"
+                        color="text.secondary" sx={{ ml: 0.5 }}>
+                        (geldig tot {bagResult.energielabelGeldigTot.slice(0, 10)})
+                      </Typography>
+                    )}
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
+            {bagResult.oppervlakte && (
+              <Grid item xs={6} sm={3}>
+                <Box sx={{ p: 1.5, bgcolor: 'grey.50', borderRadius: 1,
+                  border: '1px solid', borderColor: 'divider' }}>
+                  <Typography variant="caption" color="text.secondary"
+                    sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
+                    Oppervlakte
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600} sx={{ mt: 0.25 }}>
+                    {bagResult.oppervlakte} m²
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
           </Grid>
 
           {insulation && (
@@ -237,7 +289,7 @@ const BagLookupPage = () => {
             </Alert>
           )}
 
-          {bagResult.bouwjaar == null && (
+          {bagResult.bouwjaar == null && !bagResult.energielabel && (
             <Box sx={{ mt: 2 }}>
               <Alert severity="warning" sx={{ mb: 2 }}>
                 Bouwjaar niet beschikbaar via PDOK voor dit adres.
