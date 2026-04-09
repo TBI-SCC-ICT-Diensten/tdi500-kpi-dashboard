@@ -1,14 +1,13 @@
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-} from '@mui/material';
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
@@ -72,6 +71,22 @@ const Sidebar = ({ width }: SidebarProps) => {
               <HomeRepairServiceIcon />
             </ListItemIcon>
             <ListItemText primary="Contingent detail" />
+          </ListItemButton>
+        </ListItem>
+        {/* [BAG-LOOKUP] Remove this ListItem to disable the feature */}
+        <ListItem disablePadding>
+          <ListItemButton
+            selected={location.pathname === '/bag-lookup'}
+            onClick={() => navigate('/bag-lookup')}
+            sx={{
+              '&.Mui-selected': { bgcolor: 'primary.light' },
+              '&:hover': { bgcolor: 'primary.light' },
+            }}
+          >
+            <ListItemIcon sx={{ color: 'white', minWidth: 36 }}>
+              <LocationOnIcon />
+            </ListItemIcon>
+            <ListItemText primary="BAG Opzoeking" />
           </ListItemButton>
         </ListItem>
       </List>

@@ -18,5 +18,17 @@ export default defineConfig(({ mode }) => {
         Object.entries(env).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
       ),
     },
+    server: {
+      proxy: {
+        '/ep-online': {
+          target: 'https://public.ep-online.nl',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/ep-online/, ''),
+          headers: {
+            'Authorization': env.VITE_EP_ONLINE_API_KEY ?? '',
+          },
+        },
+      },
+    },
   };
 });

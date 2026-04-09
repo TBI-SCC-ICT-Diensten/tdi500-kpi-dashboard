@@ -23,7 +23,6 @@ vi.mock('axios', async (importOriginal) => {
 vi.mock('../services/sparqlQueries', () => ({
   SPARQL_LIST_HEATPUMPS: 'MOCK_LIST_QUERY',
   SPARQL_HEATPUMP_DETAILS: (uri: string) => `MOCK_DETAILS_FOR_${uri}`,
-  SPARQL_ALL_HEATPUMP_DATA: 'MOCK_ALL_QUERY',
 }));
 
 vi.mock('../services/dataMapper', () => ({
