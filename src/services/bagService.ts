@@ -18,7 +18,11 @@ import type { InsulationLevel, KruisProfielCode } from '../types/heatpump';
 
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
 
-// Use Vite proxy path in development, direct URL in production
+// NOTE: This proxy path only works in Vite dev mode.
+// In production, /ep-online requests will 404 unless a
+// server-side proxy is configured (e.g. nginx, Vercel rewrites).
+// For production deployment, move EP-online calls to a
+// backend API route that holds the API key server-side.
 const EP_PROXY = '/ep-online/api/v5';
 
 export interface BagResult {
