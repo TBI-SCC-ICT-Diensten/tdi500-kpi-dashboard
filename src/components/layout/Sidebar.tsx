@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
@@ -72,6 +73,22 @@ const Sidebar = ({ width }: SidebarProps) => {
               <HomeRepairServiceIcon />
             </ListItemIcon>
             <ListItemText primary="Contingent detail" />
+          </ListItemButton>
+        </ListItem>
+        {/* [BAG-LOOKUP] Remove this ListItem to disable the feature */}
+        <ListItem disablePadding>
+          <ListItemButton
+            selected={location.pathname === '/bag-lookup'}
+            onClick={() => navigate('/bag-lookup')}
+            sx={{
+              '&.Mui-selected': { bgcolor: 'primary.light' },
+              '&:hover': { bgcolor: 'primary.light' },
+            }}
+          >
+            <ListItemIcon sx={{ color: 'white', minWidth: 36 }}>
+              <LocationOnIcon />
+            </ListItemIcon>
+            <ListItemText primary="BAG Opzoeking" />
           </ListItemButton>
         </ListItem>
       </List>
