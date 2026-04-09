@@ -18,7 +18,7 @@ const validateHeatingCurve = (
   const s = parseFloat(slope);
   if (!Number.isFinite(b)) return 'Voer een geldige basiswaarde in.';
   if (!Number.isFinite(s)) return 'Voer een geldige hellingswaarde in.';
-  if (b < 15 || b > 60) return 'Basiswaarde moet tussen 15°C en 60°C liggen.';
+  if (b < -10 || b > 30) return 'Voetpunt moet een getal in graden Celsius zijn (typisch 15–25°C).';
   if (s < 0.1 || s > 4.0) return 'Hellingswaarde moet tussen 0,1 en 4,0 liggen.';
   return null;
 };
@@ -53,7 +53,7 @@ describe('heating curve validation', () => {
   it('accepts valid curve', () => {
     expect(validateHeatingCurve('20', '0.8')).toBeNull();
     expect(validateHeatingCurve('15', '0.1')).toBeNull();
-    expect(validateHeatingCurve('60', '4.0')).toBeNull();
+    expect(validateHeatingCurve('30', '4.0')).toBeNull();
   });
 
   it('rejects non-numeric base', () => {
@@ -67,8 +67,8 @@ describe('heating curve validation', () => {
   });
 
   it('rejects base out of range', () => {
-    expect(validateHeatingCurve('14', '0.8')).not.toBeNull();
-    expect(validateHeatingCurve('61', '0.8')).not.toBeNull();
+    expect(validateHeatingCurve('-11', '0.8')).not.toBeNull();
+    expect(validateHeatingCurve('31', '0.8')).not.toBeNull();
   });
 
   it('rejects slope out of range', () => {
@@ -77,7 +77,7 @@ describe('heating curve validation', () => {
   });
 
   it('accepts boundary values exactly', () => {
-    expect(validateHeatingCurve('15', '0.1')).toBeNull();
-    expect(validateHeatingCurve('60', '4.0')).toBeNull();
+    expect(validateHeatingCurve('-10', '0.1')).toBeNull();
+    expect(validateHeatingCurve('30', '4.0')).toBeNull();
   });
 });
