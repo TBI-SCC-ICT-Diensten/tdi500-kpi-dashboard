@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { config } from '../config';
-import { SparqlResponse, ApiError } from '../types/api';
+import type { SparqlResponse, ApiError } from '../types/api';
 import { SPARQL_LIST_HEATPUMPS, SPARQL_HEATPUMP_DETAILS } from './sparqlQueries';
 import { mapSparqlToHeatPumps } from './dataMapper';
 import type { HeatPumpSystem } from '../types/heatpump';
@@ -78,20 +78,6 @@ export const executeSparqlQuery = async (query: string): Promise<SparqlResponse>
     return response.data;
   } catch (error) {
     throw handleApiError(error, 'POST sparql');
-  }
-};
-
-export const executeSparqlQueryGet = async (query: string): Promise<SparqlResponse> => {
-  try {
-    const response = await hupieAxios.get('', {
-      params: {
-        ...hupieAxios.defaults.params,
-        query
-      }
-    });
-    return response.data;
-  } catch (error) {
-    throw handleApiError(error, 'GET sparql');
   }
 };
 
