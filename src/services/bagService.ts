@@ -47,14 +47,14 @@ export const fetchBagData = async (
   const docs: Record<string, unknown>[] =
     response.data?.response?.docs ?? [];
 
-  if (docs.length === 0) {
+  const doc = docs[0];
+
+  if (!doc) {
     throw new Error(
       `Geen adres gevonden voor ${postcode} ${huisnummer}. ` +
       'Controleer de postcode en het huisnummer.'
     );
   }
-
-  const doc = docs[0];
 
   return {
     weergavenaam: String(doc['weergavenaam'] ?? ''),
