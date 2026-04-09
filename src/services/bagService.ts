@@ -140,14 +140,11 @@ export const fetchBagData = async (
   let energielabelGeldigTot: string | null = null;
 
   try {
-    const epApiKey = import.meta.env.VITE_EP_ONLINE_API_KEY as string | undefined;
-
     const epResponse = await axios.get(`${EP_PROXY}/PandEnergielabel/Adres`, {
       params: {
         postcode: cleanPostcode,
         huisnummer: parseInt(cleanHuisnummer, 10),
       },
-      headers: epApiKey ? { 'Authorization': `Bearer ${epApiKey}` } : {},
       timeout: 10000,
     });
 
