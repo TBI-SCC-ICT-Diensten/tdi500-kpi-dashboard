@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { config } from '../config';
-import { SparqlResponse, ApiError } from '../types/api';
+import type { SparqlResponse, ApiError } from '../types/api';
 import { SPARQL_LIST_HEATPUMPS, SPARQL_HEATPUMP_DETAILS } from './sparqlQueries';
 import { mapSparqlToHeatPumps } from './dataMapper';
 import type { HeatPumpSystem } from '../types/heatpump';
