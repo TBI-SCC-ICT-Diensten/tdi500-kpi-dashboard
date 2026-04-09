@@ -425,9 +425,9 @@ const BagLookupPage = () => {
           </Grid>
 
           <Alert severity="info" sx={{ mt: 2, fontSize: '0.78rem' }}>
-            Dit zijn de standaard inregelinstellingen op basis van het geschatte woningprofiel.
-            Controleer het isolatieniveau via het energielabel (EP-online) voor een definitieve
-            kruisprofiel-toewijzing.
+            {bagResult?.energielabel
+              ? `Kruisprofiel bepaald op basis van energielabel ${bagResult.energielabel} — dit is de meest nauwkeurige methode.`
+              : 'Dit zijn de standaard inregelinstellingen op basis van het geschatte woningprofiel (bouwjaar). Controleer het energielabel via EP-online voor een definitieve kruisprofiel-toewijzing.'}
           </Alert>
         </Paper>
       )}
