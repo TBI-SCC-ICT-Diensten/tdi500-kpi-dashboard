@@ -18,8 +18,8 @@ const validateHeatingCurve = (
   const s = parseFloat(slope);
   if (!Number.isFinite(b)) return 'Voer een geldige basiswaarde in.';
   if (!Number.isFinite(s)) return 'Voer een geldige hellingswaarde in.';
-  if (b < -10 || b > 30) return 'Voetpunt moet tussen −10°C en 30°C liggen (buitentemperatuur).';
-  if (s < 0.1 || s > 4.0) return 'Hellingswaarde moet tussen 0,1 en 4,0 liggen.';
+  if (b < 20 || b > 60) return 'Basiswaarde moet tussen 20°C en 60°C liggen (aanvoertemperatuur).';
+  if (s < -4.0 || s > -0.1) return 'Hellingswaarde moet tussen −4,0 en −0,1 liggen (Hupie-conventie).';
   return null;
 };
 
@@ -51,9 +51,9 @@ describe('setpoint validation', () => {
 
 describe('heating curve validation', () => {
   it('accepts valid curve', () => {
-    expect(validateHeatingCurve('20', '0.8')).toBeNull();
-    expect(validateHeatingCurve('-10', '0.1')).toBeNull();
-    expect(validateHeatingCurve('30', '4.0')).toBeNull();
+    expect(validateHeatingCurve('40', '-0.6')).toBeNull();
+    expect(validateHeatingCurve('20', '-0.1')).toBeNull();
+    expect(validateHeatingCurve('60', '-4.0')).toBeNull();
   });
 
   it('rejects non-numeric base', () => {
@@ -67,17 +67,18 @@ describe('heating curve validation', () => {
   });
 
   it('rejects base out of range', () => {
-    expect(validateHeatingCurve('-11', '0.8')).not.toBeNull();
-    expect(validateHeatingCurve('31', '0.8')).not.toBeNull();
+    expect(validateHeatingCurve('19', '-0.6')).not.toBeNull();
+    expect(validateHeatingCurve('61', '-0.6')).not.toBeNull();
   });
 
   it('rejects slope out of range', () => {
-    expect(validateHeatingCurve('20', '0.09')).not.toBeNull();
-    expect(validateHeatingCurve('20', '4.1')).not.toBeNull();
+    expect(validateHeatingCurve('40', '-4.1')).not.toBeNull();
+    expect(validateHeatingCurve('40', '-0.09')).not.toBeNull();
+    expect(validateHeatingCurve('40', '0.6')).not.toBeNull();
   });
 
   it('accepts boundary values exactly', () => {
-    expect(validateHeatingCurve('-10', '0.1')).toBeNull();
-    expect(validateHeatingCurve('30', '4.0')).toBeNull();
+    expect(validateHeatingCurve('20', '-0.1')).toBeNull();
+    expect(validateHeatingCurve('60', '-4.0')).toBeNull();
   });
 });
