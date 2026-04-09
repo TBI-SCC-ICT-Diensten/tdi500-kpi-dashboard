@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/ep-online/, ''),
           headers: {
-            'Authorization': `Bearer ${env.VITE_EP_ONLINE_API_KEY ?? ''}`,
+            'Authorization': env.VITE_EP_ONLINE_API_KEY ?? '',
           },
         },
       },
