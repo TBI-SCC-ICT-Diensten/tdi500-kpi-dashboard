@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   mapBouwjaarToInsulation,
+  mapEnergielabelToInsulation,
   deriveKruisProfielCode,
   mapAfgifteToClass,
 } from '../services/bagService';
@@ -88,5 +89,47 @@ describe('deriveKruisProfielCode', () => {
       const ins = mapBouwjaarToInsulation(year);
       expect(deriveKruisProfielCode(ins.level, systeem)).toBe(expected);
     }
+  });
+});
+
+describe('mapEnergielabelToInsulation', () => {
+  it('maps A to insulation level A', () => {
+    expect(mapEnergielabelToInsulation('A')).toBe('A');
+  });
+
+  it('maps A+ variants to insulation level A', () => {
+    expect(mapEnergielabelToInsulation('A+')).toBe('A');
+    expect(mapEnergielabelToInsulation('A++')).toBe('A');
+    expect(mapEnergielabelToInsulation('A+++')).toBe('A');
+    expect(mapEnergielabelToInsulation('A++++')).toBe('A');
+  });
+
+  it('maps B to insulation level A', () => {
+    expect(mapEnergielabelToInsulation('B')).toBe('A');
+  });
+
+  it('maps C to insulation level B', () => {
+    expect(mapEnergielabelToInsulation('C')).toBe('B');
+  });
+
+  it('maps D to insulation level B', () => {
+    expect(mapEnergielabelToInsulation('D')).toBe('B');
+  });
+
+  it('maps E to insulation level C', () => {
+    expect(mapEnergielabelToInsulation('E')).toBe('C');
+  });
+
+  it('maps F to insulation level C', () => {
+    expect(mapEnergielabelToInsulation('F')).toBe('C');
+  });
+
+  it('maps G to insulation level C', () => {
+    expect(mapEnergielabelToInsulation('G')).toBe('C');
+  });
+
+  it('is case-insensitive', () => {
+    expect(mapEnergielabelToInsulation('a')).toBe('A');
+    expect(mapEnergielabelToInsulation('g')).toBe('C');
   });
 });
