@@ -37,33 +37,52 @@ export const fetchBagData = async (
   postcode: string,
   huisnummer: string
 ): Promise<BagResult> => {
-  const q = `${postcode.replace(/\s/g, '')} ${huisnummer}`.trim();
+  const cleanPostcode = postcode.replace(/\s/g, '').toUpperCase();
 
   const response = await axios.get(`${PDOK_BASE}/free`, {
-    params: { q, fq: 'type:adres', fl: '*', rows: 1 },
+    params: {
+      q: `${cleanPostcode} ${huisnummer}`,
+      fq: `type:adres AND postcode:${cleanPostcode}`,
+      fl: '*',
+      rows: 5,
+    },
     timeout: 10000,
   });
 
   const docs: Record<string, unknown>[] =
     response.data?.response?.docs ?? [];
 
-  const doc = docs[0];
-
-  if (!doc) {
+  if (docs.length === 0) {
     throw new Error(
-      `Geen adres gevonden voor ${postcode} ${huisnummer}. ` +
+      `Geen adres gevonden voor ${cleanPostcode} ${huisnummer}. ` +
       'Controleer de postcode en het huisnummer.'
     );
   }
+
+  // Find the best match: prefer exact huisnummer match
+  const hn = huisnummer.trim();
+  const exact = docs.find(
+    (d) => String(d['huisnummer'] ?? '') === hn
+  );
+  const doc = exact ?? docs[0]!;
+
+  // bouwjaar may be in bouwjaar_pand or bouwjaar field
+  const rawBouwjaar = doc['bouwjaar_pand'] ?? doc['bouwjaar'];
+  const parsedBouwjaar =
+    rawBouwjaar != null && !isNaN(Number(rawBouwjaar))
+      ? Number(rawBouwjaar)
+      : null;
 
   return {
     weergavenaam: String(doc['weergavenaam'] ?? ''),
     straatnaam: String(doc['straatnaam'] ?? ''),
     huisnummer: String(doc['huisnummer'] ?? huisnummer),
-    postcode: String(doc['postcode'] ?? postcode),
+    postcode: String(doc['postcode'] ?? cleanPostcode),
     woonplaatsnaam: String(doc['woonplaatsnaam'] ?? ''),
-    bouwjaar: doc['bouwjaar'] != null ? Number(doc['bouwjaar']) : null,
-    woningtype: doc['type_adres'] != null ? String(doc['type_adres']) : null,
+    bouwjaar: parsedBouwjaar,
+    woningtype: doc['type_adres'] != null
+      ? String(doc['type_adres'])
+      : null,
   };
 };
 

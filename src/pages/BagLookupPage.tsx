@@ -53,9 +53,16 @@ const BagLookupPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [bagResult, setBagResult] = useState<BagResult | null>(null);
   const [kruisProfielCode, setKruisProfielCode] = useState<KruisProfielCode | null>(null);
+  const [manualBouwjaar, setManualBouwjaar] = useState<string>('');
 
-  const insulation = bagResult?.bouwjaar != null
-    ? mapBouwjaarToInsulation(bagResult.bouwjaar)
+  const effectiveBouwjaar =
+    bagResult?.bouwjaar ??
+    (manualBouwjaar !== '' && !isNaN(Number(manualBouwjaar))
+      ? Number(manualBouwjaar)
+      : null);
+
+  const insulation = effectiveBouwjaar != null
+    ? mapBouwjaarToInsulation(effectiveBouwjaar)
     : null;
 
   const handleSearch = async () => {
@@ -65,6 +72,7 @@ const BagLookupPage = () => {
     setBagResult(null);
     setKruisProfielCode(null);
     setAfgiftesysteem(null);
+    setManualBouwjaar('');
 
     try {
       const result = await fetchBagData(postcode.trim(), huisnummer.trim());
@@ -230,10 +238,28 @@ const BagLookupPage = () => {
           )}
 
           {bagResult.bouwjaar == null && (
-            <Alert severity="warning">
-              Bouwjaar niet beschikbaar via PDOK voor dit adres.
-              Raadpleeg het energielabel via EP-online.nl of voer het bouwjaar handmatig in.
-            </Alert>
+            <Box sx={{ mt: 2 }}>
+              <Alert severity="warning" sx={{ mb: 2 }}>
+                Bouwjaar niet beschikbaar via PDOK voor dit adres.
+                Voer het bouwjaar handmatig in, of raadpleeg EP-online.nl.
+              </Alert>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <TextField
+                  label="Bouwjaar (handmatig)"
+                  placeholder="bijv. 1921"
+                  value={manualBouwjaar}
+                  onChange={(e) => {
+                    setManualBouwjaar(e.target.value);
+                    setKruisProfielCode(null);
+                    setAfgiftesysteem(null);
+                  }}
+                  size="small"
+                  sx={{ width: 180 }}
+                  inputProps={{ maxLength: 4 }}
+                  helperText="Voer het bouwjaar in van de woning"
+                />
+              </Box>
+            </Box>
           )}
         </Paper>
       )}
