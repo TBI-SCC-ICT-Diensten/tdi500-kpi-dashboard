@@ -12,6 +12,7 @@ import useDashboardData from '../hooks/useDashboardData';
 import { PROPERTY_LABEL_MAP } from '../types/units';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
+import HeatPumpCommandPanel from '../components/dashboard/HeatPumpCommandPanel';
 
 const statusColor = {
   active: 'success' as const,
@@ -154,6 +155,8 @@ const ContingentDetailPage = () => {
                   </Typography>
                 </Box>
               )}
+
+              <HeatPumpCommandPanel heatPump={hp} />
             </Paper>
           </Grid>
         ))}
