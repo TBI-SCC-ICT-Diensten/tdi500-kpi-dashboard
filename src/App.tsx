@@ -8,6 +8,8 @@ import MainLayout from './components/layout/MainLayout';
 import DashboardPage from './pages/DashboardPage';
 import ContingentDetailPage from './pages/ContingentDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
+// [BAG-LOOKUP] Remove this import to disable the feature
+import BagLookupPage from './pages/BagLookupPage';
 
 const App = () => {
   return (
@@ -20,6 +22,8 @@ const App = () => {
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<DashboardPage />} />
                 <Route path="contingent/:id" element={<ContingentDetailPage />} />
+                {/* [BAG-LOOKUP] Remove this route to disable the feature */}
+                <Route path="bag-lookup" element={<BagLookupPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
             </Routes>
