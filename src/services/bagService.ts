@@ -3,8 +3,8 @@
  *
  * Three-step automated lookup:
  *   1. PDOK Locatieserver → address validation + nummeraanduiding_id
- *   2. BAG API Individuele Bevragingen → bouwjaar via pand lookup
- *   3. EP-online API → energielabel
+ *   2. PDOK BAG WFS → bouwjaar, oppervlakte, gebruiksdoel (free, no auth)
+ *   3. EP-online API → energielabel (via Vite proxy to avoid CORS)
  *
  * All APIs are free and require no registration for basic use.
  *
@@ -17,11 +17,9 @@ import axios from 'axios';
 import type { InsulationLevel, KruisProfielCode } from '../types/heatpump';
 
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
-const BAG_BASE = 'https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2';
-const EP_BASE = 'https://public.ep-online.nl/api/v5';
 
-// DEMO key — works without registration for testing
-const BAG_DEMO_KEY = 'l7xx60e2f1b9a5094b43a12f4c0cf16dede7';
+// Use Vite proxy path in development, direct URL in production
+const EP_PROXY = '/ep-online/api/v5';
 
 export interface BagResult {
   // From PDOK
@@ -30,7 +28,7 @@ export interface BagResult {
   huisnummer: string;
   postcode: string;
   woonplaatsnaam: string;
-  // From BAG Individuele Bevragingen
+  // From PDOK BAG WFS
   bouwjaar: number | null;
   gebruiksdoel: string | null;
   oppervlakte: number | null;
@@ -90,8 +88,8 @@ export const fetchBagData = async (
   const straatnaam = String(pdokDoc['straatnaam'] ?? '');
   const woonplaatsnaam = String(pdokDoc['woonplaatsnaam'] ?? '');
 
-  // ── Step 2: BAG Individuele Bevragingen → pand → bouwjaar ──────────
-  onProgress?.({ step: 2, message: 'Bouwjaar ophalen via BAG Kadaster API...' });
+  // ── Step 2: PDOK BAG WFS → bouwjaar, oppervlakte, gebruiksdoel ─────
+  onProgress?.({ step: 2, message: 'Bouwjaar ophalen via PDOK BAG WFS...' });
 
   let bouwjaar: number | null = null;
   let gebruiksdoel: string | null = null;
@@ -99,75 +97,40 @@ export const fetchBagData = async (
   let pandStatus: string | null = null;
 
   try {
-    const bagAdresResponse = await axios.get(`${BAG_BASE}/adressen`, {
-      params: {
-        postcode: cleanPostcode,
-        huisnummer: parseInt(cleanHuisnummer, 10),
-      },
-      headers: {
-        'X-Api-Key': BAG_DEMO_KEY,
-        'Accept': 'application/hal+json',
-        'Accept-Crs': 'epsg:28992',
-      },
-      timeout: 10000,
-    });
-
-    const adressen: Record<string, unknown>[] =
-      (bagAdresResponse.data?._embedded?.adressen as Record<string, unknown>[]) ?? [];
-
-    if (adressen.length > 0) {
-      const adres = adressen[0] as Record<string, unknown>;
-      const pandIds = adres['pandIdentificaties'] as string[] | undefined;
-
-      if (pandIds && pandIds.length > 0) {
-        const pandId = pandIds[0];
-        const pandResponse = await axios.get(`${BAG_BASE}/panden/${pandId}`, {
-          headers: {
-            'X-Api-Key': BAG_DEMO_KEY,
-            'Accept': 'application/hal+json',
-          },
-          timeout: 10000,
-        });
-
-        const pand = pandResponse.data?.pand as Record<string, unknown> | undefined;
-        if (pand) {
-          bouwjaar = pand['oorspronkelijkBouwjaar'] != null
-            ? Number(pand['oorspronkelijkBouwjaar'])
-            : null;
-          pandStatus = pand['status'] != null ? String(pand['status']) : null;
-        }
+    const wfsResponse = await axios.get(
+      'https://service.pdok.nl/lv/bag/wfs/v2_0',
+      {
+        params: {
+          service: 'WFS',
+          version: '2.0.0',
+          request: 'GetFeature',
+          typeName: 'bag:verblijfsobject',
+          outputFormat: 'application/json',
+          count: 1,
+          CQL_FILTER: `postcode='${cleanPostcode}' AND huisnummer=${parseInt(cleanHuisnummer, 10)}`,
+        },
+        timeout: 10000,
       }
+    );
 
-      // Get gebruiksdoel and oppervlakte from verblijfsobject
-      const vboId = adres['adresseerbaarObjectIdentificatie'] as string | undefined;
-      if (vboId) {
-        try {
-          const vboResponse = await axios.get(
-            `${BAG_BASE}/verblijfsobjecten/${vboId}`,
-            {
-              headers: {
-                'X-Api-Key': BAG_DEMO_KEY,
-                'Accept': 'application/hal+json',
-              },
-              timeout: 10000,
-            }
-          );
-          const vbo = vboResponse.data?.verblijfsobject as Record<string, unknown> | undefined;
-          if (vbo) {
-            const doelen = vbo['gebruiksdoelen'] as string[] | undefined;
-            gebruiksdoel = doelen?.[0] ?? null;
-            oppervlakte = vbo['oppervlakte'] != null
-              ? Number(vbo['oppervlakte'])
-              : null;
-          }
-        } catch {
-          // VBO lookup is optional — continue without it
-        }
-      }
+    const features = wfsResponse.data?.features as Array<{
+      properties: Record<string, unknown>;
+    }> | undefined;
+
+    const firstFeature = features?.[0];
+    if (firstFeature) {
+      const props = firstFeature.properties;
+      bouwjaar = props['bouwjaar'] != null ? Number(props['bouwjaar']) : null;
+      oppervlakte = props['oppervlakte'] != null
+        ? Number(props['oppervlakte'])
+        : null;
+      gebruiksdoel = props['gebruiksdoel'] != null
+        ? String(props['gebruiksdoel'])
+        : null;
+      pandStatus = props['status'] != null ? String(props['status']) : null;
     }
-  } catch (bagErr) {
-    // BAG API failure is non-fatal — we still have address data
-    console.warn('[BAG] Pand lookup failed:', bagErr);
+  } catch (wfsErr) {
+    console.warn('[BAG WFS] Lookup failed:', wfsErr);
   }
 
   // ── Step 3: EP-online → energielabel ───────────────────────────────
@@ -177,11 +140,14 @@ export const fetchBagData = async (
   let energielabelGeldigTot: string | null = null;
 
   try {
-    const epResponse = await axios.get(`${EP_BASE}/PandEnergielabel/Adres`, {
+    const epApiKey = import.meta.env.VITE_EP_ONLINE_API_KEY as string | undefined;
+
+    const epResponse = await axios.get(`${EP_PROXY}/PandEnergielabel/Adres`, {
       params: {
         postcode: cleanPostcode,
         huisnummer: parseInt(cleanHuisnummer, 10),
       },
+      headers: epApiKey ? { 'Authorization': `Bearer ${epApiKey}` } : {},
       timeout: 10000,
     });
 
@@ -200,8 +166,7 @@ export const fetchBagData = async (
         : null;
     }
   } catch {
-    // EP-online failure is non-fatal — CORS may block this in browser
-    console.warn('[EP-online] Energielabel lookup failed (possibly CORS)');
+    console.warn('[EP-online] Energielabel lookup failed');
   }
 
   onProgress?.({ step: 4, message: 'Klaar.' });
