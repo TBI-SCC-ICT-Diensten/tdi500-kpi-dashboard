@@ -18,7 +18,7 @@ const validateHeatingCurve = (
   const s = parseFloat(slope);
   if (!Number.isFinite(b)) return 'Voer een geldige basiswaarde in.';
   if (!Number.isFinite(s)) return 'Voer een geldige hellingswaarde in.';
-  if (b < -10 || b > 30) return 'Voetpunt moet een getal in graden Celsius zijn (typisch 15–25°C).';
+  if (b < -10 || b > 30) return 'Voetpunt moet tussen −10°C en 30°C liggen (buitentemperatuur).';
   if (s < 0.1 || s > 4.0) return 'Hellingswaarde moet tussen 0,1 en 4,0 liggen.';
   return null;
 };
@@ -52,7 +52,7 @@ describe('setpoint validation', () => {
 describe('heating curve validation', () => {
   it('accepts valid curve', () => {
     expect(validateHeatingCurve('20', '0.8')).toBeNull();
-    expect(validateHeatingCurve('15', '0.1')).toBeNull();
+    expect(validateHeatingCurve('-10', '0.1')).toBeNull();
     expect(validateHeatingCurve('30', '4.0')).toBeNull();
   });
 

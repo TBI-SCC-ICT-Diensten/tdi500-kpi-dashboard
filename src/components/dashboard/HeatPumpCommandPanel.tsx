@@ -97,7 +97,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       return;
     }
     if (base < -10 || base > 30) {
-      setCurveError('Voetpunt moet een getal in graden Celsius zijn (typisch 15–25°C).');
+      setCurveError('Voetpunt moet tussen −10°C en 30°C liggen (buitentemperatuur).');
       return;
     }
     if (slope < 0.1 || slope > 4.0) {
@@ -225,7 +225,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               sx={{ width: 110 }}
               disabled={isOffline || curveStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.5' }}
-              helperText="bijv. 20°C"
+              helperText="bijv. 20°C (−10 tot 30)"
             />
             <TextField
               label="Helling"
