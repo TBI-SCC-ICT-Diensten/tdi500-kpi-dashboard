@@ -162,8 +162,13 @@ export const fetchBagData = async (
         ? String(label['Meting_geldig_tot'])
         : null;
     }
-  } catch {
-    console.warn('[EP-online] Energielabel lookup failed');
+  } catch (epErr) {
+    if (axios.isAxiosError(epErr) && epErr.response?.status === 404) {
+      // 404 = address has no registered energielabel — not an error
+      console.info('[EP-online] Geen energielabel geregistreerd voor dit adres');
+    } else {
+      console.warn('[EP-online] Energielabel lookup failed:', epErr);
+    }
   }
 
   onProgress?.({ step: 4, message: 'Klaar.' });
