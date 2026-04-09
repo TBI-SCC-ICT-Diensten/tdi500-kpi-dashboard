@@ -155,11 +155,13 @@ export const fetchBagData = async (
 
     if (labels.length > 0 && labels[0]) {
       const label = labels[0];
-      energielabel = label['Pand_energieklasse'] != null
-        ? String(label['Pand_energieklasse'])
+      // Field is 'Energieklasse' not 'Pand_energieklasse' (confirmed from API response)
+      energielabel = label['Energieklasse'] != null
+        ? String(label['Energieklasse'])
         : null;
-      energielabelGeldigTot = label['Meting_geldig_tot'] != null
-        ? String(label['Meting_geldig_tot'])
+      // Field is 'Geldig_tot' not 'Meting_geldig_tot' (confirmed from API response)
+      energielabelGeldigTot = label['Geldig_tot'] != null
+        ? String(label['Geldig_tot'])
         : null;
     }
   } catch (epErr) {
