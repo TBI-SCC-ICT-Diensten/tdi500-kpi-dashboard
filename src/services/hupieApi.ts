@@ -81,20 +81,6 @@ export const executeSparqlQuery = async (query: string): Promise<SparqlResponse>
   }
 };
 
-export const executeSparqlQueryGet = async (query: string): Promise<SparqlResponse> => {
-  try {
-    const response = await hupieAxios.get('', {
-      params: {
-        ...hupieAxios.defaults.params,
-        query
-      }
-    });
-    return response.data;
-  } catch (error) {
-    throw handleApiError(error, 'GET sparql');
-  }
-};
-
 /**
  * Fetches detail data for a single heat pump URI.
  * Uses SPARQL_HEATPUMP_DETAILS which scopes the query to one pump via VALUES.

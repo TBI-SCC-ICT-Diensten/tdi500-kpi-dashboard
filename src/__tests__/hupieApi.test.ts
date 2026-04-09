@@ -28,8 +28,4 @@ describe('Hupie API Service', () => {
   it('should export executeSparqlQuery as a function', () => {
     expect(typeof hupieApi.executeSparqlQuery).toBe('function');
   });
-
-  it('should export executeSparqlQueryGet as a function', () => {
-    expect(typeof hupieApi.executeSparqlQueryGet).toBe('function');
-  });
 });
