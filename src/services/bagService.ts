@@ -53,6 +53,13 @@ export const fetchBagData = async (
   onProgress?: (progress: LookupProgress) => void
 ): Promise<BagResult> => {
   const cleanPostcode = postcode.replace(/\s/g, '').toUpperCase();
+  // Validate postcode format to prevent CQL injection
+  if (!/^[0-9]{4}[A-Z]{2}$/.test(cleanPostcode)) {
+    throw new Error(
+      `Ongeldige postcode: "${cleanPostcode}". ` +
+      'Gebruik het formaat 1234AB.'
+    );
+  }
   const cleanHuisnummer = huisnummer.trim();
 
   // ── Step 1: PDOK Locatieserver ──────────────────────────────────────
@@ -108,6 +115,9 @@ export const fetchBagData = async (
           outputFormat: 'application/json',
           count: 1,
           CQL_FILTER: `postcode='${cleanPostcode}' AND huisnummer=${parseInt(cleanHuisnummer, 10)}`,
+          // NOTE: huisnummer suffix (e.g. "64A") is intentionally dropped here.
+          // The WFS huisnummer field is an integer. Suffix-based disambiguation
+          // requires the official BAG Individuele Bevragingen API.
         },
         timeout: 10000,
       }
