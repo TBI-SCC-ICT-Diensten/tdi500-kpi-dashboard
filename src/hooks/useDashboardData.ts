@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import type { HeatPumpSystem, Contingent, KeyPerformanceIndicator } from '../types/heatpump';
-import { fetchAllHeatPumpData } from '../services/hupieApi';
+import { fetchAllHeatPumpData, subscribeToDataSource } from '../services/hupieApi';
 import { createContingent } from '../services/contingentService';
 import { aggregateKpisForContingent } from '../services/kpiAggregator';
 import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
@@ -13,6 +13,7 @@ export interface DashboardData {
   kpis: KeyPerformanceIndicator[];
   isLoading: boolean;
   error: string | null;
+  refetch: () => void;
 }
 
 const useDashboardData = (): DashboardData => {
@@ -23,49 +24,63 @@ const useDashboardData = (): DashboardData => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
+  // Bump on each load() call so stale in-flight responses are dropped.
+  const requestIdRef = useRef(0);
 
-    const loadData = async () => {
-      setIsLoading(true);
-      setError(null);
+  const load = useCallback(async (): Promise<void> => {
+    const requestId = ++requestIdRef.current;
+    setIsLoading(true);
+    setError(null);
+    setHeatPumps([]);
 
-      try {
-        // Stream pumps into state as each one resolves.
-        // setIsLoading stays true until the first pump arrives,
-        // then turns false so the UI renders partial results immediately.
-        let firstPumpReceived = false;
+    try {
+      // Stream pumps into state as each one resolves.
+      // setIsLoading stays true until the first pump arrives,
+      // then turns false so the UI renders partial results immediately.
+      let firstPumpReceived = false;
 
-        await fetchAllHeatPumpData((pump) => {
-          if (!cancelled) {
-            if (!firstPumpReceived) {
-              firstPumpReceived = true;
-              setIsLoading(false);
-            }
-            setHeatPumps((prev) => {
-              // Avoid duplicates if pump already in state
-              if (prev.some((p) => p.id === pump.id)) return prev;
-              return [...prev, pump];
-            });
-          }
-        });
-
-        if (!cancelled && !firstPumpReceived) {
-          // No pumps loaded at all
+      await fetchAllHeatPumpData((pump) => {
+        if (requestId !== requestIdRef.current) return; // stale
+        if (!firstPumpReceived) {
+          firstPumpReceived = true;
           setIsLoading(false);
         }
-      } catch (err) {
-        if (cancelled) return;
-        const message = err instanceof Error ? err.message : String(err);
-        console.error('[useDashboardData] Failed to load heat pump data:', message);
-        setError(`Kon warmtepompdata niet ophalen: ${message}`);
+        setHeatPumps((prev) => {
+          // Avoid duplicates if pump already in state
+          if (prev.some((p) => p.id === pump.id)) return prev;
+          return [...prev, pump];
+        });
+      });
+
+      if (requestId !== requestIdRef.current) return;
+      if (!firstPumpReceived) {
+        // No pumps loaded at all
         setIsLoading(false);
       }
-    };
-
-    loadData();
-    return () => { cancelled = true; };
+    } catch (err) {
+      if (requestId !== requestIdRef.current) return;
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('[useDashboardData] Failed to load heat pump data:', message);
+      setError(`Kon warmtepompdata niet ophalen: ${message}`);
+      setIsLoading(false);
+    }
   }, []);
+
+  // Initial load on mount.
+  useEffect(() => {
+    load();
+    return () => {
+      // Bump so any in-flight callback is treated as stale.
+      requestIdRef.current++;
+    };
+  }, [load]);
+
+  // Auto-refetch when the data source (live/mock) changes.
+  useEffect(() => {
+    return subscribeToDataSource(() => {
+      load();
+    });
+  }, [load]);
 
   // Build contingents from heat pump data.
   // The Hupie API does not expose kruisprofiel per heat pump.
@@ -110,6 +125,7 @@ const useDashboardData = (): DashboardData => {
     kpis,
     isLoading,
     error,
+    refetch: load,
   };
 };
 
