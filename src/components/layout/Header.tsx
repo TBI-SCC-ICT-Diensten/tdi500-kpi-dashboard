@@ -1,11 +1,31 @@
+import { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import CircleIcon from '@mui/icons-material/Circle';
+import StorageIcon from '@mui/icons-material/Storage';
+import ScienceIcon from '@mui/icons-material/Science';
+import {
+  getDataSource,
+  setDataSource,
+  subscribeToDataSource,
+  type DataSource,
+} from '../../services/hupieApi';
 
 const Header = () => {
+  const [source, setSource] = useState<DataSource>(getDataSource());
+
+  // Keep the chip in sync if the data source changes elsewhere.
+  useEffect(() => subscribeToDataSource(setSource), []);
+
+  const handleToggle = () => {
+    const next: DataSource = source === 'live' ? 'mock' : 'live';
+    setDataSource(next);
+    // No need to call refetch here — useDashboardData subscribes to
+    // data source changes and auto-refetches.
+  };
+
   return (
     <AppBar
       position="static"
@@ -23,12 +43,13 @@ const Header = () => {
           </Typography>
         </Box>
         <Chip
-          icon={<CircleIcon sx={{ fontSize: '10px !important' }} />}
-          label="Hupie API"
+          icon={source === 'live' ? <StorageIcon /> : <ScienceIcon />}
+          label={source === 'live' ? 'Hupie API (live)' : 'Mock data'}
           size="small"
-          color="success"
-          variant="outlined"
-          sx={{ fontSize: '0.7rem' }}
+          color={source === 'live' ? 'success' : 'warning'}
+          onClick={handleToggle}
+          clickable
+          sx={{ cursor: 'pointer' }}
         />
       </Toolbar>
     </AppBar>
