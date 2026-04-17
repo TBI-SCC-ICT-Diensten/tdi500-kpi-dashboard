@@ -4,6 +4,44 @@ import type { SparqlResponse, ApiError } from '../types/api';
 import { SPARQL_LIST_HEATPUMPS, SPARQL_HEATPUMP_DETAILS } from './sparqlQueries';
 import { mapSparqlToHeatPumps } from './dataMapper';
 import type { HeatPumpSystem } from '../types/heatpump';
+import { MOCK_HEAT_PUMPS } from './mockData';
+
+export type DataSource = 'live' | 'mock';
+
+// Default from env, overridable at runtime via setDataSource()
+const envDefault: DataSource =
+  (import.meta.env['VITE_USE_MOCK_DATA'] as string | undefined) === 'true'
+    ? 'mock'
+    : 'live';
+
+let currentDataSource: DataSource = envDefault;
+
+type DataSourceListener = (source: DataSource) => void;
+const dataSourceListeners = new Set<DataSourceListener>();
+
+export const getDataSource = (): DataSource => currentDataSource;
+
+export const setDataSource = (source: DataSource): void => {
+  if (currentDataSource === source) return;
+  currentDataSource = source;
+  console.info(`[hupieApi] Data source switched to: ${source}`);
+  dataSourceListeners.forEach((listener) => listener(source));
+};
+
+/**
+ * Subscribe to data source changes. The listener fires each time
+ * setDataSource() is called with a new value. Returns an unsubscribe
+ * function for cleanup.
+ *
+ * Used by useDashboardData to auto-refetch when the user toggles the
+ * source, and by Header to keep its chip label in sync.
+ */
+export const subscribeToDataSource = (listener: DataSourceListener): (() => void) => {
+  dataSourceListeners.add(listener);
+  return () => {
+    dataSourceListeners.delete(listener);
+  };
+};
 
 const hupieAxios = axios.create({
   baseURL: config.api.baseUrl,
@@ -111,6 +149,21 @@ export const fetchHeatPumpDetails = async (
 export const fetchAllHeatPumpData = async (
   onPumpLoaded?: (pump: HeatPumpSystem) => void
 ): Promise<HeatPumpSystem[]> => {
+  // Short-circuit: if mock mode is active, return mock data
+  if (currentDataSource === 'mock') {
+    console.info('[hupieApi] Using mock data (mock mode active)');
+    // Simulate a brief loading delay so UI shows spinner realistically
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    // If streaming callback is provided, call it for each pump
+    if (onPumpLoaded) {
+      for (const pump of MOCK_HEAT_PUMPS) {
+        onPumpLoaded(pump);
+        await new Promise((resolve) => setTimeout(resolve, 150));
+      }
+    }
+    return MOCK_HEAT_PUMPS;
+  }
+
   const listResponse = await executeSparqlQuery(SPARQL_LIST_HEATPUMPS);
   const uris = listResponse.results.bindings
     .map((b) => b['heatpump']?.value)
