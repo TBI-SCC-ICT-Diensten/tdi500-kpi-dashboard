@@ -16,11 +16,31 @@ const envDefault: DataSource =
 
 let currentDataSource: DataSource = envDefault;
 
+type DataSourceListener = (source: DataSource) => void;
+const dataSourceListeners = new Set<DataSourceListener>();
+
 export const getDataSource = (): DataSource => currentDataSource;
 
 export const setDataSource = (source: DataSource): void => {
+  if (currentDataSource === source) return;
   currentDataSource = source;
   console.info(`[hupieApi] Data source switched to: ${source}`);
+  dataSourceListeners.forEach((listener) => listener(source));
+};
+
+/**
+ * Subscribe to data source changes. The listener fires each time
+ * setDataSource() is called with a new value. Returns an unsubscribe
+ * function for cleanup.
+ *
+ * Used by useDashboardData to auto-refetch when the user toggles the
+ * source, and by Header to keep its chip label in sync.
+ */
+export const subscribeToDataSource = (listener: DataSourceListener): (() => void) => {
+  dataSourceListeners.add(listener);
+  return () => {
+    dataSourceListeners.delete(listener);
+  };
 };
 
 const hupieAxios = axios.create({
