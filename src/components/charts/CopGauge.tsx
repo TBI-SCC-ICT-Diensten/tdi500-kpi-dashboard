@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import ReactApexChart from 'react-apexcharts';
+import { useTheme } from '@mui/material/styles';
 import type { KeyPerformanceIndicator } from '../../types/heatpump';
 
 interface CopGaugeProps {
@@ -10,49 +11,49 @@ interface CopGaugeProps {
 }
 
 const CopGauge = ({ kpis, minCop = 2.5 }: CopGaugeProps) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const textColor = isDark ? '#94A3B8' : '#64748B';
+  const trackBg   = isDark ? 'rgba(255,255,255,0.10)' : '#E2E8F0';
+
   const copKpi = kpis.find((k) => k.category === 'efficiency');
   const copValue = copKpi?.value ?? 0;
 
-  // Gauge max: 5.0 is excellent COP for a heat pump
   const gaugeMax = 5.0;
   const percentage = Math.min(Math.round((copValue / gaugeMax) * 100), 100);
 
   const statusColor =
-    copKpi?.status === 'good' ? '#3b6d11' :
-    copKpi?.status === 'warning' ? '#ba7517' :
-    '#a32d2d';
+    copKpi?.status === 'good'    ? theme.palette.success.main :
+    copKpi?.status === 'warning' ? theme.palette.warning.main :
+    theme.palette.error.main;
 
   const options: ApexCharts.ApexOptions = {
     chart: {
       type: 'radialBar',
       toolbar: { show: false },
       background: 'transparent',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontFamily: '"Inter", "Roboto", sans-serif',
     },
     plotOptions: {
       radialBar: {
         startAngle: -135,
         endAngle: 135,
-        hollow: {
-          margin: 0,
-          size: '70%',
-        },
+        hollow: { margin: 0, size: '70%' },
         track: {
-          background: '#e8eaf0',
+          background: trackBg,
           strokeWidth: '97%',
         },
         dataLabels: {
           name: {
             offsetY: -10,
-            color: '#4a5568',
+            color: textColor,
             fontSize: '13px',
           },
           value: {
             color: statusColor,
             fontSize: '28px',
             fontWeight: 700,
-            formatter: () =>
-              copValue === 0 ? '—' : copValue.toFixed(2),
+            formatter: () => copValue === 0 ? '—' : copValue.toFixed(2),
           },
         },
       },

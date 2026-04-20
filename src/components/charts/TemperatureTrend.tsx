@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import ReactApexChart from 'react-apexcharts';
+import { useTheme } from '@mui/material/styles';
 import type { HeatPumpSystem } from '../../types/heatpump';
 import EmptyState from '../common/EmptyState';
 
@@ -9,11 +10,16 @@ interface TemperatureTrendProps {
 }
 
 const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
-  // Build one series per heat pump that has a roomTemperature measurement
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const textColor  = isDark ? '#94A3B8' : '#64748B';
+  const gridColor  = isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0';
+  const barColors  = isDark
+    ? ['#60A5FA', '#F97316', '#93C5FD', '#FDBA74', '#38BDF8', '#FB923C', '#7DD3FC', '#FED7AA']
+    : ['#1E3A5F', '#0EA5E9', '#2E5487', '#38BDF8', '#122440', '#0284C7', '#60A5FA', '#7DD3FC'];
+
   const series = heatPumps
-    .filter((hp) =>
-      hp.measurements.some((m) => m.property === 'roomTemperature')
-    )
+    .filter((hp) => hp.measurements.some((m) => m.property === 'roomTemperature'))
     .map((hp) => {
       const temp = hp.measurements.find((m) => m.property === 'roomTemperature');
       return {
@@ -23,9 +29,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
     });
 
   const setpointSeries = heatPumps
-    .filter((hp) =>
-      hp.measurements.some((m) => m.property === 'temperatureSetpoint')
-    )
+    .filter((hp) => hp.measurements.some((m) => m.property === 'temperatureSetpoint'))
     .map((hp) => {
       const sp = hp.measurements.find((m) => m.property === 'temperatureSetpoint');
       return {
@@ -57,7 +61,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
       type: 'bar',
       toolbar: { show: false },
       background: 'transparent',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontFamily: '"Inter", "Roboto", sans-serif',
     },
     plotOptions: {
       bar: { horizontal: false, columnWidth: '55%', borderRadius: 4 },
@@ -65,24 +69,27 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
     dataLabels: { enabled: false },
     xaxis: {
       categories: ['Actuele meting'],
-      labels: { style: { colors: '#4a5568', fontSize: '12px' } },
+      labels: { style: { colors: textColor, fontSize: '12px' } },
+      axisBorder: { color: gridColor },
+      axisTicks: { color: gridColor },
     },
     yaxis: {
-      title: { text: 'Temperatuur (°C)', style: { color: '#4a5568' } },
+      title: { text: 'Temperatuur (°C)', style: { color: textColor } },
       labels: {
-        style: { colors: '#4a5568' },
+        style: { colors: textColor },
         formatter: (val: number) => `${val.toFixed(1)}°C`,
       },
     },
-    colors: ['#1a2b4a', '#ff6b35', '#2d4470', '#ff8c5a'],
+    colors: barColors,
     legend: {
       position: 'top',
-      labels: { colors: '#4a5568' },
+      labels: { colors: textColor },
     },
     tooltip: {
+      theme: isDark ? 'dark' : 'light',
       y: { formatter: (val: number) => `${val.toFixed(1)} °C` },
     },
-    grid: { borderColor: '#e8eaf0' },
+    grid: { borderColor: gridColor },
   };
 
   return (
