@@ -9,6 +9,7 @@ export interface HeatPumpSystem {
   internetConnection?: ConnectionState;
   serverConnection?: ConnectionState;
   heatingCurve?: HeatingCurve;
+  deviceSpecs?: DeviceSpecs;
 }
 
 export type HeatPumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
@@ -47,6 +48,20 @@ export interface HeatingCurve {
   baseUnit: string;
   slopeValue: number;
   slopeUnit: string;
+}
+
+/**
+ * Static device specification data for a heat pump.
+ * Sourced from HCO device spec pattern:
+ *   saref:hasManufacturer, saref:hasModel, s4ener:serialNumber,
+ *   s4watr:hasFirmwareVersion, hco:hasYearOfManufacture
+ */
+export interface DeviceSpecs {
+  manufacturer?: string;
+  model?: string;
+  serialNumber?: string;
+  firmwareVersion?: string;
+  yearOfManufacture?: number;
 }
 
 // ── TDI 500 Domain: Kruisprofielen ──────────────────────────────────────────

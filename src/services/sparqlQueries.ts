@@ -18,12 +18,14 @@ PREFIX saref: <https://saref.etsi.org/core/>
 PREFIX saref4bldg: <https://saref.etsi.org/saref4bldg/>
 PREFIX bot: <https://w3id.org/bot#>
 PREFIX saref4watr: <https://saref.etsi.org/saref4watr/>
+PREFIX s4ener: <https://saref.etsi.org/saref4ener/>
 
 SELECT ?heatpump ?building ?room ?currentTemperature ?temperatureSetpoint ?outside
        ?flowPressure ?observation ?startDateTime ?endDateTime ?state ?cop ?energyUse
        ?heatingCurve ?baseValue ?baseUnit ?baseResult ?slopeValue ?slopeUnit ?slopeResult
        ?internetConnectionStateValue ?connectionstateServer ?errorCodeValue
        ?errorCodeMessage ?errorCodeSeverity ?result ?value ?unit
+       ?manufacturer ?model ?serialNumber ?firmwareVersion ?yearOfManufacture
 WHERE {
   VALUES ?heatpump { <${heatpumpUri}> }
   ?heatpump rdf:type hco:HeatPump .
@@ -107,6 +109,14 @@ WHERE {
     ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id .
     ?heatpump saref:hasErrorCode ?errorCode .
     ?errorCode rdf:type hco:ErrorCode ; hco:hasErrorCodeValue ?errorCodeValue ; hco:hasErrorMessage ?errorCodeMessage ; hco:hasErrorSeverity ?errorCodeSeverity .
+  }
+  OPTIONAL {
+    ?heatpump rdf:type hco:HeatPump .
+    OPTIONAL { ?heatpump saref:hasManufacturer ?manufacturer . }
+    OPTIONAL { ?heatpump saref:hasModel ?model . }
+    OPTIONAL { ?heatpump s4ener:serialNumber ?serialNumber . }
+    OPTIONAL { ?heatpump saref4watr:hasFirmwareVersion ?firmwareVersion . }
+    OPTIONAL { ?heatpump hco:hasYearOfManufacture ?yearOfManufacture . }
   }
 }
 `;
