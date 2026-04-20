@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -12,15 +13,21 @@ interface KpiOverviewPanelProps {
   kpis: KeyPerformanceIndicator[];
 }
 
+const statusBorderColor: Record<KpiStatus, string> = {
+  good:     '#16A34A',
+  warning:  '#D97706',
+  critical: '#DC2626',
+};
+
 const statusColor: Record<KpiStatus, string> = {
-  good: 'success.main',
-  warning: 'warning.main',
+  good:     'success.main',
+  warning:  'warning.main',
   critical: 'error.main',
 };
 
 const statusBg: Record<KpiStatus, string> = {
-  good: 'success.light',
-  warning: 'warning.light',
+  good:     'success.light',
+  warning:  'warning.light',
   critical: 'error.light',
 };
 
@@ -32,10 +39,10 @@ const StatusIcon = ({ status }: { status: KpiStatus }) => {
 };
 
 const categoryLabel: Record<string, string> = {
-  efficiency: 'Effici\u00ebntie',
-  comfort: 'Comfort',
-  reliability: 'Betrouwbaarheid',
-  energy: 'Energie',
+  efficiency:    'Efficiëntie',
+  comfort:       'Comfort',
+  reliability:   'Betrouwbaarheid',
+  energy:        'Energie',
   commissioning: 'Inregeling',
 };
 
@@ -44,60 +51,46 @@ const KpiOverviewPanel = ({ kpis }: KpiOverviewPanelProps) => {
 
   return (
     <Box sx={{ mb: 3 }}>
-      <Typography
-        variant="overline"
-        color="text.secondary"
-        sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}
-      >
-        KPI Overzicht
-      </Typography>
+      {/* Ruled section header */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Typography variant="caption" fontWeight={700}
+          sx={{ textTransform: 'uppercase', letterSpacing: 2,
+                color: 'text.secondary', whiteSpace: 'nowrap' }}>
+          KPI Overzicht
+        </Typography>
+        <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+      </Box>
+
       <Grid container spacing={2}>
         {kpis.map((kpi) => (
-          <Grid item xs={12} sm={6} md={3} key={kpi.name}>
+          <Grid item xs={6} key={kpi.name}>
             <Card
               variant="outlined"
               sx={{
                 height: '100%',
-                borderColor:
-                  kpi.status === 'critical' ? 'error.main' :
-                  kpi.status === 'warning' ? 'warning.main' : 'divider',
-                borderWidth: kpi.status === 'critical' ? 2 : 1,
+                minHeight: 120,
+                borderLeft: `4px solid ${statusBorderColor[kpi.status]}`,
               }}
             >
-              <CardContent>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    mb: 1,
-                  }}
-                >
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}
-                  >
+              <CardContent sx={{ pb: '12px !important' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between',
+                           alignItems: 'flex-start', mb: 1 }}>
+                  <Typography variant="caption" color="text.secondary"
+                    sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
                     {categoryLabel[kpi.category] ?? kpi.category}
                   </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      px: 0.75,
-                      py: 0.25,
-                      borderRadius: 1,
-                      bgcolor: statusBg[kpi.status],
-                    }}
-                  >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5,
+                             px: 0.75, py: 0.25, borderRadius: 1,
+                             bgcolor: statusBg[kpi.status] }}>
                     <StatusIcon status={kpi.status} />
                   </Box>
                 </Box>
 
-                <Typography variant="h4" fontWeight={700} color="text.primary" sx={{ lineHeight: 1.2 }}>
+                <Typography
+                  color="text.primary"
+                  sx={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1 }}>
                   {kpi.name === 'Inregelsnelheid' && kpi.value === 0
-                    ? '\u2014'
+                    ? '—'
                     : kpi.unit === '%'
                     ? `${kpi.value}%`
                     : kpi.unit
@@ -105,16 +98,15 @@ const KpiOverviewPanel = ({ kpis }: KpiOverviewPanelProps) => {
                     : kpi.value}
                 </Typography>
 
-                <Typography variant="body2" fontWeight={500} color="text.primary" sx={{ mt: 0.5 }}>
+                <Divider sx={{ my: 0.75 }} />
+
+                <Typography variant="body2" fontWeight={500} color="text.primary">
                   {kpi.name}
                 </Typography>
 
                 {kpi.description && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: 'block', mt: 0.5, lineHeight: 1.4 }}
-                  >
+                  <Typography variant="caption" color="text.secondary"
+                    sx={{ display: 'block', mt: 0.25, lineHeight: 1.4 }}>
                     {kpi.description}
                   </Typography>
                 )}
