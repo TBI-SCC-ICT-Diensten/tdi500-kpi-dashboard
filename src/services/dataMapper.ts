@@ -1,5 +1,5 @@
 import type { SparqlResponse, SparqlBinding } from '../types/api';
-import type { HeatPumpSystem, Measurement, ErrorCode, HeatingCurve, HeatPumpStatus, MeasurementProperty } from '../types/heatpump';
+import type { HeatPumpSystem, Measurement, ErrorCode, HeatingCurve, HeatPumpStatus, MeasurementProperty, DeviceSpecs } from '../types/heatpump';
 import {
   resolveUnit,
   parseNumericValue,
@@ -23,6 +23,7 @@ export const mapSparqlToHeatPumps = (response: SparqlResponse): HeatPumpSystem[]
     const measurements = extractMeasurements(hpBindings);
     const errorCodes = extractErrorCodes(hpBindings);
     const heatingCurve = extractHeatingCurve(hpBindings);
+    const deviceSpecs = extractDeviceSpecs(hpBindings);
 
     const internetValue = extractStringValue(firstBinding['internetConnectionStateValue']);
     const serverValue = extractStringValue(firstBinding['connectionstateServer']);
@@ -40,6 +41,7 @@ export const mapSparqlToHeatPumps = (response: SparqlResponse): HeatPumpSystem[]
       internetConnection,
       serverConnection,
       heatingCurve,
+      deviceSpecs,
     });
   }
 
@@ -136,6 +138,32 @@ export const extractHeatingCurve = (bindings: SparqlBinding[]): HeatingCurve | u
   }
 
   return undefined;
+};
+
+export const extractDeviceSpecs = (bindings: SparqlBinding[]): DeviceSpecs => {
+  // Device spec fields are static per pump — take first non-null value found
+  const spec: DeviceSpecs = {};
+  for (const binding of bindings) {
+    if (!spec.manufacturer && binding['manufacturer']?.value) {
+      spec.manufacturer = extractStringValue(binding['manufacturer']);
+    }
+    if (!spec.model && binding['model']?.value) {
+      spec.model = extractStringValue(binding['model']);
+    }
+    if (!spec.serialNumber && binding['serialNumber']?.value) {
+      spec.serialNumber = extractStringValue(binding['serialNumber']);
+    }
+    if (!spec.firmwareVersion && binding['firmwareVersion']?.value) {
+      spec.firmwareVersion = extractStringValue(binding['firmwareVersion']);
+    }
+    if (!spec.yearOfManufacture && binding['yearOfManufacture']?.value) {
+      const year = parseInt(
+        extractStringValue(binding['yearOfManufacture']), 10
+      );
+      if (Number.isFinite(year)) spec.yearOfManufacture = year;
+    }
+  }
+  return spec;
 };
 
 export const determineStatus = (

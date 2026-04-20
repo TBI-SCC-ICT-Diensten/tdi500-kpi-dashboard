@@ -43,6 +43,13 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       slopeValue: -0.6,
       slopeUnit: '°C/°C',
     },
+    deviceSpecs: {
+      manufacturer: 'Remeha',
+      model: 'Elga Ace 8',
+      serialNumber: 'RMH-2021-084521',
+      firmwareVersion: '3.1.2',
+      yearOfManufacture: 2021,
+    },
   },
   {
     id: 'mock-pump-02',
@@ -72,6 +79,13 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       baseUnit: '°C',
       slopeValue: -0.8,
       slopeUnit: '°C/°C',
+    },
+    deviceSpecs: {
+      manufacturer: 'Bosch',
+      model: 'Compress 7400i AW',
+      serialNumber: 'BSH-2020-117834',
+      firmwareVersion: '2.8.0',
+      yearOfManufacture: 2020,
     },
   },
   {
@@ -108,6 +122,13 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       slopeValue: -1.4,
       slopeUnit: '°C/°C',
     },
+    deviceSpecs: {
+      manufacturer: 'Intergas',
+      model: 'HReco 200',
+      serialNumber: 'ITG-2019-003291',
+      firmwareVersion: '1.4.7',
+      yearOfManufacture: 2019,
+    },
   },
   {
     id: 'mock-pump-04',
@@ -132,6 +153,13 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       slopeValue: -0.3,
       slopeUnit: '°C/°C',
     },
+    deviceSpecs: {
+      manufacturer: 'Alklima',
+      model: 'ERST20D-VM2E',
+      serialNumber: 'ALK-2023-209156',
+      firmwareVersion: '4.0.1',
+      yearOfManufacture: 2023,
+    },
   },
   {
     id: 'mock-pump-05',
@@ -144,5 +172,12 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
     measurements: [],
     errorCodes: [],
     heatingCurve: undefined,
+    deviceSpecs: {
+      manufacturer: 'Remeha',
+      model: 'Elga Ace 6',
+      serialNumber: 'RMH-2018-061203',
+      firmwareVersion: '2.2.3',
+      yearOfManufacture: 2018,
+    },
   },
 ];
