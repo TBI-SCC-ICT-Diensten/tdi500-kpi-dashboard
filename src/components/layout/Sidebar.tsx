@@ -9,6 +9,7 @@ import Divider from '@mui/material/Divider';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { useTheme, alpha } from '@mui/material/styles';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type React from 'react';
 
@@ -34,6 +35,8 @@ const NAV_ITEMS: NavItem[] = [
 const Sidebar = ({ width }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
 
   return (
     <Box
@@ -79,10 +82,10 @@ const Sidebar = ({ width }: SidebarProps) => {
                   pl: '9px',
                   '&.Mui-selected': {
                     borderLeftColor: 'primary.main',
-                    bgcolor: 'rgba(30, 58, 95, 0.07)',
-                    '&:hover': { bgcolor: 'rgba(30, 58, 95, 0.10)' },
+                    bgcolor: alpha(primary, 0.10),
+                    '&:hover': { bgcolor: alpha(primary, 0.14) },
                   },
-                  '&:hover': { bgcolor: 'rgba(30, 58, 95, 0.04)' },
+                  '&:hover': { bgcolor: alpha(primary, 0.05) },
                 }}
               >
                 <ListItemIcon sx={{

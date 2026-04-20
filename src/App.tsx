@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import theme from './theme/theme';
+import { createAppTheme } from './theme/theme';
+import { ColorModeProvider, useColorMode } from './context/ColorModeContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { DashboardProvider } from './context/DashboardContext';
 import MainLayout from './components/layout/MainLayout';
@@ -11,7 +13,10 @@ import NotFoundPage from './pages/NotFoundPage';
 // [BAG-LOOKUP] Remove this import to disable the feature
 import BagLookupPage from './pages/BagLookupPage';
 
-const App = () => {
+const AppRoutes = () => {
+  const { mode } = useColorMode();
+  const theme = useMemo(() => createAppTheme(mode), [mode]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -33,5 +38,11 @@ const App = () => {
     </ThemeProvider>
   );
 };
+
+const App = () => (
+  <ColorModeProvider>
+    <AppRoutes />
+  </ColorModeProvider>
+);
 
 export default App;
