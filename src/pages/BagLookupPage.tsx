@@ -17,6 +17,7 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import HomeIcon from '@mui/icons-material/Home';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -48,6 +49,8 @@ const confidenceColor = {
 };
 
 const BagLookupPage = () => {
+  const theme = useTheme();
+  const cellBg = theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'grey.50';
   const [postcode, setPostcode] = useState('');
   const [huisnummer, setHuisnummer] = useState('');
   const [afgiftesysteem, setAfgiftesysteem] = useState<Afgiftesysteem | null>(null);
@@ -168,9 +171,7 @@ const BagLookupPage = () => {
           </Button>
         </Box>
 
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-          Adres via PDOK Locatieserver (gratis). Bouwjaar via BAG Individuele Bevragingen (API-sleutel in aanvraag). Energielabel via EP-online (API-sleutel vereist).
-        </Typography>
+
       </Paper>
 
       {loading && (
@@ -209,7 +210,7 @@ const BagLookupPage = () => {
               { label: 'Gebruiksdoel', value: bagResult.gebruiksdoel ?? 'Niet beschikbaar' },
             ].map(({ label, value }) => (
               <Grid item xs={6} sm={3} key={label}>
-                <Box sx={{ p: 1.5, bgcolor: 'grey.50', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ p: 1.5, bgcolor: cellBg, borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
                   <Typography variant="caption" color="text.secondary"
                     sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
                     {label}
@@ -222,7 +223,7 @@ const BagLookupPage = () => {
             ))}
             {bagResult.energielabel && (
               <Grid item xs={6} sm={3}>
-                <Box sx={{ p: 1.5, bgcolor: 'grey.50', borderRadius: 1,
+                <Box sx={{ p: 1.5, bgcolor: cellBg, borderRadius: 1,
                   border: '1px solid', borderColor: 'divider' }}>
                   <Typography variant="caption" color="text.secondary"
                     sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
@@ -242,7 +243,7 @@ const BagLookupPage = () => {
             )}
             {bagResult.oppervlakte && (
               <Grid item xs={6} sm={3}>
-                <Box sx={{ p: 1.5, bgcolor: 'grey.50', borderRadius: 1,
+                <Box sx={{ p: 1.5, bgcolor: cellBg, borderRadius: 1,
                   border: '1px solid', borderColor: 'divider' }}>
                   <Typography variant="caption" color="text.secondary"
                     sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
@@ -380,8 +381,7 @@ const BagLookupPage = () => {
           </Box>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Op basis van de BAG-gegevens en het geselecteerde afgiftesysteem gelden de volgende
-            TDI 500 inregelinstellingen (bron: TNO Activity 2.1 — Catalogus inregelinstellingen):
+            Op basis van de BAG-gegevens en het geselecteerde afgiftesysteem gelden de volgende aanbevolen inregelinstellingen:
           </Typography>
 
           <Grid container spacing={2}>

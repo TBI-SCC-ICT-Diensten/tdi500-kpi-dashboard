@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -33,15 +34,27 @@ const statusLabel: Record<PumpStatus, string> = {
   unknown: 'Onbekend',
 };
 
-const getSeveritySx = (severity: string) => {
+const getSeveritySx = (severity: string, isDark: boolean) => {
   const s = severity.toLowerCase();
   if (s === 'critical' || s === 'high' || s === 'error') {
-    return { bg: '#FEE2E2', text: '#991B1B', border: '#DC2626' };
+    return {
+      bg:     isDark ? 'rgba(220,38,38,0.15)'  : '#FEE2E2',
+      text:   isDark ? '#FCA5A5'               : '#991B1B',
+      border: '#DC2626',
+    };
   }
   if (s === 'warning') {
-    return { bg: '#FEF3C7', text: '#92400E', border: '#D97706' };
+    return {
+      bg:     isDark ? 'rgba(217,119,6,0.15)'  : '#FEF3C7',
+      text:   isDark ? '#FCD34D'               : '#92400E',
+      border: '#D97706',
+    };
   }
-  return { bg: '#F1F5F9', text: '#475569', border: '#94A3B8' };
+  return {
+    bg:     isDark ? 'rgba(148,163,184,0.10)' : '#F1F5F9',
+    text:   isDark ? '#94A3B8'               : '#475569',
+    border: isDark ? '#475569'               : '#94A3B8',
+  };
 };
 
 interface Props {
@@ -50,6 +63,8 @@ interface Props {
 
 const HeatPumpDetailCard = ({ heatPump }: Props) => {
   const [specsExpanded, setSpecsExpanded] = useState(false);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const specs = heatPump.deviceSpecs;
   const hasSpecs = specs && Object.values(specs).some(Boolean);
   const status = heatPump.status as PumpStatus;
@@ -117,7 +132,7 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
           </Box>
           <Collapse in={specsExpanded}>
             <Box sx={{
-              bgcolor: 'grey.50',
+              bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'grey.50',
               border: '1px solid',
               borderColor: 'divider',
               borderRadius: '6px',
@@ -181,7 +196,7 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
       {heatPump.errorCodes.length > 0 && (
         <Box sx={{ mt: 1, mb: 0.5 }}>
           {heatPump.errorCodes.map((ec) => {
-            const sev = getSeveritySx(ec.severity);
+            const sev = getSeveritySx(ec.severity, isDark);
             return (
               <Box key={ec.code}
                 sx={{
