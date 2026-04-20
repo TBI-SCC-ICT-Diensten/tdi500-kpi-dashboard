@@ -6,6 +6,7 @@ import {
   extractMeasurements,
   extractErrorCodes,
   extractHeatingCurve,
+  extractDeviceSpecs,
   determineStatus,
 } from '../services/dataMapper';
 
@@ -220,6 +221,83 @@ describe('extractHeatingCurve', () => {
     ];
 
     expect(extractHeatingCurve(bindings)).toBeUndefined();
+  });
+});
+
+describe('extractDeviceSpecs', () => {
+  it('extracts all five fields when present in bindings', () => {
+    const bindings: SparqlBinding[] = [
+      {
+        heatpump: makeSparqlValue('https://example.org/hp1', 'uri'),
+        manufacturer: makeSparqlValue('Remeha'),
+        model: makeSparqlValue('Elga Ace 8'),
+        serialNumber: makeSparqlValue('RMH-2021-084521'),
+        firmwareVersion: makeSparqlValue('3.1.2'),
+        yearOfManufacture: makeSparqlValue('2021'),
+      },
+    ];
+
+    const specs = extractDeviceSpecs(bindings);
+
+    expect(specs.manufacturer).toBe('Remeha');
+    expect(specs.model).toBe('Elga Ace 8');
+    expect(specs.serialNumber).toBe('RMH-2021-084521');
+    expect(specs.firmwareVersion).toBe('3.1.2');
+    expect(specs.yearOfManufacture).toBe(2021);
+  });
+
+  it('returns empty object when no spec bindings present', () => {
+    const bindings: SparqlBinding[] = [
+      { heatpump: makeSparqlValue('https://example.org/hp1', 'uri') },
+    ];
+
+    expect(extractDeviceSpecs(bindings)).toEqual({});
+  });
+
+  it('parses yearOfManufacture as integer', () => {
+    const bindings: SparqlBinding[] = [
+      {
+        heatpump: makeSparqlValue('https://example.org/hp1', 'uri'),
+        yearOfManufacture: makeSparqlValue('2023'),
+      },
+    ];
+
+    const specs = extractDeviceSpecs(bindings);
+
+    expect(specs.yearOfManufacture).toBe(2023);
+    expect(typeof specs.yearOfManufacture).toBe('number');
+  });
+
+  it('skips non-finite year values', () => {
+    const bindings: SparqlBinding[] = [
+      {
+        heatpump: makeSparqlValue('https://example.org/hp1', 'uri'),
+        yearOfManufacture: makeSparqlValue('not-a-year'),
+      },
+    ];
+
+    const specs = extractDeviceSpecs(bindings);
+
+    expect(specs.yearOfManufacture).toBeUndefined();
+  });
+
+  it('takes first non-null value across multiple bindings', () => {
+    const bindings: SparqlBinding[] = [
+      {
+        heatpump: makeSparqlValue('https://example.org/hp1', 'uri'),
+        manufacturer: makeSparqlValue('Remeha'),
+      },
+      {
+        heatpump: makeSparqlValue('https://example.org/hp1', 'uri'),
+        manufacturer: makeSparqlValue('Bosch'),
+        model: makeSparqlValue('Compress 7400i AW'),
+      },
+    ];
+
+    const specs = extractDeviceSpecs(bindings);
+
+    expect(specs.manufacturer).toBe('Remeha');
+    expect(specs.model).toBe('Compress 7400i AW');
   });
 });
 

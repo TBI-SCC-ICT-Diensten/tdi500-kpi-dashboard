@@ -5,30 +5,11 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
-import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CircleIcon from '@mui/icons-material/Circle';
 import useDashboardData from '../hooks/useDashboardData';
-import { PROPERTY_LABEL_MAP } from '../types/units';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
-import HeatPumpCommandPanel from '../components/dashboard/HeatPumpCommandPanel';
-
-const statusColor = {
-  active: 'success' as const,
-  warning: 'warning' as const,
-  error: 'error' as const,
-  offline: 'default' as const,
-  unknown: 'default' as const,
-};
-
-const statusLabel = {
-  active: 'Actief',
-  warning: 'Waarschuwing',
-  error: 'Fout',
-  offline: 'Offline',
-  unknown: 'Onbekend',
-};
+import HeatPumpDetailCard from '../components/detail/HeatPumpDetailCard';
 
 const ContingentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -113,51 +94,7 @@ const ContingentDetailPage = () => {
       <Grid container spacing={2}>
         {contingent.heatPumps.map((hp) => (
           <Grid item xs={12} sm={6} md={4} key={hp.id}>
-            <Paper variant="outlined" sx={{ p: 2 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                  {hp.id}
-                </Typography>
-                <Chip
-                  icon={<CircleIcon sx={{ fontSize: '10px !important' }} />}
-                  label={statusLabel[hp.status]}
-                  color={statusColor[hp.status]}
-                  size="small"
-                  variant="outlined"
-                />
-              </Box>
-
-              <Divider sx={{ mb: 1.5 }} />
-
-              {hp.measurements.length > 0 ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                  {hp.measurements.map((m) => (
-                    <Box key={m.property} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="caption" color="text.secondary">
-                        {PROPERTY_LABEL_MAP[m.property] ?? m.property}
-                      </Typography>
-                      <Typography variant="caption" fontWeight={500}>
-                        {m.value} {m.unit}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              ) : (
-                <Typography variant="caption" color="text.disabled">
-                  Geen metingen beschikbaar
-                </Typography>
-              )}
-
-              {hp.errorCodes.length > 0 && (
-                <Box sx={{ mt: 1.5, p: 1, bgcolor: 'error.light', borderRadius: 1 }}>
-                  <Typography variant="caption" color="error.dark" fontWeight={500}>
-                    {hp.errorCodes.length} foutcode(s) actief
-                  </Typography>
-                </Box>
-              )}
-
-              <HeatPumpCommandPanel heatPump={hp} />
-            </Paper>
+            <HeatPumpDetailCard heatPump={hp} />
           </Grid>
         ))}
       </Grid>
