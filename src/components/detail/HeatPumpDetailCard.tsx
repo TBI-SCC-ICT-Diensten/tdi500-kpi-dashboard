@@ -1,9 +1,3 @@
-/**
- * HeatPumpDetailCard — per-pump card for ContingentDetailPage
- *
- * Renders: device header, spec panel (manufacturer/model/serial/firmware/year),
- * building/room info, measurements, error codes expanded, and command panel.
- */
 import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -13,7 +7,6 @@ import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import CircleIcon from '@mui/icons-material/Circle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -22,15 +15,17 @@ import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
 import { PROPERTY_LABEL_MAP } from '../../types/units';
 import type { HeatPumpSystem } from '../../types/heatpump';
 
-const statusColor = {
-  active: 'success' as const,
-  warning: 'warning' as const,
-  error: 'error' as const,
-  offline: 'default' as const,
-  unknown: 'default' as const,
+type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
+
+const statusDotColor: Record<PumpStatus, string> = {
+  active: '#16A34A',
+  warning: '#D97706',
+  error: '#DC2626',
+  offline: '#6B7280',
+  unknown: '#6B7280',
 };
 
-const statusLabel = {
+const statusLabel: Record<PumpStatus, string> = {
   active: 'Actief',
   warning: 'Waarschuwing',
   error: 'Fout',
@@ -38,12 +33,15 @@ const statusLabel = {
   unknown: 'Onbekend',
 };
 
-const severityColor: Record<string, string> = {
-  critical: 'error.dark',
-  high: 'error.dark',
-  error: 'error.dark',
-  warning: 'warning.dark',
-  low: 'text.secondary',
+const getSeveritySx = (severity: string) => {
+  const s = severity.toLowerCase();
+  if (s === 'critical' || s === 'high' || s === 'error') {
+    return { bg: '#FEE2E2', text: '#991B1B', border: '#DC2626' };
+  }
+  if (s === 'warning') {
+    return { bg: '#FEF3C7', text: '#92400E', border: '#D97706' };
+  }
+  return { bg: '#F1F5F9', text: '#475569', border: '#94A3B8' };
 };
 
 interface Props {
@@ -54,35 +52,38 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
   const [specsExpanded, setSpecsExpanded] = useState(false);
   const specs = heatPump.deviceSpecs;
   const hasSpecs = specs && Object.values(specs).some(Boolean);
+  const status = heatPump.status as PumpStatus;
 
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
 
-      {/* ── Header: ID + status ─────────────────────── */}
+      {/* ── Header: manufacturer/model (prominent) + status dot ─── */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between',
-                 alignItems: 'center', mb: 0.5 }}>
-        <Typography variant="subtitle2" fontWeight={600}
-          sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-          {heatPump.id}
-        </Typography>
-        <Chip
-          icon={<CircleIcon sx={{ fontSize: '10px !important' }} />}
-          label={statusLabel[heatPump.status]}
-          color={statusColor[heatPump.status]}
-          size="small"
-          variant="outlined"
-        />
+                 alignItems: 'flex-start', mb: 0.5 }}>
+        <Box>
+          <Typography variant="body1" fontWeight={600} sx={{ lineHeight: 1.3 }}>
+            {specs?.manufacturer
+              ? `${specs.manufacturer}${specs.model ? ` — ${specs.model}` : ''}`
+              : 'Warmtepomp'}
+          </Typography>
+          <Typography variant="caption" color="text.secondary"
+            sx={{ fontFamily: 'monospace' }}>
+            {heatPump.id}
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25, flexShrink: 0 }}>
+          <Box sx={{
+            width: 8, height: 8, borderRadius: '50%',
+            bgcolor: statusDotColor[status],
+            flexShrink: 0,
+          }} />
+          <Typography variant="caption" color="text.secondary">
+            {statusLabel[status]}
+          </Typography>
+        </Box>
       </Box>
 
-      {/* ── Manufacturer + model subtitle ───────────── */}
-      {specs?.manufacturer && (
-        <Typography variant="caption" color="text.secondary"
-          sx={{ display: 'block', mb: 1 }}>
-          {specs.manufacturer}{specs.model ? ` — ${specs.model}` : ''}
-        </Typography>
-      )}
-
-      {/* ── Building / room ─────────────────────────── */}
+      {/* ── Building / room ─────────────────────────────────────── */}
       {(heatPump.building || heatPump.room) && (
         <Typography variant="caption" color="text.disabled"
           sx={{ display: 'block', mb: 1 }}>
@@ -90,9 +91,9 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
         </Typography>
       )}
 
-      <Divider sx={{ mb: 1.5 }} />
+      <Divider sx={{ mb: 1.5, mt: heatPump.building || heatPump.room ? 0 : 1 }} />
 
-      {/* ── Device specs collapsible ─────────────────── */}
+      {/* ── Device specs collapsible ─────────────────────────────── */}
       {hasSpecs && (
         <Box sx={{ mb: 1.5 }}>
           <Box
@@ -115,16 +116,23 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
             </IconButton>
           </Box>
           <Collapse in={specsExpanded}>
-            <Box sx={{ display: 'flex', flexDirection: 'column',
-                       gap: 0.4, pt: 1,
-                       pl: 1, borderLeft: '2px solid',
-                       borderColor: 'divider' }}>
+            <Box sx={{
+              bgcolor: 'grey.50',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: '6px',
+              p: '8px 12px',
+              mt: 0.75,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0.4,
+            }}>
               {[
-                { label: 'Fabrikant',     value: specs.manufacturer },
-                { label: 'Model',         value: specs.model },
-                { label: 'Serienummer',   value: specs.serialNumber },
-                { label: 'Firmware',      value: specs.firmwareVersion },
-                { label: 'Bouwjaar',      value: specs.yearOfManufacture?.toString() },
+                { label: 'Fabrikant',   value: specs.manufacturer },
+                { label: 'Model',       value: specs.model },
+                { label: 'Serienummer', value: specs.serialNumber },
+                { label: 'Firmware',    value: specs.firmwareVersion },
+                { label: 'Bouwjaar',    value: specs.yearOfManufacture?.toString() },
               ]
                 .filter(r => r.value)
                 .map(({ label, value }) => (
@@ -147,7 +155,7 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
         </Box>
       )}
 
-      {/* ── Measurements ────────────────────────────── */}
+      {/* ── Measurements ─────────────────────────────────────────── */}
       {heatPump.measurements.length > 0 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
           {heatPump.measurements.map((m) => (
@@ -169,39 +177,48 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
         </Typography>
       )}
 
-      {/* ── Error codes expanded ─────────────────────── */}
+      {/* ── Error codes ───────────────────────────────────────────── */}
       {heatPump.errorCodes.length > 0 && (
         <Box sx={{ mt: 1, mb: 0.5 }}>
-          {heatPump.errorCodes.map((ec) => (
-            <Box key={ec.code}
-              sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75,
-                    p: 0.75, mb: 0.5, bgcolor: 'error.light',
-                    borderRadius: 1 }}>
-              <WarningAmberIcon sx={{ fontSize: 14, mt: 0.1,
-                color: severityColor[ec.severity.toLowerCase()] ?? 'error.dark' }} />
-              <Box>
-                <Typography variant="caption" fontWeight={700}
-                  color={severityColor[ec.severity.toLowerCase()] ?? 'error.dark'}
-                  sx={{ fontFamily: 'monospace' }}>
-                  {ec.code}
-                </Typography>
-                {ec.message && (
-                  <Typography variant="caption" color="error.dark"
-                    sx={{ display: 'block', fontSize: '0.7rem' }}>
-                    {ec.message}
+          {heatPump.errorCodes.map((ec) => {
+            const sev = getSeveritySx(ec.severity);
+            return (
+              <Box key={ec.code}
+                sx={{
+                  display: 'flex', alignItems: 'flex-start', gap: 0.75,
+                  p: '6px 10px', mb: 0.5,
+                  bgcolor: sev.bg,
+                  borderLeft: `3px solid ${sev.border}`,
+                  borderRadius: '0 4px 4px 0',
+                }}>
+                <WarningAmberIcon sx={{ fontSize: 13, mt: 0.2,
+                  color: sev.text, flexShrink: 0 }} />
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography variant="caption" fontWeight={700}
+                    sx={{ fontFamily: 'monospace', color: sev.text }}>
+                    {ec.code}
                   </Typography>
-                )}
+                  {ec.message && (
+                    <Typography variant="caption"
+                      sx={{ display: 'block', fontSize: '0.7rem', color: sev.text }}>
+                      {ec.message}
+                    </Typography>
+                  )}
+                </Box>
+                <Tooltip title={`Ernst: ${ec.severity}`} placement="top">
+                  <Chip label={ec.severity} size="small"
+                    sx={{
+                      ml: 'auto', height: 16, fontSize: '0.6rem',
+                      bgcolor: sev.border, color: '#fff', flexShrink: 0,
+                    }} />
+                </Tooltip>
               </Box>
-              <Tooltip title={`Ernst: ${ec.severity}`} placement="top">
-                <Chip label={ec.severity} size="small"
-                  sx={{ ml: 'auto', height: 16, fontSize: '0.6rem' }} />
-              </Tooltip>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
       )}
 
-      {/* ── Command panel ────────────────────────────── */}
+      {/* ── Command panel ─────────────────────────────────────────── */}
       <HeatPumpCommandPanel heatPump={heatPump} />
 
     </Paper>
