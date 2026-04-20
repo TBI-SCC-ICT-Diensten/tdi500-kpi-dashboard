@@ -5,14 +5,31 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useNavigate, useLocation } from 'react-router-dom';
+import type React from 'react';
 
 interface SidebarProps {
   width: number;
 }
+
+interface NavItem {
+  path: string;
+  label: string;
+  icon: React.ElementType;
+  matchExact?: boolean;
+  matchPrefix?: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { path: '/',                       label: 'Dashboard',         icon: DashboardIcon,         matchExact: true  },
+  { path: '/contingent/default-b2',  label: 'Contingent detail', icon: HomeRepairServiceIcon, matchPrefix: '/contingent' },
+  // [BAG-LOOKUP] Remove this entry to disable the feature
+  { path: '/bag-lookup',             label: 'BAG Opzoeking',     icon: LocationOnIcon,        matchExact: true  },
+];
 
 const Sidebar = ({ width }: SidebarProps) => {
   const navigate = useNavigate();
@@ -26,69 +43,66 @@ const Sidebar = ({ width }: SidebarProps) => {
         top: 0,
         left: 0,
         height: '100vh',
-        bgcolor: 'primary.main',
-        color: 'white',
+        bgcolor: 'background.paper',
+        borderRight: '1px solid',
+        borderColor: 'divider',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1rem' }}>
+      <Box sx={{ px: 2.5, py: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', lineHeight: 1.2 }}>
           TDI 500
         </Typography>
-        <Typography variant="caption" sx={{ opacity: 0.7 }}>
+        <Typography variant="caption" color="text.secondary">
           Installateursportaal
         </Typography>
       </Box>
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={location.pathname === '/'}
-            onClick={() => navigate('/')}
-            sx={{
-              '&.Mui-selected': { bgcolor: 'primary.light' },
-              '&:hover': { bgcolor: 'primary.light' },
-            }}
-          >
-            <ListItemIcon sx={{ color: 'white', minWidth: 36 }}>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={location.pathname.startsWith('/contingent')}
-            // TODO: navigate to selectedContingentId when multiple contingents
-            // are supported. Currently hardcoded to the single default contingent.
-            onClick={() => navigate('/contingent/default-b2')}
-            sx={{
-              '&.Mui-selected': { bgcolor: 'primary.light' },
-              '&:hover': { bgcolor: 'primary.light' },
-            }}
-          >
-            <ListItemIcon sx={{ color: 'white', minWidth: 36 }}>
-              <HomeRepairServiceIcon />
-            </ListItemIcon>
-            <ListItemText primary="Contingent detail" />
-          </ListItemButton>
-        </ListItem>
-        {/* [BAG-LOOKUP] Remove this ListItem to disable the feature */}
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={location.pathname === '/bag-lookup'}
-            onClick={() => navigate('/bag-lookup')}
-            sx={{
-              '&.Mui-selected': { bgcolor: 'primary.light' },
-              '&:hover': { bgcolor: 'primary.light' },
-            }}
-          >
-            <ListItemIcon sx={{ color: 'white', minWidth: 36 }}>
-              <LocationOnIcon />
-            </ListItemIcon>
-            <ListItemText primary="BAG Opzoeking" />
-          </ListItemButton>
-        </ListItem>
+
+      <Divider />
+
+      <List sx={{ pt: 1, px: 1 }}>
+        {NAV_ITEMS.map((item) => {
+          const { path, label, icon: Icon, matchExact, matchPrefix } = item;
+          const isActive = matchExact
+            ? location.pathname === path
+            : location.pathname.startsWith(matchPrefix ?? path);
+
+          return (
+            <ListItem key={path} disablePadding sx={{ mb: 0.25 }}>
+              <ListItemButton
+                selected={isActive}
+                onClick={() => navigate(path)}
+                sx={{
+                  borderRadius: 1,
+                  borderLeft: '3px solid transparent',
+                  pl: '9px',
+                  '&.Mui-selected': {
+                    borderLeftColor: 'primary.main',
+                    bgcolor: 'rgba(30, 58, 95, 0.07)',
+                    '&:hover': { bgcolor: 'rgba(30, 58, 95, 0.10)' },
+                  },
+                  '&:hover': { bgcolor: 'rgba(30, 58, 95, 0.04)' },
+                }}
+              >
+                <ListItemIcon sx={{
+                  minWidth: 34,
+                  color: isActive ? 'primary.main' : 'text.secondary',
+                }}>
+                  <Icon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={label}
+                  primaryTypographyProps={{
+                    variant: 'body2',
+                    fontWeight: isActive ? 600 : 400,
+                    color: isActive ? 'primary.main' : 'text.secondary',
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
     </Box>
   );

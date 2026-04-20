@@ -4,7 +4,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import StorageIcon from '@mui/icons-material/Storage';
+import WifiIcon from '@mui/icons-material/Wifi';
 import ScienceIcon from '@mui/icons-material/Science';
 import {
   getDataSource,
@@ -35,7 +35,7 @@ const Header = () => {
     >
       <Toolbar sx={{ gap: 2 }}>
         <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h6" fontWeight={600} color="text.primary" sx={{ lineHeight: 1.2 }}>
+          <Typography variant="h6" fontWeight={700} color="primary.main" sx={{ lineHeight: 1.2 }}>
             Installateursportaal
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -43,7 +43,7 @@ const Header = () => {
           </Typography>
         </Box>
         <Chip
-          icon={source === 'live' ? <StorageIcon /> : <ScienceIcon />}
+          icon={source === 'live' ? <WifiIcon /> : <ScienceIcon />}
           label={source === 'live' ? 'Hupie API (live)' : 'Mock data'}
           size="small"
           color={source === 'live' ? 'success' : 'warning'}
