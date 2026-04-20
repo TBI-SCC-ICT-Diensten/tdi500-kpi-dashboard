@@ -38,6 +38,7 @@ export interface BagResult {
   gebruiksdoelen: string[];
   oppervlakte: number | null;
   pandStatus: string | null;
+  rdCoordinates?: [number, number];
   // From EP-online
   energielabel: string | null;
   energielabelGeldigTot: string | null;
@@ -66,6 +67,7 @@ export async function fetchBagApiData(postcode: string, huisnummer: string): Pro
   bouwjaar: number | null;
   oppervlakte: number | null;
   gebruiksdoelen: string[];
+  rdCoordinates: [number, number] | null;
 } | null> {
   const apiKey = import.meta.env['VITE_BAG_API_KEY'] as string | undefined;
   if (!apiKey) {
@@ -104,10 +106,18 @@ export async function fetchBagApiData(postcode: string, huisnummer: string): Pro
     ? adres.gebruiksdoelen
     : [];
 
+  // RD New coordinates (epsg:28992) for KNMI station lookup
+  const geometry = adres.adresseerbaarObjectGeometrie?.punt?.coordinates;
+  const rdCoordinates: [number, number] | null =
+    Array.isArray(geometry) && geometry.length >= 2
+      ? [geometry[0] as number, geometry[1] as number]
+      : null;
+
   return {
     bouwjaar: Number.isFinite(bouwjaarParsed) ? bouwjaarParsed : null,
     oppervlakte,
     gebruiksdoelen,
+    rdCoordinates,
   };
 }
 
@@ -170,6 +180,7 @@ export const fetchBagData = async (
   let gebruiksdoel: string | null = null;
   let gebruiksdoelen: string[] = [];
   let oppervlakte: number | null = null;
+  let rdCoordinates: [number, number] | undefined = undefined;
   const pandStatus: string | null = null; // not returned by adressenuitgebreid
 
   try {
@@ -179,6 +190,9 @@ export const fetchBagData = async (
       oppervlakte = bagData.oppervlakte;
       gebruiksdoelen = bagData.gebruiksdoelen;
       gebruiksdoel = bagData.gebruiksdoelen[0] ?? null;
+      if (bagData.rdCoordinates) {
+        rdCoordinates = bagData.rdCoordinates;
+      }
     }
   } catch (err) {
     console.warn('[bagService] BAG API lookup failed:', err);
@@ -236,6 +250,7 @@ export const fetchBagData = async (
     gebruiksdoelen,
     oppervlakte,
     pandStatus,
+    rdCoordinates,
     energielabel,
     energielabelGeldigTot,
   };
