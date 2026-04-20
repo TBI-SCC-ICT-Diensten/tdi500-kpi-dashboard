@@ -71,7 +71,7 @@ const DecisionSupportCard = ({
   const { overallScore, summary, details, suggestedAction } = recommendation;
 
   return (
-    <Paper variant="outlined" sx={{ p: 3 }}>
+    <Paper variant="outlined" sx={{ p: 2 }}>
 
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
@@ -94,8 +94,8 @@ const DecisionSupportCard = ({
           display: 'flex',
           alignItems: 'center',
           gap: 2,
-          p: 2,
-          mb: 2,
+          p: 1.5,
+          mb: 1.5,
           borderRadius: 1,
           bgcolor: scoreBg[overallScore],
           border: `1px solid ${scoreColor[overallScore]}33`,
@@ -190,14 +190,17 @@ const DecisionSupportCard = ({
       <Box
         sx={{
           p: 1.5,
-          mb: 2,
-          bgcolor: 'primary.main',
+          mb: 1.5,
+          border: '1px solid',
+          borderColor: 'primary.main',
           borderRadius: 1,
-          color: 'primary.contrastText',
+          color: 'primary.main',
         }}
       >
-        <Typography variant="caption" sx={{ opacity: 0.75, display: 'block', mb: 0.5 }}>
-          AANBEVOLEN ACTIE
+        <Typography variant="caption" fontWeight={700}
+          sx={{ opacity: 0.7, display: 'block', mb: 0.5,
+                textTransform: 'uppercase', letterSpacing: 1 }}>
+          Aanbevolen actie
         </Typography>
         <Typography variant="body2" fontWeight={500}>
           {suggestedAction}
