@@ -6,6 +6,22 @@ import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import type { Contingent } from '../../types/heatpump';
 
+type WorstStatus = 'error' | 'warning' | 'active' | 'offline';
+
+const worstStatusBorderColor: Record<WorstStatus, string> = {
+  error:   '#DC2626',
+  warning: '#D97706',
+  active:  '#16A34A',
+  offline: '#6B7280',
+};
+
+const getWorstStatus = (pumps: Contingent['heatPumps']): WorstStatus => {
+  if (pumps.some(p => p.status === 'error'))   return 'error';
+  if (pumps.some(p => p.status === 'warning')) return 'warning';
+  if (pumps.every(p => p.status === 'offline')) return 'offline';
+  return 'active';
+};
+
 interface ContingentSelectorProps {
   contingents: Contingent[];
   selectedContingentId: string | null;
@@ -36,6 +52,8 @@ const ContingentSelector = ({
           const onlineCount = contingent.heatPumps.filter(
             (hp) => hp.status !== 'offline'
           ).length;
+          const worst = getWorstStatus(contingent.heatPumps);
+          const statusBorder = worstStatusBorderColor[worst] ?? '#6B7280';
 
           return (
             <Card
@@ -45,6 +63,7 @@ const ContingentSelector = ({
                 minWidth: 200,
                 borderColor: isSelected ? 'primary.main' : 'divider',
                 borderWidth: isSelected ? 2 : 1,
+                borderLeft: `3px solid ${statusBorder}`,
                 bgcolor: isSelected ? 'primary.main' : 'background.paper',
                 transition: 'all 0.15s ease',
                 flex: '1 1 200px',
