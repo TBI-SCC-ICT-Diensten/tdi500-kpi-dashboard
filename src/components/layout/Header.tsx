@@ -4,17 +4,23 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import WifiIcon from '@mui/icons-material/Wifi';
 import ScienceIcon from '@mui/icons-material/Science';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import {
   getDataSource,
   setDataSource,
   subscribeToDataSource,
   type DataSource,
 } from '../../services/hupieApi';
+import { useColorMode } from '../../context/ColorModeContext';
 
 const Header = () => {
   const [source, setSource] = useState<DataSource>(getDataSource());
+  const { mode, toggleColorMode } = useColorMode();
 
   // Keep the chip in sync if the data source changes elsewhere.
   useEffect(() => subscribeToDataSource(setSource), []);
@@ -51,6 +57,13 @@ const Header = () => {
           clickable
           sx={{ cursor: 'pointer' }}
         />
+        <Tooltip title={mode === 'dark' ? 'Licht thema' : 'Donker thema'}>
+          <IconButton size="small" onClick={toggleColorMode} sx={{ color: 'text.secondary' }}>
+            {mode === 'dark'
+              ? <Brightness7Icon fontSize="small" />
+              : <Brightness4Icon fontSize="small" />}
+          </IconButton>
+        </Tooltip>
       </Toolbar>
     </AppBar>
   );

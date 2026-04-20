@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import ReactApexChart from 'react-apexcharts';
+import { useTheme } from '@mui/material/styles';
 import type { HeatPumpSystem } from '../../types/heatpump';
 import EmptyState from '../common/EmptyState';
 
@@ -9,6 +10,12 @@ interface EnergyComparisonProps {
 }
 
 const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const textColor = isDark ? '#94A3B8' : '#64748B';
+  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0';
+  const barColor  = isDark ? '#60A5FA' : '#1E3A5F';
+
   const pumpsWithEnergy = heatPumps.filter((hp) =>
     hp.measurements.some((m) => m.property === 'energyUsage' && m.value > 0)
   );
@@ -39,41 +46,33 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
       type: 'bar',
       toolbar: { show: false },
       background: 'transparent',
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontFamily: '"Inter", "Roboto", sans-serif',
     },
     plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: '50%',
-        borderRadius: 4,
-      },
+      bar: { horizontal: false, columnWidth: '50%', borderRadius: 4 },
     },
     dataLabels: { enabled: false },
     xaxis: {
       categories,
-      title: {
-        text: 'Warmtepomp',
-        style: { color: '#4a5568' },
-      },
-      labels: { style: { colors: '#4a5568', fontSize: '11px' } },
+      title: { text: 'Warmtepomp', style: { color: textColor } },
+      labels: { style: { colors: textColor, fontSize: '11px' } },
+      axisBorder: { color: gridColor },
+      axisTicks: { color: gridColor },
     },
     yaxis: {
-      // ETHICAL: bar chart Y-axis always starts at 0
       min: 0,
-      title: {
-        text: 'Energieverbruik (kWh)',
-        style: { color: '#4a5568' },
-      },
+      title: { text: 'Energieverbruik (kWh)', style: { color: textColor } },
       labels: {
-        style: { colors: '#4a5568' },
+        style: { colors: textColor },
         formatter: (val: number) => `${val.toFixed(1)} kWh`,
       },
     },
-    colors: ['#1a2b4a'],
+    colors: [barColor],
     tooltip: {
+      theme: isDark ? 'dark' : 'light',
       y: { formatter: (val: number) => `${val.toFixed(2)} kWh` },
     },
-    grid: { borderColor: '#e8eaf0' },
+    grid: { borderColor: gridColor },
     legend: { show: false },
   };
 
@@ -87,7 +86,7 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
       </Typography>
       <Typography variant="caption" color="text.disabled"
         sx={{ display: 'block', mb: 2 }}>
-        Elektriciteitsverbruik per warmtepomp — Y-as altijd vanaf 0 (ethische visualisatie)
+        Elektriciteitsverbruik per warmtepomp — Y-as altijd vanaf 0
       </Typography>
       <ReactApexChart
         options={options}
