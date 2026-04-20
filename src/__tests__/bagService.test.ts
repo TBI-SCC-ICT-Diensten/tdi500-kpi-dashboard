@@ -1,10 +1,21 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import axios from 'axios';
 import {
   mapBouwjaarToInsulation,
   mapEnergielabelToInsulation,
   deriveKruisProfielCode,
   mapAfgifteToClass,
+  fetchBagApiData,
 } from '../services/bagService';
+
+vi.mock('axios', () => ({
+  default: {
+    get: vi.fn(),
+    isAxiosError: vi.fn((err: unknown): boolean =>
+      typeof err === 'object' && err !== null && 'isAxiosError' in err
+    ),
+  },
+}));
 
 describe('mapBouwjaarToInsulation', () => {
   it('maps pre-1945 to insulation C with high confidence', () => {
@@ -89,6 +100,99 @@ describe('deriveKruisProfielCode', () => {
       const ins = mapBouwjaarToInsulation(year);
       expect(deriveKruisProfielCode(ins.level, systeem)).toBe(expected);
     }
+  });
+});
+
+describe('fetchBagApiData', () => {
+  const mockBagApiResponse = {
+    data: {
+      _embedded: {
+        adressen: [{
+          openbareRuimteNaam: 'Teststraat',
+          huisnummer: 1,
+          postcode: '1234AB',
+          woonplaatsNaam: 'Teststad',
+          oorspronkelijkBouwjaar: ['1975'],
+          oppervlakte: 120,
+          gebruiksdoelen: ['woonfunctie'],
+          pandIdentificaties: ['1234100000000001'],
+        }],
+      },
+    },
+  };
+
+  beforeEach(() => {
+    vi.stubEnv('VITE_BAG_API_KEY', 'test-api-key');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetAllMocks();
+  });
+
+  it('returns bouwjaar, oppervlakte and gebruiksdoelen on success', async () => {
+    vi.mocked(axios.get).mockResolvedValueOnce(mockBagApiResponse);
+    const result = await fetchBagApiData('1234AB', '1');
+    expect(result).not.toBeNull();
+    expect(result?.bouwjaar).toBe(1975);
+    expect(result?.oppervlakte).toBe(120);
+    expect(result?.gebruiksdoelen).toEqual(['woonfunctie']);
+  });
+
+  it('returns null when _embedded is missing', async () => {
+    vi.mocked(axios.get).mockResolvedValueOnce({ data: {} });
+    const result = await fetchBagApiData('1234AB', '1');
+    expect(result).toBeNull();
+  });
+
+  it('returns null when _embedded.adressen is empty', async () => {
+    vi.mocked(axios.get).mockResolvedValueOnce({
+      data: { _embedded: { adressen: [] } },
+    });
+    const result = await fetchBagApiData('1234AB', '1');
+    expect(result).toBeNull();
+  });
+
+  it('returns null and skips API call when VITE_BAG_API_KEY is not set', async () => {
+    vi.stubEnv('VITE_BAG_API_KEY', '');
+    const result = await fetchBagApiData('1234AB', '1');
+    expect(result).toBeNull();
+    expect(axios.get).not.toHaveBeenCalled();
+  });
+
+  it('handles non-array oorspronkelijkBouwjaar gracefully', async () => {
+    const response = {
+      data: {
+        _embedded: {
+          adressen: [{
+            ...mockBagApiResponse.data._embedded.adressen[0],
+            oorspronkelijkBouwjaar: null,
+          }],
+        },
+      },
+    };
+    vi.mocked(axios.get).mockResolvedValueOnce(response);
+    const result = await fetchBagApiData('1234AB', '1');
+    expect(result?.bouwjaar).toBeNull();
+    expect(result?.oppervlakte).toBe(120);
+  });
+
+  it('strips spaces from postcode before calling API', async () => {
+    vi.mocked(axios.get).mockResolvedValueOnce(mockBagApiResponse);
+    await fetchBagApiData('1234 AB', '1');
+    expect(vi.mocked(axios.get)).toHaveBeenCalledWith(
+      expect.stringContaining('postcode=1234AB'),
+      expect.any(Object),
+    );
+  });
+
+  it('uses exacteMatch=true in the request URL', async () => {
+    vi.mocked(axios.get).mockResolvedValueOnce(mockBagApiResponse);
+    await fetchBagApiData('1234AB', '1');
+    expect(vi.mocked(axios.get)).toHaveBeenCalledWith(
+      expect.stringContaining('exacteMatch=true'),
+      expect.any(Object),
+    );
   });
 });
 
