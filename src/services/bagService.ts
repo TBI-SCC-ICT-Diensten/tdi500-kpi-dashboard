@@ -3,10 +3,9 @@
  *
  * Three-step automated lookup:
  *   1. PDOK Locatieserver → address validation + nummeraanduiding_id
- *   2. PDOK BAG WFS → bouwjaar, oppervlakte, gebruiksdoel (free, no auth)
+ *   2. BAG Individuele Bevragingen API → bouwjaar, oppervlakte, gebruiksdoelen
+ *      (requires VITE_BAG_API_KEY; CORS header is * so no Vite proxy needed)
  *   3. EP-online API → energielabel (via Vite proxy to avoid CORS)
- *
- * All APIs are free and require no registration for basic use.
  *
  * [BAG-LOOKUP] To remove this feature: delete this file,
  * BagLookupPage.tsx, and the two [BAG-LOOKUP] entries in
@@ -17,6 +16,7 @@ import axios from 'axios';
 import type { InsulationLevel, KruisProfielCode } from '../types/heatpump';
 
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
+const BAG_API_BASE = 'https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2';
 
 // NOTE: This proxy path only works in Vite dev mode.
 // In production, /ep-online requests will 404 unless a
@@ -32,9 +32,10 @@ export interface BagResult {
   huisnummer: string;
   postcode: string;
   woonplaatsnaam: string;
-  // From PDOK BAG WFS
+  // From BAG Individuele Bevragingen API
   bouwjaar: number | null;
   gebruiksdoel: string | null;
+  gebruiksdoelen: string[];
   oppervlakte: number | null;
   pandStatus: string | null;
   // From EP-online
@@ -45,6 +46,69 @@ export interface BagResult {
 export interface LookupProgress {
   step: 1 | 2 | 3 | 4;
   message: string;
+}
+
+/**
+ * Fetches bouwjaar and oppervlakte from the BAG Individuele Bevragingen API.
+ * Uses /adressenuitgebreid which returns all needed fields in a single call.
+ *
+ * Requires VITE_BAG_API_KEY environment variable.
+ * CORS header is * so no Vite proxy is needed.
+ *
+ * @param postcode - Dutch postcode without spaces (e.g. "3012KN")
+ * @param huisnummer - House number as string (e.g. "180")
+ * @returns bouwjaar, oppervlakte, gebruiksdoelen or null if not found
+ *
+ * Source: BAG Individuele Bevragingen API v2
+ * https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/adressenuitgebreid
+ */
+export async function fetchBagApiData(postcode: string, huisnummer: string): Promise<{
+  bouwjaar: number | null;
+  oppervlakte: number | null;
+  gebruiksdoelen: string[];
+} | null> {
+  const apiKey = import.meta.env['VITE_BAG_API_KEY'] as string | undefined;
+  if (!apiKey) {
+    console.warn('[bagService] VITE_BAG_API_KEY not set — BAG lookup skipped');
+    return null;
+  }
+
+  const postcodeClean = postcode.replace(/\s+/g, '').toUpperCase();
+  const url = `${BAG_API_BASE}/adressenuitgebreid?postcode=${postcodeClean}&huisnummer=${encodeURIComponent(huisnummer)}&exacteMatch=true`;
+
+  const response = await axios.get(url, {
+    headers: {
+      'X-Api-Key': apiKey,
+      'Accept': 'application/hal+json',
+      'Accept-Crs': 'epsg:28992',
+    },
+  });
+
+  const adressen = response.data?._embedded?.adressen;
+  if (!adressen || adressen.length === 0) {
+    return null;
+  }
+
+  const adres = adressen[0];
+
+  const bouwjaarRaw = adres.oorspronkelijkBouwjaar;
+  const bouwjaarParsed = Array.isArray(bouwjaarRaw) && bouwjaarRaw.length > 0
+    ? parseInt(String(bouwjaarRaw[0]), 10)
+    : null;
+
+  const oppervlakte = typeof adres.oppervlakte === 'number'
+    ? adres.oppervlakte
+    : null;
+
+  const gebruiksdoelen: string[] = Array.isArray(adres.gebruiksdoelen)
+    ? adres.gebruiksdoelen
+    : [];
+
+  return {
+    bouwjaar: Number.isFinite(bouwjaarParsed) ? bouwjaarParsed : null,
+    oppervlakte,
+    gebruiksdoelen,
+  };
 }
 
 /**
@@ -99,56 +163,26 @@ export const fetchBagData = async (
   const straatnaam = String(pdokDoc['straatnaam'] ?? '');
   const woonplaatsnaam = String(pdokDoc['woonplaatsnaam'] ?? '');
 
-  // ── Step 2: PDOK BAG WFS → bouwjaar, oppervlakte, gebruiksdoel ─────
-  onProgress?.({ step: 2, message: 'Bouwjaar ophalen via PDOK BAG WFS...' });
+  // ── Step 2: BAG Individuele Bevragingen API — bouwjaar + oppervlakte ─
+  onProgress?.({ step: 2, message: 'Bouwjaar ophalen via BAG Individuele Bevragingen API...' });
 
   let bouwjaar: number | null = null;
   let gebruiksdoel: string | null = null;
+  let gebruiksdoelen: string[] = [];
   let oppervlakte: number | null = null;
-  let pandStatus: string | null = null;
+  const pandStatus: string | null = null; // not returned by adressenuitgebreid
 
   try {
-    const wfsResponse = await axios.get(
-      'https://service.pdok.nl/lv/bag/wfs/v2_0',
-      {
-        params: {
-          service: 'WFS',
-          version: '2.0.0',
-          request: 'GetFeature',
-          typeName: 'bag:verblijfsobject',
-          outputFormat: 'application/json',
-          count: 1,
-          CQL_FILTER: `postcode='${cleanPostcode}' AND huisnummer=${parseInt(cleanHuisnummer, 10)}`,
-          // NOTE: huisnummer suffix (e.g. "64A") is intentionally dropped here.
-          // The WFS huisnummer field is an integer. Suffix-based disambiguation
-          // requires the official BAG Individuele Bevragingen API.
-        },
-        timeout: 10000,
-      }
-    );
-
-    const features = wfsResponse.data?.features as Array<{
-      properties: Record<string, unknown>;
-    }> | undefined;
-
-    const firstFeature = features?.[0];
-    if (firstFeature) {
-      const props = firstFeature.properties;
-      // NOTE: bouwjaar and oppervlakte from WFS are unreliable —
-      // the WFS returns the first matching verblijfsobject which may
-      // not be the correct one. These fields require the official
-      // BAG Individuele Bevragingen API (api.bag.kadaster.nl) with
-      // a Kadaster API key for accurate results.
-      // TODO: replace with BAG Individuele Bevragingen when key is available.
-      bouwjaar = null;
-      oppervlakte = null;
-      gebruiksdoel = props['gebruiksdoel'] != null
-        ? String(props['gebruiksdoel'])
-        : null;
-      pandStatus = props['status'] != null ? String(props['status']) : null;
+    const bagData = await fetchBagApiData(cleanPostcode, cleanHuisnummer);
+    if (bagData) {
+      bouwjaar = bagData.bouwjaar;
+      oppervlakte = bagData.oppervlakte;
+      gebruiksdoelen = bagData.gebruiksdoelen;
+      gebruiksdoel = bagData.gebruiksdoelen[0] ?? null;
     }
-  } catch (wfsErr) {
-    console.warn('[BAG WFS] Lookup failed:', wfsErr);
+  } catch (err) {
+    console.warn('[bagService] BAG API lookup failed:', err);
+    // Non-fatal: continue without bouwjaar/oppervlakte
   }
 
   // ── Step 3: EP-online → energielabel ───────────────────────────────
@@ -199,6 +233,7 @@ export const fetchBagData = async (
     woonplaatsnaam,
     bouwjaar,
     gebruiksdoel,
+    gebruiksdoelen,
     oppervlakte,
     pandStatus,
     energielabel,
