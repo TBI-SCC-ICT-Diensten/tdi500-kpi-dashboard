@@ -28,6 +28,14 @@ export default defineConfig(({ mode }) => {
             'Authorization': env.VITE_EP_ONLINE_API_KEY ?? '',
           },
         },
+        '/knmi-dataplatform': {
+          target: 'https://api.dataplatform.knmi.nl',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/knmi-dataplatform/, ''),
+          headers: {
+            'Authorization': env.VITE_KNMI_API_KEY ?? '',
+          },
+        },
       },
     },
   };
