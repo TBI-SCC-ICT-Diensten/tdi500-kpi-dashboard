@@ -2,17 +2,18 @@
  * KNMI Data Platform service — current weather observations.
  *
  * Uses the Actuele10mindataKNMIstations dataset (10-minute observations).
- * Data is served as NetCDFReader3 binary files via signed download URLs.
+ * Data is served as NetCDF3 binary files via signed download URLs.
  *
  * Flow:
  *   1. Get latest filename from file listing endpoint
  *   2. Get signed temporary download URL for that file
- *   3. Download binary NetCDFReader file as ArrayBuffer
+ *   3. Download binary NetCDF file as ArrayBuffer
  *   4. Parse with netcdfjs, find nearest station to target coordinates
  *   5. Return structured weather observation
  *
  * Requires: VITE_KNMI_API_KEY environment variable
- * CORS: * (direct browser calls work, no proxy needed)
+ * CORS: proxied through Vite dev server (/knmi-dataplatform) — Authorization
+ * header is injected server-side; no browser CORS preflight.
  *
  * Source: https://api.dataplatform.knmi.nl/open-data/v1/
  * Dataset: Actuele10mindataKNMIstations, version 2
@@ -21,7 +22,7 @@
 import { NetCDFReader } from 'netcdfjs';
 import { haversineKm } from '../utils/rdToWgs84';
 
-const KNMI_BASE = 'https://api.dataplatform.knmi.nl/open-data/v1';
+const KNMI_BASE = '/knmi-dataplatform/open-data/v1';
 const DATASET_NAME = 'Actuele10mindataKNMIstations';
 const DATASET_VERSION = '2';
 
@@ -54,15 +55,14 @@ export async function fetchKnmiWeather(
     console.warn('[knmiService] VITE_KNMI_API_KEY not set — weather lookup skipped');
     return null;
   }
-
-  const headers = { Authorization: apiKey };
+  // Key is injected server-side by Vite proxy — not sent from browser
 
   // Step 1: Get latest filename
   const listUrl =
     `${KNMI_BASE}/datasets/${DATASET_NAME}/versions/${DATASET_VERSION}/files` +
     `?maxKeys=1&orderBy=created&sorting=desc`;
 
-  const listRes = await fetch(listUrl, { headers });
+  const listRes = await fetch(listUrl);
   if (!listRes.ok) {
     console.warn('[knmiService] File listing failed:', listRes.status);
     return null;
@@ -79,8 +79,7 @@ export async function fetchKnmiWeather(
 
   // Step 2: Get signed download URL
   const urlRes = await fetch(
-    `${KNMI_BASE}/datasets/${DATASET_NAME}/versions/${DATASET_VERSION}/files/${filename}/url`,
-    { headers }
+    `${KNMI_BASE}/datasets/${DATASET_NAME}/versions/${DATASET_VERSION}/files/${filename}/url`
   );
   if (!urlRes.ok) {
     console.warn('[knmiService] Download URL request failed:', urlRes.status);
@@ -90,15 +89,15 @@ export async function fetchKnmiWeather(
     temporaryDownloadUrl: string
   };
 
-  // Step 3: Download binary NetCDFReader file
+  // Step 3: Download binary NetCDF file
   const fileRes = await fetch(temporaryDownloadUrl);
   if (!fileRes.ok) {
-    console.warn('[knmiService] NetCDFReader file download failed:', fileRes.status);
+    console.warn('[knmiService] NetCDF file download failed:', fileRes.status);
     return null;
   }
   const buffer = await fileRes.arrayBuffer();
 
-  // Step 4: Parse NetCDFReader and find nearest station
+  // Step 4: Parse NetCDF and find nearest station
   return parseNetcdfAndFindNearest(buffer, targetLat, targetLon, fileCreated);
 }
 
@@ -114,7 +113,7 @@ function parseNetcdfAndFindNearest(
     // Log available variables on first parse for debugging
     if (import.meta.env.DEV) {
       console.debug(
-        '[knmiService] NetCDFReader variables:',
+        '[knmiService] NetCDF variables:',
         reader.variables.map((v: { name: string }) => v.name)
       );
     }
@@ -124,7 +123,7 @@ function parseNetcdfAndFindNearest(
     const lons = tryGetVariable(reader, ['lon', 'longitude', 'LON']) as number[] | null;
 
     if (!lats || !lons || lats.length === 0) {
-      console.warn('[knmiService] Could not find lat/lon variables in NetCDFReader');
+      console.warn('[knmiService] Could not find lat/lon variables in NetCDF');
       return null;
     }
 
@@ -191,14 +190,14 @@ function parseNetcdfAndFindNearest(
       isValid: temperatureCelsius !== null,
     };
   } catch (err) {
-    // netcdfjs throws on NetCDFReader4/HDF5 files — handle gracefully
-    if (err instanceof Error && err.message.includes('Not a valid NetCDFReader v3 file')) {
+    // netcdfjs throws on NetCDF4/HDF5 files — handle gracefully
+    if (err instanceof Error && err.message.includes('Not a valid NetCDF v3 file')) {
       console.warn(
-        '[knmiService] KNMI file is NetCDFReader4 format — netcdfjs only supports NetCDFReader3.',
-        'A server-side conversion layer would be needed for NetCDFReader4 support.'
+        '[knmiService] KNMI file is NetCDF4 format — netcdfjs only supports NetCDF3.',
+        'A server-side conversion layer would be needed for NetCDF4 support.'
       );
     } else {
-      console.warn('[knmiService] NetCDFReader parse error:', err);
+      console.warn('[knmiService] NetCDF parse error:', err);
     }
     return null;
   }
