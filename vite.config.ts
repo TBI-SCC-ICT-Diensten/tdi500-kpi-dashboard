@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
+        // Dev only — production uses api/ep-online.ts serverless function
         '/ep-online': {
           target: 'https://public.ep-online.nl',
           changeOrigin: true,
