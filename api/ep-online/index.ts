@@ -30,9 +30,14 @@ export default async function handler(
     return;
   }
 
-  // Strip the /api/ep-online prefix to get the upstream path
-  // Vercel rewrites /ep-online/(.*) → /api/ep-online/$1 before invoking this function
-  const upstreamPath = req.url?.replace(/^\/api\/ep-online/, '') ?? '/';
+  // req.url in a catch-all function contains only the sub-path
+  // e.g. for /ep-online/api/v5/... Vercel passes /api/v5/...
+  // Strip any remaining /api/ep-online prefix just in case
+  const rawPath = req.url ?? '/';
+  const upstreamPath = rawPath.replace(/^\/api\/ep-online/, '');
+
+  console.log('[ep-online proxy] req.url:', req.url);
+  console.log('[ep-online proxy] upstream path:', upstreamPath);
 
   const options: https.RequestOptions = {
     hostname: 'public.ep-online.nl',
