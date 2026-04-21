@@ -1,35 +1,36 @@
 import { describe, it, expect } from 'vitest';
-import { rdToWgs84, haversineKm } from '../utils/rdToWgs84';
+import { rdToWgs84 } from '../utils/rdToWgs84';
 
 describe('rdToWgs84', () => {
-  it('converts Amersfoort reference point correctly', () => {
+  it('converts Amersfoort reference point (origin)', () => {
     const [lat, lon] = rdToWgs84(155000, 463000);
     expect(lat).toBeCloseTo(52.1552, 3);
     expect(lon).toBeCloseTo(5.3872, 3);
   });
 
-  it('converts Amsterdam correctly', () => {
-    // RD New center of Amsterdam; lon comes out ~4.898 for these coordinates
+  it('converts Amsterdam Centraal', () => {
     const [lat, lon] = rdToWgs84(121687, 487041);
-    expect(lat).toBeCloseTo(52.373, 2);
-    expect(lon).toBeCloseTo(4.898, 2);
+    expect(lat).toBeCloseTo(52.370, 2);
+    expect(lon).toBeCloseTo(4.900, 2);
   });
 
-  it('converts Rotterdam correctly', () => {
+  it('converts Rotterdam', () => {
     const [lat, lon] = rdToWgs84(92560, 437402);
-    expect(lat).toBeCloseTo(51.9225, 2);
-    expect(lon).toBeCloseTo(4.4792, 2);
-  });
-});
-
-describe('haversineKm', () => {
-  it('returns 0 for same point', () => {
-    expect(haversineKm(52.0, 5.0, 52.0, 5.0)).toBe(0);
+    expect(lat).toBeCloseTo(51.922, 2);
+    expect(lon).toBeCloseTo(4.479, 2);
   });
 
-  it('calculates Amsterdam-Rotterdam distance correctly', () => {
-    const dist = haversineKm(52.3731, 4.8922, 51.9225, 4.4792);
-    expect(dist).toBeGreaterThan(55);
-    expect(dist).toBeLessThan(65);
+  it('converts Den Haag', () => {
+    const [lat, lon] = rdToWgs84(81253, 455271);
+    expect(lat).toBeCloseTo(52.080, 2);
+    expect(lon).toBeCloseTo(4.312, 2);
+  });
+
+  it('returns values within valid Netherlands bounding box', () => {
+    const [lat, lon] = rdToWgs84(155000, 463000);
+    expect(lat).toBeGreaterThan(50.7);
+    expect(lat).toBeLessThan(53.7);
+    expect(lon).toBeGreaterThan(3.3);
+    expect(lon).toBeLessThan(7.3);
   });
 });

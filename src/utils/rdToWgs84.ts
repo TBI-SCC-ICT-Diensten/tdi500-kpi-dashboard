@@ -2,10 +2,12 @@
  * Converts RD New (EPSG:28992) coordinates to WGS84 (lat/lon).
  *
  * Uses the standard Dutch geodetic polynomial approximation.
- * Reference: Benelux transformation, accurate to ~1m for Netherlands.
+ * Accurate to ~1m across the Netherlands.
  *
- * @param x - RD New X coordinate (easting, e.g. 92294.3)
- * @param y - RD New Y coordinate (northing, e.g. 436830.56)
+ * Reference: Benelux geodetic transformation formulas
+ *
+ * @param x - RD New easting (e.g. 92294.3)
+ * @param y - RD New northing (e.g. 436830.56)
  * @returns [latitude, longitude] in decimal degrees WGS84
  */
 export function rdToWgs84(x: number, y: number): [number, number] {
@@ -43,22 +45,4 @@ export function rdToWgs84(x: number, y: number): [number, number] {
   const lon = 5.38720621 + sumE / 3600;
 
   return [lat, lon];
-}
-
-/**
- * Haversine distance between two WGS84 points in kilometers.
- */
-export function haversineKm(
-  lat1: number, lon1: number,
-  lat2: number, lon2: number
-): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
