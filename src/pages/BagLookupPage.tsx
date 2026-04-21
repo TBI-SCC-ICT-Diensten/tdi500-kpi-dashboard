@@ -362,7 +362,7 @@ const BagLookupPage = () => {
       )}
 
       {/* Step 4: Current weather */}
-      {bagResult?.rdCoordinates && !loading && (
+      {bagResult?.rdCoordinates && (
         <Box sx={{ mt: 3, mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
             <Typography variant="caption" fontWeight={700}
@@ -375,8 +375,8 @@ const BagLookupPage = () => {
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Typography variant="caption" color="text.secondary"
               sx={{ display: 'block', mb: 1.5 }}>
-              Actuele meting van het dichtstbijzijnde KNMI-weerstation.
-              Buitentemperatuur beïnvloedt de verwachte COP en aanvoertemperatuur.
+              Actuele meting op basis van Open-Meteo (KNMI/ECMWF model).
+              Buitentemperatuur beïnvloedt de verwachte COP en stooklijn.
             </Typography>
             <WeatherWidget
               rdCoordinates={bagResult.rdCoordinates}
