@@ -22,10 +22,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import HomeIcon from '@mui/icons-material/Home';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Spinner from '../components/common/Spinner';
+import WeatherWidget from '../components/bag/WeatherWidget';
 import {
   fetchBagData,
   mapBouwjaarToInsulation,
   mapEnergielabelToInsulation,
+  mapAfgifteToClass,
   deriveKruisProfielCode,
   type BagResult,
   type LookupProgress,
@@ -359,12 +361,37 @@ const BagLookupPage = () => {
         </Paper>
       )}
 
-      {/* Step 4: Kruisprofiel + Inregelinstellingen result */}
+      {/* Step 4: Current weather */}
+      {bagResult?.rdCoordinates && (
+        <Box sx={{ mt: 3, mb: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <Typography variant="caption" fontWeight={700}
+              sx={{ textTransform: 'uppercase', letterSpacing: 2,
+                    color: 'text.secondary', whiteSpace: 'nowrap' }}>
+              Stap 4 — Actuele weersomstandigheden
+            </Typography>
+            <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+          </Box>
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="caption" color="text.secondary"
+              sx={{ display: 'block', mb: 1.5 }}>
+              Actuele meting op basis van Open-Meteo (KNMI/ECMWF model).
+              Buitentemperatuur beïnvloedt de verwachte COP en stooklijn.
+            </Typography>
+            <WeatherWidget
+              rdCoordinates={bagResult.rdCoordinates}
+              supplyTemperatureClass={afgiftesysteem ? mapAfgifteToClass(afgiftesysteem) : undefined}
+            />
+          </Paper>
+        </Box>
+      )}
+
+      {/* Step 5: Kruisprofiel + Inregelinstellingen result */}
       {profiel && thresholds && (
         <Paper variant="outlined" sx={{ p: 3 }}>
           <Typography variant="overline" color="text.secondary"
             sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}>
-            Stap 4 — Aanbevolen Inregelinstellingen
+            Stap 5 — Aanbevolen Inregelinstellingen
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2,
