@@ -243,6 +243,19 @@ const BagLookupPage = () => {
                 </Box>
               </Grid>
             )}
+            {bagResult.energielabelError && (
+              <Grid item xs={12}>
+                <Paper variant="outlined"
+                  sx={{ p: 1.5, borderColor: 'warning.main',
+                        bgcolor: 'warning.light' }}>
+                  <Typography variant="caption"
+                    sx={{ color: 'warning.dark', fontWeight: 600 }}>
+                    ⚠ Energielabel kon niet worden opgehaald:{' '}
+                    {bagResult.energielabelError}
+                  </Typography>
+                </Paper>
+              </Grid>
+            )}
             {bagResult.oppervlakte && (
               <Grid item xs={6} sm={3}>
                 <Box sx={{ p: 1.5, bgcolor: cellBg, borderRadius: 1,

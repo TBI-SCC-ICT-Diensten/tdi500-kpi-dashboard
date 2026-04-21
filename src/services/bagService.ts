@@ -15,6 +15,44 @@
 import axios from 'axios';
 import type { InsulationLevel, KruisProfielCode } from '../types/heatpump';
 
+/**
+ * Structured error logger for bagService API calls.
+ * Distinguishes between infrastructure errors and application errors.
+ */
+function logApiError(
+  source: string,
+  endpoint: string,
+  error: unknown,
+  context?: Record<string, string>
+): void {
+  const ctx = context
+    ? ' | ' + Object.entries(context).map(([k, v]) => `${k}=${v}`).join(', ')
+    : '';
+
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status;
+    const message = error.response?.data
+      ? JSON.stringify(error.response.data).slice(0, 200)
+      : error.message;
+
+    if (status === 404) {
+      console.info(`[${source}] 404 — niet gevonden: ${endpoint}${ctx}`);
+    } else if (status === 401 || status === 403) {
+      console.error(`[${source}] Auth fout (${status}): ${endpoint}${ctx} | Controleer API key`);
+    } else if (status === 500 || status === 502 || status === 503) {
+      console.error(`[${source}] Server fout (${status}): ${endpoint}${ctx} | ${message}`);
+    } else if (!status) {
+      console.error(`[${source}] Netwerk/proxy fout: ${endpoint}${ctx} | ${error.message}`);
+    } else {
+      console.warn(`[${source}] HTTP ${status}: ${endpoint}${ctx} | ${message}`);
+    }
+  } else if (error instanceof Error) {
+    console.error(`[${source}] Onverwachte fout: ${endpoint}${ctx} | ${error.message}`);
+  } else {
+    console.error(`[${source}] Onbekende fout: ${endpoint}${ctx}`, error);
+  }
+}
+
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
 const BAG_API_BASE = 'https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2';
 
@@ -42,6 +80,7 @@ export interface BagResult {
   // From EP-online
   energielabel: string | null;
   energielabelGeldigTot: string | null;
+  energielabelError?: string;
 }
 
 export interface LookupProgress {
@@ -143,18 +182,25 @@ export const fetchBagData = async (
   // ── Step 1: PDOK Locatieserver ──────────────────────────────────────
   onProgress?.({ step: 1, message: 'Adres opzoeken via PDOK Locatieserver...' });
 
-  const pdokResponse = await axios.get(`${PDOK_BASE}/free`, {
-    params: {
-      q: `${cleanPostcode} ${cleanHuisnummer}`,
-      fq: `type:adres AND postcode:${cleanPostcode}`,
-      fl: 'id,weergavenaam,straatnaam,huisnummer,postcode,woonplaatsnaam,nummeraanduiding_id',
-      rows: 5,
-    },
-    timeout: 10000,
-  });
-
-  const docs: Record<string, unknown>[] =
-    pdokResponse.data?.response?.docs ?? [];
+  let docs: Record<string, unknown>[];
+  try {
+    const pdokResponse = await axios.get(`${PDOK_BASE}/free`, {
+      params: {
+        q: `${cleanPostcode} ${cleanHuisnummer}`,
+        fq: `type:adres AND postcode:${cleanPostcode}`,
+        fl: 'id,weergavenaam,straatnaam,huisnummer,postcode,woonplaatsnaam,nummeraanduiding_id',
+        rows: 5,
+      },
+      timeout: 10000,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    docs = (pdokResponse.data?.response?.docs ?? []) as Record<string, unknown>[];
+  } catch (err) {
+    logApiError('PDOK Locatieserver', PDOK_BASE + '/free', err, {
+      query: `${cleanPostcode} ${cleanHuisnummer}`
+    });
+    throw new Error('Adres kon niet worden gevonden via PDOK Locatieserver');
+  }
 
   if (docs.length === 0) {
     throw new Error(
@@ -195,8 +241,11 @@ export const fetchBagData = async (
       }
     }
   } catch (err) {
-    console.warn('[bagService] BAG API lookup failed:', err);
-    // Non-fatal: continue without bouwjaar/oppervlakte
+    logApiError('BAG Individuele Bevragingen', '/adressenuitgebreid', err, {
+      postcode: cleanPostcode, huisnummer: cleanHuisnummer
+    });
+    // Non-fatal — continue without bouwjaar/oppervlakte
+    console.warn('[BAG] Bouwjaar/oppervlakte niet beschikbaar — doorgaan zonder');
   }
 
   // ── Step 3: EP-online → energielabel ───────────────────────────────
@@ -204,6 +253,7 @@ export const fetchBagData = async (
 
   let energielabel: string | null = null;
   let energielabelGeldigTot: string | null = null;
+  let energielabelError: string | undefined = undefined;
 
   try {
     const epResponse = await axios.get(`${EP_PROXY}/PandEnergielabel/Adres`, {
@@ -228,12 +278,26 @@ export const fetchBagData = async (
         ? String(label['Geldig_tot'])
         : null;
     }
-  } catch (epErr) {
-    if (axios.isAxiosError(epErr) && epErr.response?.status === 404) {
-      // 404 = address has no registered energielabel — not an error
-      console.info('[EP-online] Geen energielabel geregistreerd voor dit adres');
-    } else {
-      console.warn('[EP-online] Energielabel lookup failed:', epErr);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      if (status === 404) {
+        // Legitimate: this address has no registered energy label
+        console.info('[EP-online] Geen energielabel geregistreerd:', cleanPostcode, cleanHuisnummer);
+        // energielabel stays null — correct behaviour
+      } else if (!status) {
+        // Network/proxy error — the proxy itself failed
+        logApiError('EP-online proxy', '/ep-online/api/v5/PandEnergielabel/Adres', err, {
+          postcode: cleanPostcode, huisnummer: cleanHuisnummer
+        });
+        console.warn('[EP-online] Proxy niet bereikbaar — controleer Vercel serverless function en EP_ONLINE_API_KEY');
+        energielabelError = 'Proxy niet bereikbaar';
+      } else {
+        logApiError('EP-online', '/ep-online/api/v5/PandEnergielabel/Adres', err, {
+          postcode: cleanPostcode, huisnummer: cleanHuisnummer, status: String(status)
+        });
+        energielabelError = `EP-online fout (${status})`;
+      }
     }
   }
 
@@ -253,6 +317,7 @@ export const fetchBagData = async (
     rdCoordinates,
     energielabel,
     energielabelGeldigTot,
+    energielabelError,
   };
 };
 
