@@ -18,9 +18,13 @@ export default async function handler(
     return;
   }
 
-  const url = new URL(req.url ?? '/', 'http://localhost');
-  url.searchParams.delete('subpath');
-  const remainingQuery = url.searchParams.toString();
+  // Parse query string directly without URL object
+  const rawUrl = req.url ?? '/';
+  const queryStart = rawUrl.indexOf('?');
+  const queryString = queryStart >= 0 ? rawUrl.slice(queryStart + 1) : '';
+  const params = new URLSearchParams(queryString);
+  params.delete('subpath');
+  const remainingQuery = params.toString();
   const upstreamPath = '/' + subpath + (remainingQuery ? '?' + remainingQuery : '');
 
   console.log('[ep-online proxy] subpath:', subpath);
