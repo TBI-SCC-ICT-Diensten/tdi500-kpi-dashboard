@@ -30,8 +30,9 @@ export default async function handler(
     return;
   }
 
-  // Strip the /ep-online prefix to get the upstream path
-  const upstreamPath = req.url?.replace(/^\/ep-online/, '') ?? '/';
+  // Strip the /api/ep-online prefix to get the upstream path
+  // Vercel rewrites /ep-online/(.*) → /api/ep-online/$1 before invoking this function
+  const upstreamPath = req.url?.replace(/^\/api\/ep-online/, '') ?? '/';
 
   const options: https.RequestOptions = {
     hostname: 'public.ep-online.nl',
