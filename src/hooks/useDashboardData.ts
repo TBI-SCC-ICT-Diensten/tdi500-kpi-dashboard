@@ -1,0 +1,132 @@
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import type { HeatPumpSystem, Contingent, KeyPerformanceIndicator } from '../types/heatpump';
+import { fetchAllHeatPumpData, subscribeToDataSource } from '../services/hupieApi';
+import { createContingent } from '../services/contingentService';
+import { aggregateKpisForContingent } from '../services/kpiAggregator';
+import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
+import { useDashboardContext } from '../context/DashboardContext';
+
+export interface DashboardData {
+  heatPumps: HeatPumpSystem[];
+  contingents: Contingent[];
+  selectedContingent: Contingent | null;
+  kpis: KeyPerformanceIndicator[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => void;
+}
+
+const useDashboardData = (): DashboardData => {
+  const { state, setSelectedContingentId } = useDashboardContext();
+  const { selectedContingentId } = state;
+
+  const [heatPumps, setHeatPumps] = useState<HeatPumpSystem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Bump on each load() call so stale in-flight responses are dropped.
+  const requestIdRef = useRef(0);
+
+  const load = useCallback(async (): Promise<void> => {
+    const requestId = ++requestIdRef.current;
+    setIsLoading(true);
+    setError(null);
+    setHeatPumps([]);
+
+    try {
+      // Stream pumps into state as each one resolves.
+      // setIsLoading stays true until the first pump arrives,
+      // then turns false so the UI renders partial results immediately.
+      let firstPumpReceived = false;
+
+      await fetchAllHeatPumpData((pump) => {
+        if (requestId !== requestIdRef.current) return; // stale
+        if (!firstPumpReceived) {
+          firstPumpReceived = true;
+          setIsLoading(false);
+        }
+        setHeatPumps((prev) => {
+          // Avoid duplicates if pump already in state
+          if (prev.some((p) => p.id === pump.id)) return prev;
+          return [...prev, pump];
+        });
+      });
+
+      if (requestId !== requestIdRef.current) return;
+      if (!firstPumpReceived) {
+        // No pumps loaded at all
+        setIsLoading(false);
+      }
+    } catch (err) {
+      if (requestId !== requestIdRef.current) return;
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('[useDashboardData] Failed to load heat pump data:', message);
+      setError(`Kon warmtepompdata niet ophalen: ${message}`);
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Initial load on mount.
+  useEffect(() => {
+    load();
+    return () => {
+      // Bump so any in-flight callback is treated as stale.
+      requestIdRef.current++;
+    };
+  }, [load]);
+
+  // Auto-refetch when the data source (live/mock) changes.
+  useEffect(() => {
+    return subscribeToDataSource(() => {
+      load();
+    });
+  }, [load]);
+
+  // Build contingents from heat pump data.
+  // The Hupie API does not expose kruisprofiel per heat pump.
+  // All heat pumps are assigned to one default contingent (B2) until
+  // the API provides per-pump kruisprofiel assignments.
+  const contingents = useMemo((): Contingent[] => {
+    if (heatPumps.length === 0) return [];
+
+    const defaultContingent = createContingent(
+      'default-b2',
+      'Alle warmtepompen',
+      'B2',
+      heatPumps
+    );
+
+    return [defaultContingent];
+  }, [heatPumps]);
+
+  // Auto-select the first contingent when contingents load
+  useEffect(() => {
+    if (contingents.length > 0 && selectedContingentId === null) {
+      const first = contingents[0];
+      if (first) setSelectedContingentId(first.id);
+    }
+  }, [contingents, selectedContingentId, setSelectedContingentId]);
+
+  const selectedContingent = useMemo(
+    () => contingents.find((c) => c.id === selectedContingentId) ?? null,
+    [contingents, selectedContingentId]
+  );
+
+  const kpis = useMemo((): KeyPerformanceIndicator[] => {
+    if (!selectedContingent) return [];
+    const thresholds = SCORING_THRESHOLDS_BY_PROFIEL[selectedContingent.kruisProfiel.code];
+    return aggregateKpisForContingent(selectedContingent.heatPumps, thresholds);
+  }, [selectedContingent]);
+
+  return {
+    heatPumps,
+    contingents,
+    selectedContingent,
+    kpis,
+    isLoading,
+    error,
+    refetch: load,
+  };
+};
+
+export default useDashboardData;

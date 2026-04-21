@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+*.log
+node_modules
+.claude
+Claude.md
