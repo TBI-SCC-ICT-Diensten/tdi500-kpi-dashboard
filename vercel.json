@@ -4,8 +4,8 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/ep-online/:path*",
-      "destination": "/api/ep-online/:path*"
+      "source": "/ep-online/(.*)",
+      "destination": "/api/ep-online?subpath=$1"
     },
     {
       "source": "/((?!api/).*)",
