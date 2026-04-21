@@ -30,13 +30,22 @@ export default async function handler(
     return;
   }
 
-  // req.url in a catch-all function contains only the sub-path
-  // e.g. for /ep-online/api/v5/... Vercel passes /api/v5/...
-  // Strip any remaining /api/ep-online prefix just in case
-  const rawPath = req.url ?? '/';
-  const upstreamPath = rawPath.replace(/^\/api\/ep-online/, '');
+  // Sub-path passed as query param via vercel.json rewrite
+  // e.g. /ep-online/api/v5/PandEnergielabel/Adres?postcode=X&huisnummer=Y
+  // becomes ?subpath=api/v5/PandEnergielabel/Adres&postcode=X&huisnummer=Y
+  const subpath = req.query['subpath'];
+  if (!subpath) {
+    res.status(400).json({ error: 'Missing subpath parameter' });
+    return;
+  }
 
-  console.log('[ep-online proxy] req.url:', req.url);
+  // Reconstruct the full query string minus the subpath param
+  const url = new URL(req.url ?? '/', 'http://localhost');
+  url.searchParams.delete('subpath');
+  const remainingQuery = url.searchParams.toString();
+  const upstreamPath = '/' + subpath + (remainingQuery ? '?' + remainingQuery : '');
+
+  console.log('[ep-online proxy] subpath:', subpath);
   console.log('[ep-online proxy] upstream path:', upstreamPath);
 
   const options: https.RequestOptions = {
