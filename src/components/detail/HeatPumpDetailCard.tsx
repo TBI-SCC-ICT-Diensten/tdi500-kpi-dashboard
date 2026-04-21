@@ -14,7 +14,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
 import { PROPERTY_LABEL_MAP } from '../../types/units';
-import type { HeatPumpSystem } from '../../types/heatpump';
+import type { HeatPumpSystem, SupplyTemperatureClass } from '../../types/heatpump';
+import { estimateExpectedCop } from '../../services/weatherService';
 
 type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
 
@@ -59,15 +60,54 @@ const getSeveritySx = (severity: string, isDark: boolean) => {
 
 interface Props {
   heatPump: HeatPumpSystem;
+  outdoorTempCelsius?: number;
+  supplyTemperatureClass?: SupplyTemperatureClass;
 }
 
-const HeatPumpDetailCard = ({ heatPump }: Props) => {
+const HeatPumpDetailCard = ({
+  heatPump,
+  outdoorTempCelsius,
+  supplyTemperatureClass,
+}: Props) => {
   const [specsExpanded, setSpecsExpanded] = useState(false);
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const specs = heatPump.deviceSpecs;
   const hasSpecs = specs && Object.values(specs).some(Boolean);
   const status = heatPump.status as PumpStatus;
+
+  // Expected COP based on outdoor temp + supply class
+  // Only calculated when we have outdoor temperature context
+  const copMeasurement = heatPump.measurements.find(
+    (m) => m.property === 'cop'
+  );
+  const actualCop = copMeasurement?.value ?? null;
+
+  const expectedCop =
+    outdoorTempCelsius !== undefined && supplyTemperatureClass
+      ? estimateExpectedCop(outdoorTempCelsius, supplyTemperatureClass)
+      : null;
+
+  // COP status: how does actual compare to expected?
+  const copDelta =
+    actualCop !== null && expectedCop !== null
+      ? actualCop - expectedCop
+      : null;
+
+  const copStatus: 'good' | 'warning' | 'critical' | null =
+    copDelta === null
+      ? null
+      : copDelta >= -0.3
+      ? 'good'       // within 0.3 of expected or above
+      : copDelta >= -0.8
+      ? 'warning'    // 0.3–0.8 below expected
+      : 'critical';  // more than 0.8 below expected
+
+  const copStatusColor: Record<'good' | 'warning' | 'critical', string> = {
+    good:     '#16A34A',
+    warning:  '#D97706',
+    critical: '#DC2626',
+  };
 
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
@@ -172,18 +212,59 @@ const HeatPumpDetailCard = ({ heatPump }: Props) => {
 
       {/* ── Measurements ─────────────────────────────────────────── */}
       {heatPump.measurements.length > 0 ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
-          {heatPump.measurements.map((m) => (
-            <Box key={m.property}
-              sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="caption" color="text.secondary">
-                {PROPERTY_LABEL_MAP[m.property] ?? m.property}
-              </Typography>
-              <Typography variant="caption" fontWeight={500}>
-                {m.value} {m.unit}
-              </Typography>
-            </Box>
-          ))}
+        <Box sx={{ display: 'flex', flexDirection: 'column',
+                   gap: 0.5, mb: 1 }}>
+          {heatPump.measurements.map((m) => {
+
+            // Special treatment for COP when we have context
+            if (m.property === 'cop' && expectedCop !== null && copStatus !== null) {
+              return (
+                <Box key={m.property}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between',
+                             alignItems: 'center' }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {PROPERTY_LABEL_MAP[m.property] ?? m.property}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <Typography variant="caption" fontWeight={700}
+                        sx={{ color: copStatusColor[copStatus] }}>
+                        {m.value} {m.unit}
+                      </Typography>
+                      <Typography variant="caption"
+                        sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+                        / verwacht {expectedCop.toFixed(1)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {/* Inline context line for warning/critical */}
+                  {copStatus !== 'good' && (
+                    <Typography variant="caption"
+                      sx={{ display: 'block', mt: 0.25, mb: 0.25,
+                            fontSize: '0.68rem', fontStyle: 'italic',
+                            color: copStatusColor[copStatus],
+                            pl: 0 }}>
+                      {copStatus === 'critical'
+                        ? `${Math.abs(copDelta!).toFixed(1)} onder verwachting bij ${outdoorTempCelsius!.toFixed(1)}°C — controleren`
+                        : `Licht onder verwachting bij ${outdoorTempCelsius!.toFixed(1)}°C`}
+                    </Typography>
+                  )}
+                </Box>
+              );
+            }
+
+            // Generic row for all other measurements
+            return (
+              <Box key={m.property}
+                sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="caption" color="text.secondary">
+                  {PROPERTY_LABEL_MAP[m.property] ?? m.property}
+                </Typography>
+                <Typography variant="caption" fontWeight={500}>
+                  {m.value} {m.unit}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
       ) : (
         <Typography variant="caption" color="text.disabled"
