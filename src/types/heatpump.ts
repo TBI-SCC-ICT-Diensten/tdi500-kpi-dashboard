@@ -1,3 +1,13 @@
+/**
+ * WGS84 coordinates for weather lookup.
+ * Populated from BAG API rdCoordinates via rdToWgs84 conversion.
+ * Optional — Hupie API does not expose location data.
+ */
+export interface Wgs84Location {
+  lat: number;
+  lon: number;
+}
+
 export interface HeatPumpSystem {
   id: string;
   uri: string;
@@ -10,6 +20,7 @@ export interface HeatPumpSystem {
   serverConnection?: ConnectionState;
   heatingCurve?: HeatingCurve;
   deviceSpecs?: DeviceSpecs;
+  wgs84?: Wgs84Location;
 }
 
 export type HeatPumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';

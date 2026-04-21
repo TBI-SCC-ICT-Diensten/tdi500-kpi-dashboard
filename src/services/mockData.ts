@@ -50,6 +50,7 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       firmwareVersion: '3.1.2',
       yearOfManufacture: 2021,
     },
+    wgs84: { lat: 51.9225, lon: 4.4792 },
   },
   {
     id: 'mock-pump-02',
@@ -87,6 +88,7 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       firmwareVersion: '2.8.0',
       yearOfManufacture: 2020,
     },
+    wgs84: { lat: 52.0705, lon: 4.3007 },
   },
   {
     id: 'mock-pump-03',
@@ -129,6 +131,7 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       firmwareVersion: '1.4.7',
       yearOfManufacture: 2019,
     },
+    wgs84: { lat: 52.3676, lon: 4.9041 },
   },
   {
     id: 'mock-pump-04',
@@ -160,6 +163,7 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       firmwareVersion: '4.0.1',
       yearOfManufacture: 2023,
     },
+    wgs84: { lat: 52.0907, lon: 5.1214 },
   },
   {
     id: 'mock-pump-05',
@@ -179,5 +183,6 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       firmwareVersion: '2.2.3',
       yearOfManufacture: 2018,
     },
+    wgs84: { lat: 51.4416, lon: 5.4697 },
   },
 ];
