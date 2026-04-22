@@ -20,15 +20,15 @@ const makeHeatPump = (id: string, status: HeatPumpSystem['status'] = 'active'): 
 describe('contingent construction from heat pump list', () => {
   it('creates a default B2 contingent from all heat pumps', () => {
     const pumps = [makeHeatPump('hp1'), makeHeatPump('hp2')];
-    const contingent = createContingent('default-b2', 'Alle warmtepompen', 'B2', pumps);
+    const contingent = createContingent('contingent-B2', 'Alle warmtepompen', 'B2', pumps);
 
-    expect(contingent.id).toBe('default-b2');
+    expect(contingent.id).toBe('contingent-B2');
     expect(contingent.kruisProfiel.code).toBe('B2');
     expect(contingent.heatPumps).toHaveLength(2);
   });
 
   it('B2 contingent has correct kruisprofiel properties', () => {
-    const contingent = createContingent('default-b2', 'Test', 'B2', []);
+    const contingent = createContingent('contingent-B2', 'Test', 'B2', []);
     expect(contingent.kruisProfiel.insulationLevel).toBe('B');
     expect(contingent.kruisProfiel.supplyTemperatureClass).toBe('2');
     expect(contingent.kruisProfiel.maxSupplyTemperatureCelsius).toBe(55);
@@ -38,7 +38,7 @@ describe('contingent construction from heat pump list', () => {
 describe('KPI aggregation for selected contingent', () => {
   it('returns 4 KPIs for a contingent with heat pumps', () => {
     const pumps = [makeHeatPump('hp1'), makeHeatPump('hp2')];
-    const contingent = createContingent('default-b2', 'Test', 'B2', pumps);
+    const contingent = createContingent('contingent-B2', 'Test', 'B2', pumps);
     const thresholds = SCORING_THRESHOLDS_BY_PROFIEL[contingent.kruisProfiel.code];
     const kpis = aggregateKpisForContingent(contingent.heatPumps, thresholds);
 
@@ -53,7 +53,7 @@ describe('KPI aggregation for selected contingent', () => {
 
   it('KPI categories cover efficiency, reliability, and commissioning', () => {
     const pumps = [makeHeatPump('hp1')];
-    const contingent = createContingent('default-b2', 'Test', 'B2', pumps);
+    const contingent = createContingent('contingent-B2', 'Test', 'B2', pumps);
     const thresholds = SCORING_THRESHOLDS_BY_PROFIEL['B2'];
     const kpis = aggregateKpisForContingent(contingent.heatPumps, thresholds);
     const categories = kpis.map((k) => k.category);
@@ -68,7 +68,7 @@ describe('KPI aggregation for selected contingent', () => {
       makeHeatPump('hp1', 'active'),
       makeHeatPump('hp2', 'offline'),
     ];
-    const contingent = createContingent('default-b2', 'Test', 'B2', pumps);
+    const contingent = createContingent('contingent-B2', 'Test', 'B2', pumps);
     const thresholds = SCORING_THRESHOLDS_BY_PROFIEL['B2'];
     const kpis = aggregateKpisForContingent(contingent.heatPumps, thresholds);
     const connectivity = kpis.find((k) => k.category === 'reliability');

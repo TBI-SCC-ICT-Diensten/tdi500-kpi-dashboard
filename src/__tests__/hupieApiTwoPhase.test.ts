@@ -37,15 +37,15 @@ vi.mock('../services/dataMapper', () => ({
   ),
 }));
 
-import { fetchAllHeatPumpData, fetchHeatPumpDetails } from '../services/hupieApi';
+import { fetchAllHeatPumpData, fetchHeatPumpDetails, setDataSource } from '../services/hupieApi';
 
 // Helpers — wrapped in { data: ... } because executeSparqlQuery returns response.data
-const makeListResponse = (uris: string[]) => ({
+const makeListResponse = (ids: string[]) => ({
   data: {
-    head: { vars: ['heatpump'] },
+    head: { vars: ['id'] },
     results: {
-      bindings: uris.map((uri) => ({
-        heatpump: { type: 'uri' as const, value: uri },
+      bindings: ids.map((id) => ({
+        id: { type: 'literal' as const, value: id },
       })),
     },
   },
@@ -63,18 +63,24 @@ const makeDetailResponse = (count = 1) => ({
 });
 
 describe('fetchHeatPumpDetails', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setDataSource('live');
+  });
 
   it('calls executeSparqlQuery with a string query', async () => {
     mockPost.mockResolvedValueOnce(makeDetailResponse(1));
-    await fetchHeatPumpDetails('https://example.com/hp/abc');
+    await fetchHeatPumpDetails('abc');
     expect(mockPost).toHaveBeenCalledTimes(1);
     expect(typeof mockPost.mock.calls[0]?.[1]).toBe('string');
   });
 });
 
 describe('fetchAllHeatPumpData', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setDataSource('live');
+  });
 
   it('returns empty array when list query returns no URIs', async () => {
     mockPost.mockResolvedValueOnce(makeListResponse([]));
@@ -83,9 +89,9 @@ describe('fetchAllHeatPumpData', () => {
   });
 
   it('fires one detail query per URI from the list', async () => {
-    const uris = ['https://example.com/hp/1', 'https://example.com/hp/2'];
+    const ids = ['1', '2'];
     mockPost
-      .mockResolvedValueOnce(makeListResponse(uris))
+      .mockResolvedValueOnce(makeListResponse(ids))
       .mockResolvedValueOnce(makeDetailResponse(1))
       .mockResolvedValueOnce(makeDetailResponse(1));
 
@@ -95,9 +101,9 @@ describe('fetchAllHeatPumpData', () => {
   });
 
   it('returns combined heat pumps from all detail responses', async () => {
-    const uris = ['https://example.com/hp/1', 'https://example.com/hp/2'];
+    const ids = ['1', '2'];
     mockPost
-      .mockResolvedValueOnce(makeListResponse(uris))
+      .mockResolvedValueOnce(makeListResponse(ids))
       .mockResolvedValueOnce(makeDetailResponse(1))
       .mockResolvedValueOnce(makeDetailResponse(1));
 
@@ -106,9 +112,9 @@ describe('fetchAllHeatPumpData', () => {
   });
 
   it('skips failed detail queries and returns the rest', async () => {
-    const uris = ['https://example.com/hp/1', 'https://example.com/hp/2'];
+    const ids = ['1', '2'];
     mockPost
-      .mockResolvedValueOnce(makeListResponse(uris))
+      .mockResolvedValueOnce(makeListResponse(ids))
       .mockRejectedValueOnce(new Error('timeout'))
       .mockResolvedValueOnce(makeDetailResponse(1));
 

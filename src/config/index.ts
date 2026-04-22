@@ -2,7 +2,7 @@ export const config = {
   api: {
     baseUrl: import.meta.env.VITE_HUPIE_API_URL ?? '',
     apiKey: import.meta.env.VITE_HUPIE_API_KEY ?? '',
-    timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
+    timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 30000,
     detailTimeout: 30000,
   },
 } as const;

@@ -83,27 +83,48 @@ const useDashboardData = (): DashboardData => {
   }, [load]);
 
   // Build contingents from heat pump data.
-  // The Hupie API does not expose kruisprofiel per heat pump.
-  // All heat pumps are assigned to one default contingent (B2) until
-  // the API provides per-pump kruisprofiel assignments.
   const contingents = useMemo((): Contingent[] => {
     if (heatPumps.length === 0) return [];
 
-    const defaultContingent = createContingent(
-      'default-b2',
-      'Alle warmtepompen',
-      'B2',
-      heatPumps
+    // Dynamically calculate Kruisprofiel from URL/UI filters
+    const searchParams = new URLSearchParams(window.location.search);
+    const isolatie = searchParams.get('isolatie');
+    const aanvoer = searchParams.get('aanvoer');
+    
+    // Defaults to 'B' and '2' if missing/null
+    const isolatieniveau = isolatie || 'B';
+    const aanvoertemp = aanvoer || '2';
+    
+    const kruisProfielCode = `${isolatieniveau}${aanvoertemp}` as any;
+    const contingentId = `contingent-${kruisProfielCode}`;
+
+    // Filter heat pumps properly under this specific Kruisprofiel code.
+    // Assuming heat pumps MIGHT have kruisProfielCode or we fall back.
+    const filteredPumps = heatPumps.filter((hp: any) => {
+      if (hp.kruisProfielCode) {
+        return hp.kruisProfielCode === kruisProfielCode;
+      }
+      // If the API hasn't mapped it to the pump yet, we include all in the dynamically created contingent
+      return true;
+    });
+
+    const activeContingent = createContingent(
+      contingentId,
+      `Contingent ${kruisProfielCode}`,
+      kruisProfielCode,
+      filteredPumps
     );
 
-    return [defaultContingent];
+    return [activeContingent];
   }, [heatPumps]);
 
-  // Auto-select the first contingent when contingents load
+  // Auto-select the first contingent when contingents load or if the current isn't found
   useEffect(() => {
-    if (contingents.length > 0 && selectedContingentId === null) {
-      const first = contingents[0];
-      if (first) setSelectedContingentId(first.id);
+    if (contingents.length > 0) {
+      const found = contingents.some(c => c.id === selectedContingentId);
+      if (!found) {
+        setSelectedContingentId(contingents[0]!.id);
+      }
     }
   }, [contingents, selectedContingentId, setSelectedContingentId]);
 

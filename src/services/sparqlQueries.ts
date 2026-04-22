@@ -10,7 +10,7 @@ WHERE {
 }
 `;
 
-export const SPARQL_HEATPUMP_DETAILS = (heatpumpUri: string): string => `
+export const SPARQL_HEATPUMP_DETAILS = (id: string): string => `
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/>
 PREFIX hco: <https://www.tno.nl/building/ontology/heatpump-common-ontology#>
@@ -27,11 +27,12 @@ SELECT ?heatpump ?building ?room ?currentTemperature ?temperatureSetpoint ?outsi
        ?errorCodeMessage ?errorCodeSeverity ?result ?value ?unit
        ?manufacturer ?model ?serialNumber ?firmwareVersion ?yearOfManufacture
 WHERE {
-  VALUES ?heatpump { <${heatpumpUri}> }
+  VALUES ?id { "${id}" }
+
   ?heatpump rdf:type hco:HeatPump .
+  ?heatpump saref:hasIdentifier ?id .
 
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id .
     ?building rdf:type saref4bldg:Building ; saref4bldg:contains ?heatpump ; saref4bldg:hasSpace ?room .
     ?room rdf:type saref4bldg:BuildingSpace, saref:FeatureOfInterest ; saref:hasPropertyOfInterest ?currentTemperature .
     ?currentTemperature rdf:type saref:PropertyOfInterest ; saref:hasPropertyKind hco:CurrentTemperature .
@@ -40,7 +41,7 @@ WHERE {
     ?result rdf:type saref:PropertyValue ; saref:isValueOfProperty ?currentTemperature ; saref:hasValue ?value ; saref:isMeasuredIn ?unit .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id ; saref:hasPropertyOfInterest ?temperatureSetpoint .
+    ?heatpump saref:hasPropertyOfInterest ?temperatureSetpoint .
     ?temperatureSetpoint rdf:type saref:PropertyOfInterest ; saref:hasPropertyKind hco:TemperatureSetpoint .
     ?building rdf:type saref4bldg:Building ; saref4bldg:contains ?heatpump ; saref4bldg:hasSpace ?room .
     ?room rdf:type saref4bldg:BuildingSpace .
@@ -50,7 +51,6 @@ WHERE {
     ?temperatureResult rdf:type saref:PropertyValue ; saref:hasValue ?value ; saref:isMeasuredIn ?unit .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id .
     ?outside rdf:type bot:Zone, saref:FeatureOfInterest ; saref:hasPropertyOfInterest ?currentTemperature .
     ?outside bot:hasBuilding ?building .
     ?building rdf:type saref4bldg:Building ; saref4bldg:contains ?heatpump .
@@ -60,7 +60,7 @@ WHERE {
     ?result rdf:type saref:PropertyValue ; saref:isValueOfProperty ?currentTemperature ; saref:hasValue ?value ; saref:isMeasuredIn ?unit .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:consistsOf ?waterAsset .
+    ?heatpump saref:consistsOf ?waterAsset .
     ?waterAsset rdf:type hco:HeatPumpWaterAsset ; saref:hasPropertyOfInterest ?flowPressure .
     ?flowPressure rdf:type saref:PropertyOfInterest ; saref:hasPropertyKind saref4watr:FlowPressure .
     ?heatpump saref:madeExecution ?observation .
@@ -68,26 +68,25 @@ WHERE {
     ?result rdf:type saref:PropertyValue ; saref:isValueOfProperty ?flowPressure ; saref:hasValue ?value ; saref:isMeasuredIn ?unit .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id .
     ?heatpump saref:hasState ?state .
     ?state hco:hasStartTime ?startDateTime ; hco:hasEndTime ?endDateTime .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id ; saref:hasPropertyOfInterest ?cop .
+    ?heatpump saref:hasPropertyOfInterest ?cop .
     ?cop rdf:type saref:PropertyOfInterest ; saref:hasPropertyKind hco:COP .
     ?heatpump saref:madeExecution ?observation .
     ?observation rdf:type saref:Observation ; saref:observes ?heatpump, ?cop ; saref:hasResult ?result .
     ?result rdf:type saref:PropertyValue ; saref:isValueOfProperty ?cop ; saref:hasValue ?value ; saref:isMeasuredIn ?unit .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id ; saref:hasPropertyOfInterest ?energyUse .
+    ?heatpump saref:hasPropertyOfInterest ?energyUse .
     ?energyUse rdf:type saref:PropertyOfInterest ; saref:hasPropertyKind hco:ElectricityUse .
     ?heatpump saref:madeExecution ?observation .
     ?observation rdf:type hco:LatestObservation ; saref:observes ?heatpump, ?energyUse ; saref:hasResult ?result .
     ?result rdf:type saref:PropertyValue ; saref:isValueOfProperty ?energyUse ; saref:hasValue ?value ; saref:isMeasuredIn ?unit .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasPropertyOfInterest ?heatingCurve .
+    ?heatpump saref:hasPropertyOfInterest ?heatingCurve .
     ?heatingCurve rdf:type saref:PropertyOfInterest ; saref:hasPropertyKind hco:HeatingCurve .
     ?heatpump saref:madeExecution ?observation .
     ?observation rdf:type saref:Observation ; saref:observes ?heatpump, ?heatingCurve ; saref:hasResult ?result .
@@ -96,28 +95,16 @@ WHERE {
     ?slopeResult rdf:type saref:PropertyValue ; saref:isValueOfProperty hco:HeatingCurveSlope ; saref:hasValue ?slopeValue ; saref:isMeasuredIn ?slopeUnit .
   }
   OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id .
     ?heatpump saref:hasStateOfInterest ?internetConnectionState .
     ?internetConnectionState rdf:type saref:StateOfInterest ; saref:hasStateKind hco:InternetConnection ; saref:hasStateValue ?internetConnectionStateValue .
   }
-  OPTIONAL {
-    ?server rdf:type hco:Server ; saref:ofSupplier ?supplier .
-    ?server saref:hasStateOfInterest ?stateServer .
-    ?stateServer rdf:type saref:StateOfInterest ; saref:hasStateKind hco:InternetConnection ; saref:hasStateValue ?connectionstateServer .
-  }
-  OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump ; saref:hasIdentifier ?id .
-    ?heatpump saref:hasErrorCode ?errorCode .
-    ?errorCode rdf:type hco:ErrorCode ; hco:hasErrorCodeValue ?errorCodeValue ; hco:hasErrorMessage ?errorCodeMessage ; hco:hasErrorSeverity ?errorCodeSeverity .
-  }
-  OPTIONAL {
-    ?heatpump rdf:type hco:HeatPump .
-    OPTIONAL { ?heatpump saref:hasManufacturer ?manufacturer . }
-    OPTIONAL { ?heatpump saref:hasModel ?model . }
-    OPTIONAL { ?heatpump s4ener:serialNumber ?serialNumber . }
-    OPTIONAL { ?heatpump saref4watr:hasFirmwareVersion ?firmwareVersion . }
-    OPTIONAL { ?heatpump hco:hasYearOfManufacture ?yearOfManufacture . }
-  }
+  
+  # Flattened device spec Optionals
+  OPTIONAL { ?heatpump saref:hasManufacturer ?manufacturer . }
+  OPTIONAL { ?heatpump saref:hasModel ?model . }
+  OPTIONAL { ?heatpump s4ener:serialNumber ?serialNumber . }
+  OPTIONAL { ?heatpump saref4watr:hasFirmwareVersion ?firmwareVersion . }
+  OPTIONAL { ?heatpump hco:hasYearOfManufacture ?yearOfManufacture . }
 }
 `;
 
@@ -212,13 +199,13 @@ INSERT {
   <${base}/execution-${suffix}> saref:hasResult <${base}/result-${suffix}> .
   <${base}/result-${suffix}> rdf:type saref:PropertyValue .
   <${base}/result-${suffix}> saref:isValueOfProperty ?temperatureSetpoint .
-  <${base}/result-${suffix}> saref:consistsOf ?room .
   <${base}/result-${suffix}> saref:consistsOf <${base}/tempresult-${suffix}> .
   <${base}/tempresult-${suffix}> rdf:type saref:PropertyValue .
   <${base}/tempresult-${suffix}> saref:hasValue "${value}"^^xsd:double .
   <${base}/tempresult-${suffix}> saref:isMeasuredIn om:degreeCelsius .
 }
 WHERE {
+  VALUES ?id { "${id}" }
   ?heatPump rdf:type hco:HeatPump .
   ?heatPump saref:hasIdentifier ?id .
   ?heatPump saref:hasPropertyOfInterest ?temperatureSetpoint .
@@ -228,11 +215,6 @@ WHERE {
   ?temperatureSetpointCommand rdf:type saref:CommandOfInterest .
   ?temperatureSetpointCommand saref:hasCommandKind hco:ControlTemperatureSetpoint .
   ?temperatureSetpointCommand saref:controls ?heatPump, ?temperatureSetpoint .
-  ?building rdf:type saref4bldg:Building .
-  ?building saref4bldg:contains ?heatPump .
-  ?building saref4bldg:hasSpace ?room .
-  ?room rdf:type saref4bldg:BuildingSpace .
-  VALUES ?id { "${id}" }
 }
 `;
 };
