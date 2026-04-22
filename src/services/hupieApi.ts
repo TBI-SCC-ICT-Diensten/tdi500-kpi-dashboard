@@ -45,7 +45,7 @@ export const subscribeToDataSource = (listener: DataSourceListener): (() => void
 
 const hupieAxios = axios.create({
   baseURL: config.api.baseUrl,
-  timeout: config.api.timeout,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/sparql-query',
     'Accept': 'application/json',
@@ -62,7 +62,7 @@ const hupieAxios = axios.create({
  */
 const hupieDetailAxios = axios.create({
   baseURL: config.api.baseUrl,
-  timeout: config.api.detailTimeout,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/sparql-query',
     'Accept': 'application/json',
@@ -80,8 +80,9 @@ const hupieDetailAxios = axios.create({
  * per-request Content-Type overrides cleanly with interceptors.
  */
 const hupieUpdateAxios = axios.create({
-  baseURL: config.api.baseUrl,
-  timeout: config.api.timeout,
+  // Strip /query or /query/ and explicitly append /update/ with the trailing slash
+  baseURL: config.api.baseUrl.replace(/\/query\/?$/, '/update/').replace(/\/sparql\/?$/, '/update/'),
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/sparql-update',
     'Accept': 'application/json',
@@ -125,13 +126,13 @@ export const executeSparqlQuery = async (query: string): Promise<SparqlResponse>
  * Each query is small enough for the Hupie endpoint to handle without timeout.
  */
 export const fetchHeatPumpDetails = async (
-  heatpumpUri: string
+  id: string
 ): Promise<SparqlResponse> => {
   try {
-    const response = await hupieDetailAxios.post('', SPARQL_HEATPUMP_DETAILS(heatpumpUri));
+    const response = await hupieDetailAxios.post('', SPARQL_HEATPUMP_DETAILS(id));
     return response.data;
   } catch (error) {
-    throw handleApiError(error, `POST sparql-detail [${heatpumpUri}]`);
+    throw handleApiError(error, `POST sparql-detail [${id}]`);
   }
 };
 
@@ -165,22 +166,22 @@ export const fetchAllHeatPumpData = async (
   }
 
   const listResponse = await executeSparqlQuery(SPARQL_LIST_HEATPUMPS);
-  const uris = listResponse.results.bindings
-    .map((b) => b['heatpump']?.value)
-    .filter((uri): uri is string => Boolean(uri));
+  const ids = listResponse.results.bindings
+    .map((b) => b['id']?.value)
+    .filter((id): id is string => Boolean(id));
 
-  if (uris.length === 0) {
-    console.warn('[TDI500] fetchAllHeatPumpData: no heat pump URIs returned');
+  if (ids.length === 0) {
+    console.warn('[TDI500] fetchAllHeatPumpData: no heat pump IDs returned');
     return [];
   }
 
-  console.log(`[TDI500] fetchAllHeatPumpData: fetching details for ${uris.length} heat pumps`);
+  console.log(`[TDI500] fetchAllHeatPumpData: fetching details for ${ids.length} heat pumps`);
 
   const allPumps: HeatPumpSystem[] = [];
 
-  const promises = uris.map(async (uri) => {
+  for (const id of ids) {
     try {
-      const response = await fetchHeatPumpDetails(uri);
+      const response = await fetchHeatPumpDetails(id);
       const mapped = mapSparqlToHeatPumps(response);
       mapped.forEach((pump) => {
         allPumps.push(pump);
@@ -188,13 +189,11 @@ export const fetchAllHeatPumpData = async (
       });
     } catch (error) {
       console.warn(
-        `[TDI500] fetchAllHeatPumpData: failed for ${uri}:`,
+        `[TDI500] fetchAllHeatPumpData: failed for ${id}:`,
         error
       );
     }
-  });
-
-  await Promise.allSettled(promises);
+  }
 
   console.log(`[TDI500] fetchAllHeatPumpData: mapped ${allPumps.length} heat pumps`);
   return allPumps;

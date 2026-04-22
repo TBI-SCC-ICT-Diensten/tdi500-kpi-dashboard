@@ -11,6 +11,7 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useDashboardContext } from '../../context/DashboardContext';
 import type React from 'react';
 
 interface SidebarProps {
@@ -27,7 +28,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { path: '/',                       label: 'Dashboard',         icon: DashboardIcon,         matchExact: true  },
-  { path: '/contingent/default-b2',  label: 'Contingent detail', icon: HomeRepairServiceIcon, matchPrefix: '/contingent' },
+  { path: '/contingent',             label: 'Contingent detail', icon: HomeRepairServiceIcon, matchPrefix: '/contingent' },
   // [BAG-LOOKUP] Remove this entry to disable the feature
   { path: '/bag-lookup',             label: 'BAG Opzoeking',     icon: LocationOnIcon,        matchExact: true  },
 ];
@@ -36,7 +37,10 @@ const Sidebar = ({ width }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
+  const { state } = useDashboardContext();
   const primary = theme.palette.primary.main;
+
+  const contingentId = state.selectedContingentId || 'contingent-B2';
 
   return (
     <Box
@@ -67,15 +71,18 @@ const Sidebar = ({ width }: SidebarProps) => {
       <List sx={{ pt: 1, px: 1 }}>
         {NAV_ITEMS.map((item) => {
           const { path, label, icon: Icon, matchExact, matchPrefix } = item;
+          // Determine the actual navigation path for contingents
+          const navPath = path === '/contingent' ? `/contingent/${contingentId}` : path;
+          
           const isActive = matchExact
-            ? location.pathname === path
-            : location.pathname.startsWith(matchPrefix ?? path);
+            ? location.pathname === navPath
+            : location.pathname.startsWith(matchPrefix ?? navPath);
 
           return (
             <ListItem key={path} disablePadding sx={{ mb: 0.25 }}>
               <ListItemButton
                 selected={isActive}
-                onClick={() => navigate(path)}
+                onClick={() => navigate(navPath)}
                 sx={{
                   borderRadius: 1,
                   borderLeft: '3px solid transparent',
