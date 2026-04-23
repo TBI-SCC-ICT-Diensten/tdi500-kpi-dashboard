@@ -43,11 +43,9 @@ WHERE {
   OPTIONAL {
     ?heatpump saref:hasPropertyOfInterest ?temperatureSetpoint .
     ?temperatureSetpoint rdf:type saref:PropertyOfInterest ; saref:hasPropertyKind hco:TemperatureSetpoint .
-    ?building rdf:type saref4bldg:Building ; saref4bldg:contains ?heatpump ; saref4bldg:hasSpace ?room .
-    ?room rdf:type saref4bldg:BuildingSpace .
     ?heatpump saref:madeExecution ?observation .
     ?observation rdf:type hco:LatestObservation ; saref:observes ?heatpump, ?temperatureSetpoint ; saref:hasResult ?result .
-    ?result rdf:type saref:PropertyValue ; saref:isValueOfProperty ?temperatureSetpoint ; saref:consistsOf ?room ; saref:consistsOf ?temperatureResult .
+    ?result rdf:type saref:PropertyValue ; saref:isValueOfProperty ?temperatureSetpoint ; saref:consistsOf ?temperatureResult .
     ?temperatureResult rdf:type saref:PropertyValue ; saref:hasValue ?value ; saref:isMeasuredIn ?unit .
   }
   OPTIONAL {
