@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -253,6 +253,32 @@ const HeatPumpDetailCard = ({
             }
 
             // Generic row for all other measurements
+            if (m.property === 'temperatureSetpoint') return null; // Handled after roomTemperature
+
+            if (m.property === 'roomTemperature') {
+              const setpointMeasurement = heatPump.measurements.find(x => x.property === 'temperatureSetpoint');
+              return (
+                <React.Fragment key={m.property}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {PROPERTY_LABEL_MAP[m.property] ?? m.property}
+                    </Typography>
+                    <Typography variant="caption" fontWeight={500}>
+                      {m.value} {m.unit}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Huidig Setpoint
+                    </Typography>
+                    <Typography variant="caption" fontWeight={500}>
+                      {setpointMeasurement ? `${setpointMeasurement.value} °C` : 'Onbekend'}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              );
+            }
+
             return (
               <Box key={m.property}
                 sx={{ display: 'flex', justifyContent: 'space-between' }}>
