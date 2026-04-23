@@ -8,7 +8,7 @@
  * Calls heatPumpCommandService which sends SPARQL UPDATE to Hupie API.
  * Disabled when heat pump is offline.
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -58,6 +58,17 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
   );
   const [curveStatus, setCurveStatus] = useState<CommandStatus>('idle');
   const [curveError, setCurveError] = useState<string | null>(null);
+
+  // ── Sync incoming props ──────────────────────────────────────────
+  useEffect(() => {
+    if (currentSetpoint) {
+      setSetpointValue(String(currentSetpoint.value));
+    }
+    if (currentCurve) {
+      setCurveBase(String(currentCurve.baseValue));
+      setCurveSlope(String(currentCurve.slopeValue));
+    }
+  }, [heatPump, currentSetpoint, currentCurve]);
 
   // ── Handlers ─────────────────────────────────────────────────────
   const handleSetpointSubmit = async () => {

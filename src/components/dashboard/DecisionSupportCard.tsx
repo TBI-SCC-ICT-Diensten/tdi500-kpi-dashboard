@@ -1,9 +1,12 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
+import Button from '@mui/material/Button';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -12,6 +15,7 @@ import AssistantIcon from '@mui/icons-material/Assistant';
 import type { KeyPerformanceIndicator, KruisProfielCode } from '../../types/heatpump';
 import type { OverallScore, DecisionScore } from '../../types/decision';
 import { evaluateContingent } from '../../services/decisionEngine';
+import { useDashboardContext } from '../../context/DashboardContext';
 
 interface DecisionSupportCardProps {
   kpis?: KeyPerformanceIndicator[];
@@ -67,8 +71,11 @@ const DecisionSupportCard = ({
   kruisProfielCode = 'B2',
 
 }: DecisionSupportCardProps) => {
+  const { state } = useDashboardContext();
   const recommendation = evaluateContingent(kpis, kruisProfielCode);
   const { overallScore, summary, details, suggestedAction } = recommendation;
+  
+  const profileCode = state.selectedContingentId ? state.selectedContingentId.replace('contingent-', '') : null;
 
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
@@ -89,41 +96,34 @@ const DecisionSupportCard = ({
       <Divider sx={{ mb: 2 }} />
 
       {/* Overall score banner */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          p: 1.5,
-          mb: 1.5,
-          borderRadius: 1,
-          bgcolor: scoreBg[overallScore],
-          border: `1px solid ${scoreColor[overallScore]}33`,
-        }}
+      <Alert
+        severity={
+          overallScore === 'good' ? 'success' :
+          overallScore === 'acceptable' ? 'warning' :
+          overallScore === 'poor' ? 'error' : 'info'
+        }
+        variant="filled"
+        sx={{ mb: 1.5, alignItems: 'center' }}
       >
-        <OverallIcon score={overallScore} />
-        <Box sx={{ flex: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="subtitle2" fontWeight={700}
-              sx={{ color: scoreColor[overallScore] }}>
-              Algeheel oordeel:
-            </Typography>
-            <Chip
-              label={scoreLabel[overallScore]}
-              size="small"
-              sx={{
-                bgcolor: scoreColor[overallScore],
-                color: 'white',
-                fontWeight: 600,
-                fontSize: '0.7rem',
-              }}
-            />
-          </Box>
-          <Typography variant="body2" color="text.primary">
-            {summary}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+          <Typography variant="subtitle2" fontWeight={700}>
+            Algeheel oordeel:
           </Typography>
+          <Chip
+            label={scoreLabel[overallScore]}
+            size="small"
+            sx={{
+              bgcolor: 'background.paper',
+              color: 'text.primary',
+              fontWeight: 600,
+              fontSize: '0.7rem',
+            }}
+          />
         </Box>
-      </Box>
+        <Typography variant="body2">
+          {summary}
+        </Typography>
+      </Alert>
 
       {/* Factor breakdown */}
       {details.length > 0 && (
@@ -186,29 +186,49 @@ const DecisionSupportCard = ({
         </Box>
       )}
 
-      {/* Suggested action */}
-      <Box
-        sx={{
-          p: 1.5,
-          mb: 1.5,
-          border: '1px solid',
-          borderColor: 'primary.main',
-          borderRadius: 1,
-          color: 'primary.main',
-        }}
-      >
-        <Typography variant="caption" fontWeight={700}
-          sx={{ opacity: 0.7, display: 'block', mb: 0.5,
-                textTransform: 'uppercase', letterSpacing: 1 }}>
-          Aanbevolen actie
-        </Typography>
-        <Typography variant="body2" fontWeight={500}>
-          {suggestedAction}
-        </Typography>
-      </Box>
+      {/* Suggested action (fallback if no contingent selected) */}
+      {!profileCode && (
+        <Box
+          sx={{
+            p: 1.5,
+            mb: 1.5,
+            border: '1px solid',
+            borderColor: 'primary.main',
+            borderRadius: 1,
+            color: 'primary.main',
+          }}
+        >
+          <Typography variant="caption" fontWeight={700}
+            sx={{ opacity: 0.7, display: 'block', mb: 0.5,
+                  textTransform: 'uppercase', letterSpacing: 1 }}>
+            Aanbevolen actie
+          </Typography>
+          <Typography variant="body2" fontWeight={500}>
+            {suggestedAction}
+          </Typography>
+        </Box>
+      )}
+
+      {/* Contingent Profile Recommendation */}
+      {profileCode && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          <AlertTitle sx={{ fontWeight: 600 }}>Aanbevolen Inregelprofiel</AlertTitle>
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            Op basis van de geselecteerde filters is het aanbevolen inregelprofiel voor deze woningen: Profiel {profileCode}.
+          </Typography>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            size="small" 
+            onClick={() => console.log('Applying profile')}
+          >
+            Pas Profiel {profileCode} toe op apparaten
+          </Button>
+        </Alert>
+      )}
 
       {/* Ethical disclaimer — always visible */}
-      <Alert severity="info" sx={{ fontSize: '0.78rem' }}>
+      <Alert severity="warning" sx={{ fontSize: '0.78rem' }}>
         Dit advies is gebaseerd op beschikbare meetdata en dient als
         ondersteuning, niet als definitief oordeel. De installateur
         blijft verantwoordelijk voor de uiteindelijke beslissing.
