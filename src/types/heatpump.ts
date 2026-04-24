@@ -21,6 +21,12 @@ export interface HeatPumpSystem {
   heatingCurve?: HeatingCurve;
   deviceSpecs?: DeviceSpecs;
   wgs84?: Wgs84Location;
+  /**
+   * Optional kruisprofiel code assigned during contingent classification.
+   * Not exposed by the Hupie API — populated from BAG lookup or manual
+   * assignment by the installer.
+   */
+  kruisProfielCode?: KruisProfielCode;
 }
 
 export type HeatPumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
@@ -142,3 +148,15 @@ export interface TemperatureSetpointCommand {
 }
 
 export type CommandStatus = 'idle' | 'pending' | 'success' | 'error';
+
+/** All valid kruisprofiel codes from the TNO catalogus. */
+export const VALID_KRUISPROFIEL_CODES: readonly KruisProfielCode[] = [
+  'A1', 'A2', 'A3',
+  'B1', 'B2', 'B3',
+  'C1', 'C2', 'C3',
+] as const;
+
+/** Type guard — validates that a string is a valid KruisProfielCode. */
+export function isValidKruisProfielCode(code: string): code is KruisProfielCode {
+  return VALID_KRUISPROFIEL_CODES.includes(code as KruisProfielCode);
+}
