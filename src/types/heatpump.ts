@@ -160,3 +160,81 @@ export const VALID_KRUISPROFIEL_CODES: readonly KruisProfielCode[] = [
 export function isValidKruisProfielCode(code: string): code is KruisProfielCode {
   return VALID_KRUISPROFIEL_CODES.includes(code as KruisProfielCode);
 }
+
+// ── TNO Catalogus (Activiteit 2.1) ──────────────────────────────────────────
+
+/**
+ * Manufacturers that participated in the TNO TDI 500 catalogus (Activiteit 2.1).
+ * Source: TNO 2025 R00000, Tabel 1–9.
+ *
+ * These are the four fabrikanten that submitted standard inregelinstellingen
+ * per kruisprofiel. Other manufacturers (Daikin, Stiebel-Eltron, Atag,
+ * Climate for Life, Inventum, Triple Solar) participated in the consortium
+ * but did not submit catalogus entries for Activiteit 2.1.
+ */
+export type Fabrikant = 'Intergas' | 'Bosch' | 'Remeha' | 'Alklima';
+
+export const ALL_FABRIKANTEN: readonly Fabrikant[] = [
+  'Intergas',
+  'Bosch',
+  'Remeha',
+  'Alklima',
+] as const;
+
+/**
+ * A single parameter entry in the TNO catalogus.
+ *
+ * Values can be:
+ *   - A concrete value (string for free-form, number when numeric)
+ *   - null when the source document has 'X' (niet opgegeven door fabrikant)
+ *
+ * Free-form strings are used because the source data varies in format:
+ *   "20/20, -10/30" (stooklijn as piecewise linear)
+ *   "0,3" (stooklijn as slope coefficient)
+ *   "Variabel (vrijgave: 5gr)" (bivalent temperature description)
+ *   "instelbaar (300K/°/min)" (backup delay description)
+ *
+ * A stricter schema would require the fabrikanten to standardize their
+ * formats — out of scope for this project.
+ */
+export type CatalogusValue = string | number | null;
+
+/**
+ * One fabrikant's settings for one kruisprofiel.
+ * All 11 parameters from Tabel 1–9 in the TNO document.
+ */
+export interface FabrikantInstellingen {
+  /** e.g. "xtend", "compress 3400i compress 7400i" — null when fabrikant has no applicable model */
+  warmtepompType: CatalogusValue;
+  /** e.g. "vloerverw", "radiator", "hete lucht" */
+  afgiftesysteem: CatalogusValue;
+  /** Celsius. "X" in source → null */
+  maxAanvoertemperatuur: CatalogusValue;
+  /** e.g. "Model afh.", or null */
+  minimaleCop: CatalogusValue;
+  /** e.g. "20/20, -10/30" or "0,3". Free-form — fabrikanten use different formats */
+  stooklijn: CatalogusValue;
+  /** e.g. "1K", "4k". Free-form */
+  ruimteInvloed: CatalogusValue;
+  /** e.g. "0gr", "5gr", "7gr" */
+  vrijgaveBijverwarming: CatalogusValue;
+  /** Minutes before backup kicks in. e.g. 120, or "instelbaar (300K/°/min)" */
+  wachttijdBackupMin: CatalogusValue;
+  /** e.g. "Instelbaar (hybride)", "ERSD-VM2E", "Kosten" */
+  hybrideModus: CatalogusValue;
+  /** e.g. "7K" */
+  deltaT: CatalogusValue;
+  /** e.g. "Variabel (vrijgave: 5gr)" */
+  bivalentTemperatuur: CatalogusValue;
+}
+
+/**
+ * Full catalogus entry for one kruisprofiel — one FabrikantInstellingen
+ * per fabrikant.
+ */
+export type CatalogusProfiel = Record<Fabrikant, FabrikantInstellingen>;
+
+/**
+ * Complete TNO catalogus: all 9 profielen × 4 fabrikanten.
+ */
+export type TnoCatalogus = Record<KruisProfielCode, CatalogusProfiel>;
