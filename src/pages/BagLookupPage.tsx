@@ -23,6 +23,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Spinner from '../components/common/Spinner';
 import WeatherWidget from '../components/bag/WeatherWidget';
+import AanbevolenInstellingen from '../components/bag/AanbevolenInstellingen';
 import {
   fetchBagData,
   mapBouwjaarToInsulation,
@@ -126,11 +127,11 @@ const BagLookupPage = () => {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" fontWeight={600} gutterBottom>
-          BAG Woningopzoeking & Inregelinstellingen
+          Inregelen
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Voer een postcode en huisnummer in om het woningprofiel op te halen
-          en de aanbevolen TDI 500 inregelinstellingen te bepalen.
+          en de aanbevolen TDI 500 inregelinstellingen per fabrikant te bepalen.
         </Typography>
       </Box>
 
@@ -404,7 +405,7 @@ const BagLookupPage = () => {
         <Paper variant="outlined" sx={{ p: 3 }}>
           <Typography variant="overline" color="text.secondary"
             sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}>
-            Stap 5 — Aanbevolen Inregelinstellingen
+            Stap 5 — Profielgrenzen
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2,
@@ -421,7 +422,7 @@ const BagLookupPage = () => {
           </Box>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Op basis van de BAG-gegevens en het geselecteerde afgiftesysteem gelden de volgende aanbevolen inregelinstellingen:
+            Op basis van dit kruisprofiel hanteert het dashboard de volgende grenzen voor KPI-monitoring:
           </Typography>
 
           <Grid container spacing={2}>
@@ -469,6 +470,20 @@ const BagLookupPage = () => {
               ? `Kruisprofiel bepaald op basis van energielabel ${bagResult.energielabel} — dit is de meest nauwkeurige methode.`
               : 'Dit zijn de standaard inregelinstellingen op basis van het geschatte woningprofiel (bouwjaar). Controleer het energielabel via EP-online voor een definitieve kruisprofiel-toewijzing.'}
           </Alert>
+        </Paper>
+      )}
+
+      {/* Step 6: Aanbevolen instellingen per fabrikant */}
+      {kruisProfielCode && (
+        <Paper variant="outlined" sx={{ p: 3, mt: 3 }}>
+          <Typography
+            variant="overline"
+            color="text.secondary"
+            sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}
+          >
+            Stap 6 — Aanbevolen instellingen per fabrikant
+          </Typography>
+          <AanbevolenInstellingen kruisProfielCode={kruisProfielCode} />
         </Paper>
       )}
     </Box>
