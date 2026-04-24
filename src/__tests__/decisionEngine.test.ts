@@ -1,48 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { evaluateContingent } from '../services/decisionEngine';
-import type { KeyPerformanceIndicator } from '../types/heatpump';
-
-const makeKpis = (overrides: {
-  copValue?: number;
-  copStatus?: KeyPerformanceIndicator['status'];
-  connectValue?: number;
-  connectStatus?: KeyPerformanceIndicator['status'];
-  storingenValue?: number;
-  storingenStatus?: KeyPerformanceIndicator['status'];
-} = {}): KeyPerformanceIndicator[] => [
-  {
-    name: 'Gemiddelde COP',
-    value: overrides.copValue ?? 3.8,
-    unit: '',
-    category: 'efficiency',
-    status: overrides.copStatus ?? 'good',
-    description: 'Test COP',
-  },
-  {
-    name: 'Connectiviteit',
-    value: overrides.connectValue ?? 100,
-    unit: '%',
-    category: 'reliability',
-    status: overrides.connectStatus ?? 'good',
-    description: 'Test connectivity',
-  },
-  {
-    name: 'Storingen',
-    value: overrides.storingenValue ?? 0,
-    unit: 'meldingen',
-    category: 'commissioning',
-    status: overrides.storingenStatus ?? 'good',
-    description: 'Test storingen',
-  },
-  {
-    name: 'Inregelsnelheid',
-    value: 0,
-    unit: 'min',
-    category: 'commissioning',
-    status: 'good',
-    description: 'Placeholder',
-  },
-];
+import { makeKpis } from '../test/fixtures';
 
 describe('evaluateContingent', () => {
   it('returns good when all KPIs are good', () => {
