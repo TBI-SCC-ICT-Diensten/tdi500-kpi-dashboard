@@ -25,6 +25,7 @@ import {
   setHeatingCurve,
   setTemperatureSetpoint,
 } from '../../services/heatPumpCommandService';
+import { RateLimitError } from '../../services/hupieApi';
 import type {
   HeatPumpSystem,
   CommandStatus,
@@ -59,6 +60,20 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
   const [curveStatus, setCurveStatus] = useState<CommandStatus>('idle');
   const [curveError, setCurveError] = useState<string | null>(null);
 
+  // ── Rate-limit cooldown ──────────────────────────────────────────
+  // Cooldown after rate limit hit — seconds remaining, shared
+  // across both forms because the rate limit is per-pump, not per-command
+  const [rateLimitCooldown, setRateLimitCooldown] = useState(0);
+
+  useEffect(() => {
+    if (rateLimitCooldown <= 0) return;
+    const timer = setTimeout(
+      () => setRateLimitCooldown((s) => s - 1),
+      1000
+    );
+    return () => clearTimeout(timer);
+  }, [rateLimitCooldown]);
+
   // ── Sync incoming props ──────────────────────────────────────────
   useEffect(() => {
     if (currentSetpoint) {
@@ -89,9 +104,19 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       setSetpointStatus('success');
     } catch (err) {
       setSetpointStatus('error');
-      setSetpointError(
-        err instanceof Error ? err.message : 'Onbekende fout bij versturen commando.'
-      );
+      if (err instanceof RateLimitError) {
+        setRateLimitCooldown(30);
+        setSetpointError(
+          'Rate limit bereikt — Triple Solar server is tijdelijk bezet. ' +
+          'Knop wordt automatisch opnieuw ingeschakeld.'
+        );
+      } else {
+        setSetpointError(
+          err instanceof Error
+            ? err.message
+            : 'Onbekende fout bij versturen commando.'
+        );
+      }
     }
   };
 
@@ -127,9 +152,19 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       setCurveStatus('success');
     } catch (err) {
       setCurveStatus('error');
-      setCurveError(
-        err instanceof Error ? err.message : 'Onbekende fout bij versturen commando.'
-      );
+      if (err instanceof RateLimitError) {
+        setRateLimitCooldown(30);
+        setCurveError(
+          'Rate limit bereikt — Triple Solar server is tijdelijk bezet. ' +
+          'Knop wordt automatisch opnieuw ingeschakeld.'
+        );
+      } else {
+        setCurveError(
+          err instanceof Error
+            ? err.message
+            : 'Onbekende fout bij versturen commando.'
+        );
+      }
     }
   };
 
@@ -191,11 +226,18 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               variant="contained"
               size="small"
               onClick={handleSetpointSubmit}
-              disabled={isOffline || setpointStatus === 'pending' || !setpointValue.trim()}
+              disabled={
+                isOffline ||
+                setpointStatus === 'pending' ||
+                !setpointValue.trim() ||
+                rateLimitCooldown > 0
+              }
               sx={{ height: 40, minWidth: 80 }}
             >
               {setpointStatus === 'pending'
                 ? <CircularProgress size={16} color="inherit" />
+                : rateLimitCooldown > 0
+                ? `Wacht ${rateLimitCooldown}s`
                 : 'Instellen'}
             </Button>
           </Box>
@@ -260,12 +302,15 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
                 isOffline ||
                 curveStatus === 'pending' ||
                 !curveBase.trim() ||
-                !curveSlope.trim()
+                !curveSlope.trim() ||
+                rateLimitCooldown > 0
               }
               sx={{ height: 40, minWidth: 80 }}
             >
               {curveStatus === 'pending'
                 ? <CircularProgress size={16} color="inherit" />
+                : rateLimitCooldown > 0
+                ? `Wacht ${rateLimitCooldown}s`
                 : 'Instellen'}
             </Button>
           </Box>
@@ -279,6 +324,30 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             <Alert severity="error" sx={{ mt: 0.5, py: 0.25, fontSize: '0.72rem' }}>
               {curveError}
             </Alert>
+          )}
+
+          {rateLimitCooldown > 0 && (
+            <Box sx={{ mt: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{
+                flex: 1,
+                height: 3,
+                bgcolor: 'action.hover',
+                borderRadius: 2,
+                overflow: 'hidden'
+              }}>
+                <Box sx={{
+                  height: '100%',
+                  width: `${(rateLimitCooldown / 30) * 100}%`,
+                  bgcolor: 'warning.main',
+                  transition: 'width 1s linear',
+                  borderRadius: 2,
+                }} />
+              </Box>
+              <Typography variant="caption" color="warning.main"
+                sx={{ minWidth: 32, textAlign: 'right', fontWeight: 600 }}>
+                {rateLimitCooldown}s
+              </Typography>
+            </Box>
           )}
 
           <Alert severity="info" sx={{ mt: 1.5, py: 0.5, fontSize: '0.72rem' }}>
