@@ -12,6 +12,8 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDashboardContext } from '../../context/DashboardContext';
+import { useRole } from '../../context/RoleContext';
+import type { Role } from '../../context/RoleContext';
 import type React from 'react';
 
 interface SidebarProps {
@@ -24,13 +26,35 @@ interface NavItem {
   icon: React.ElementType;
   matchExact?: boolean;
   matchPrefix?: string;
+  /**
+   * Which roles can see this nav item. Undefined = visible for all roles.
+   */
+  visibleFor?: Role[];
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { path: '/',                       label: 'Dashboard',         icon: DashboardIcon,         matchExact: true  },
-  { path: '/contingent',             label: 'Contingent detail', icon: HomeRepairServiceIcon, matchPrefix: '/contingent' },
+  {
+    path: '/',
+    label: 'Dashboard',
+    icon: DashboardIcon,
+    matchExact: true,
+    visibleFor: ['beheerder'],
+  },
+  {
+    path: '/contingent',
+    label: 'Contingent detail',
+    icon: HomeRepairServiceIcon,
+    matchPrefix: '/contingent',
+    visibleFor: ['beheerder'],
+  },
   // [BAG-LOOKUP] Remove this entry to disable the feature
-  { path: '/bag-lookup',             label: 'BAG Opzoeking',     icon: LocationOnIcon,        matchExact: true  },
+  {
+    path: '/bag-lookup',
+    label: 'Inregelen',
+    icon: LocationOnIcon,
+    matchExact: true,
+    visibleFor: ['installateur'],
+  },
 ];
 
 const Sidebar = ({ width }: SidebarProps) => {
@@ -38,6 +62,7 @@ const Sidebar = ({ width }: SidebarProps) => {
   const location = useLocation();
   const theme = useTheme();
   const { state } = useDashboardContext();
+  const { role } = useRole();
   const primary = theme.palette.primary.main;
 
   const contingentId = state.selectedContingentId || 'contingent-B2';
@@ -69,7 +94,9 @@ const Sidebar = ({ width }: SidebarProps) => {
       <Divider />
 
       <List sx={{ pt: 1, px: 1 }}>
-        {NAV_ITEMS.map((item) => {
+        {NAV_ITEMS
+          .filter((item) => !item.visibleFor || item.visibleFor.includes(role))
+          .map((item) => {
           const { path, label, icon: Icon, matchExact, matchPrefix } = item;
           // Determine the actual navigation path for contingents
           const navPath = path === '/contingent' ? `/contingent/${contingentId}` : path;
