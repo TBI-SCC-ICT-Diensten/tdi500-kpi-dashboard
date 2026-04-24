@@ -36,6 +36,7 @@ import {
 import { getKruisProfiel } from '../config/kruisProfielen';
 import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
 import type { KruisProfielCode } from '../types/heatpump';
+import { useRole } from '../context/RoleContext';
 
 type Afgiftesysteem = 'vloerverwarming' | 'radiator' | 'hete lucht';
 
@@ -54,6 +55,7 @@ const confidenceColor = {
 const BagLookupPage = () => {
   const theme = useTheme();
   const cellBg = theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'grey.50';
+  const { role } = useRole();
   const [postcode, setPostcode] = useState('');
   const [huisnummer, setHuisnummer] = useState('');
   const [afgiftesysteem, setAfgiftesysteem] = useState<Afgiftesysteem | null>(null);
@@ -125,6 +127,13 @@ const BagLookupPage = () => {
 
   return (
     <Box>
+      {role === 'beheerder' && (
+        <Alert severity="info" sx={{ mb: 3, fontSize: '0.85rem' }}>
+          Deze pagina is primair voor installateurs. Je bekijkt hem
+          momenteel als beheerder — schakel naar installateursmodus
+          voor het volledige inregelen-perspectief.
+        </Alert>
+      )}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" fontWeight={600} gutterBottom>
           Inregelen
