@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import type { HeatPumpSystem, Contingent, KeyPerformanceIndicator } from '../types/heatpump';
+import { useSearchParams } from 'react-router-dom';
+import type { HeatPumpSystem, Contingent, KeyPerformanceIndicator, KruisProfielCode } from '../types/heatpump';
+import { isValidKruisProfielCode } from '../types/heatpump';
 import { fetchAllHeatPumpData, subscribeToDataSource } from '../services/hupieApi';
 import { createContingent } from '../services/contingentService';
 import { aggregateKpisForContingent } from '../services/kpiAggregator';
@@ -19,6 +21,10 @@ export interface DashboardData {
 const useDashboardData = (): DashboardData => {
   const { state, setSelectedContingentId } = useDashboardContext();
   const { selectedContingentId } = state;
+
+  const [searchParams] = useSearchParams();
+  const isolatie = searchParams.get('isolatie');
+  const aanvoer = searchParams.get('aanvoer');
 
   const [heatPumps, setHeatPumps] = useState<HeatPumpSystem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -86,25 +92,22 @@ const useDashboardData = (): DashboardData => {
   const contingents = useMemo((): Contingent[] => {
     if (heatPumps.length === 0) return [];
 
-    // Dynamically calculate Kruisprofiel from URL/UI filters
-    const searchParams = new URLSearchParams(window.location.search);
-    const isolatie = searchParams.get('isolatie');
-    const aanvoer = searchParams.get('aanvoer');
-    
     // Defaults to 'B' and '2' if missing/null
     const isolatieniveau = isolatie || 'B';
     const aanvoertemp = aanvoer || '2';
-    
-    const kruisProfielCode = `${isolatieniveau}${aanvoertemp}` as any;
+
+    const candidateCode = `${isolatieniveau}${aanvoertemp}`;
+    const kruisProfielCode: KruisProfielCode = isValidKruisProfielCode(candidateCode)
+      ? candidateCode
+      : 'B2'; // fallback to default profiel if URL params are invalid
     const contingentId = `contingent-${kruisProfielCode}`;
 
     // Filter heat pumps properly under this specific Kruisprofiel code.
-    // Assuming heat pumps MIGHT have kruisProfielCode or we fall back.
-    const filteredPumps = heatPumps.filter((hp: any) => {
+    // Pumps without an assigned code are included (API hasn't mapped yet).
+    const filteredPumps = heatPumps.filter((hp) => {
       if (hp.kruisProfielCode) {
         return hp.kruisProfielCode === kruisProfielCode;
       }
-      // If the API hasn't mapped it to the pump yet, we include all in the dynamically created contingent
       return true;
     });
 
@@ -116,7 +119,7 @@ const useDashboardData = (): DashboardData => {
     );
 
     return [activeContingent];
-  }, [heatPumps]);
+  }, [heatPumps, isolatie, aanvoer]);
 
   // Auto-select the first contingent when contingents load or if the current isn't found
   useEffect(() => {
