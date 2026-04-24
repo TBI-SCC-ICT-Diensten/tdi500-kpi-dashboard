@@ -10,6 +10,32 @@ WHERE {
 }
 `;
 
+/**
+ * SPARQL SELECT query to fetch all operational data for a single heat pump.
+ *
+ * KNOWN ISSUE — Variable Shadowing (VV-16):
+ * The variables ?value, ?unit, ?observation, and ?result are shared across
+ * multiple OPTIONAL blocks (roomTemperature, temperatureSetpoint,
+ * outsideTemperature, flowPressure, COP, energyUsage). In SPARQL, when
+ * the same variable name appears in multiple OPTIONAL blocks, the database
+ * engine may produce a Cartesian product or silently drop bindings where
+ * values coincide (e.g. setpoint = roomTemperature).
+ *
+ * The dataMapper.ts compensates for this by inspecting which ontology-
+ * specific variable (?currentTemperature, ?outside, ?temperatureSetpoint,
+ * ?flowPressure, ?cop, ?energyUse) is bound in each result row to
+ * determine which measurement type the row represents.
+ *
+ * Recommended fix (future): rename to unique variables per measurement:
+ *   ?roomValue, ?roomUnit, ?setpointValue, ?setpointUnit, etc.
+ * This requires updating both the SELECT clause and the corresponding
+ * extractMeasurements() logic in dataMapper.ts.
+ *
+ * Risk: refactoring breaks the mapping layer. Only do this with
+ * comprehensive test coverage of the full GET pipeline.
+ *
+ * @param heatpumpUri - Full URI of the heat pump resource
+ */
 export const SPARQL_HEATPUMP_DETAILS = (id: string): string => `
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/>
