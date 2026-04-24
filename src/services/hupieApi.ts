@@ -6,6 +6,34 @@ import { mapSparqlToHeatPumps } from './dataMapper';
 import type { HeatPumpSystem } from '../types/heatpump';
 import { MOCK_HEAT_PUMPS } from './mockData';
 
+/**
+ * Thrown when the manufacturer's server is rate limiting requests.
+ * The Hupie API returns HTTP 200 with this message in the body
+ * rather than a proper HTTP 429, so we must parse the response text.
+ *
+ * Triple Solar specifically returns:
+ *   "No response from manufacturer server"
+ */
+export class RateLimitError extends Error {
+  readonly type = 'rate_limit' as const;
+  constructor(message: string) {
+    super(message);
+    this.name = 'RateLimitError';
+  }
+}
+
+/**
+ * Thrown when the manufacturer's server is unreachable for other reasons.
+ * Also returned as HTTP 200 with an error message in the body.
+ */
+export class ManufacturerServerError extends Error {
+  readonly type = 'manufacturer_server' as const;
+  constructor(message: string) {
+    super(message);
+    this.name = 'ManufacturerServerError';
+  }
+}
+
 export type DataSource = 'live' | 'mock';
 
 // Default from env, overridable at runtime via setDataSource()
@@ -207,9 +235,29 @@ export const fetchAllHeatPumpData = async (
  * Returns Promise<void>.
  */
 export const executeSparqlUpdate = async (query: string): Promise<void> => {
+  let response;
   try {
-    await hupieUpdateAxios.post('', query);
+    response = await hupieUpdateAxios.post('', query);
   } catch (error) {
     throw handleApiError(error, 'POST sparql-update');
+  }
+
+  // Hupie returns HTTP 200 even when the manufacturer's server
+  // rate-limits the request. Check response body for error strings.
+  const responseBody = typeof response.data === 'string'
+    ? response.data
+    : JSON.stringify(response.data ?? '');
+
+  if (responseBody.includes('No response from manufacturer server')) {
+    throw new RateLimitError(
+      'Triple Solar server niet bereikbaar — rate limit bereikt. ' +
+      'Wacht 30 seconden en probeer opnieuw.'
+    );
+  }
+
+  if (responseBody.toLowerCase().includes('manufacturer server')) {
+    throw new ManufacturerServerError(
+      'Geen reactie van de fabrikantserver. Probeer het opnieuw.'
+    );
   }
 };
