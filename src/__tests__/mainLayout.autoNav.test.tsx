@@ -51,24 +51,36 @@ describe('MainLayout — auto-nav on role switch', () => {
     setRoleExternal = null;
   });
 
-  it('redirects installateur off / to /bag-lookup', () => {
-    renderAt('/', 'installateur');
-    expect(screen.getByTestId('current-page')).toHaveTextContent('inregelen');
-  });
-
   it('keeps beheerder on / without redirect', () => {
     renderAt('/', 'beheerder');
-    expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
-  });
-
-  it('redirects beheerder off /bag-lookup to /', () => {
-    renderAt('/bag-lookup', 'beheerder');
     expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
   });
 
   it('keeps installateur on /bag-lookup without redirect', () => {
     renderAt('/bag-lookup', 'installateur');
     expect(screen.getByTestId('current-page')).toHaveTextContent('inregelen');
+  });
+
+  // ── Regression tests for #57 — mount/refresh/hard-navigate is a no-op ──
+  // Before the ref-based guard, the auto-nav effect fired on initial
+  // render, which meant a beheerder hard-navigating to /bag-lookup would
+  // be bounced to / before the "primair voor installateurs" banner could
+  // render. These three tests cover the inverse of the old mount-redirect
+  // assertions that were deleted in this commit.
+
+  it('beheerder hard-navigating to /bag-lookup stays on page', () => {
+    renderAt('/bag-lookup', 'beheerder');
+    expect(screen.getByTestId('current-page')).toHaveTextContent('inregelen');
+  });
+
+  it('installateur refresh on /bag-lookup stays on page', () => {
+    renderAt('/bag-lookup', 'installateur');
+    expect(screen.getByTestId('current-page')).toHaveTextContent('inregelen');
+  });
+
+  it('beheerder refresh on / stays on page', () => {
+    renderAt('/', 'beheerder');
+    expect(screen.getByTestId('current-page')).toHaveTextContent('dashboard');
   });
 
   it('does not redirect either role from /contingent/:id', () => {
