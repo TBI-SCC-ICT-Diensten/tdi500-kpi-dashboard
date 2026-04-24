@@ -4,6 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { createAppTheme } from './theme/theme';
 import { ColorModeProvider, useColorMode } from './context/ColorModeContext';
+import { RoleProvider } from './context/RoleContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { DashboardProvider } from './context/DashboardContext';
 import MainLayout from './components/layout/MainLayout';
@@ -41,7 +42,9 @@ const AppRoutes = () => {
 
 const App = () => (
   <ColorModeProvider>
-    <AppRoutes />
+    <RoleProvider>
+      <AppRoutes />
+    </RoleProvider>
   </ColorModeProvider>
 );
 
