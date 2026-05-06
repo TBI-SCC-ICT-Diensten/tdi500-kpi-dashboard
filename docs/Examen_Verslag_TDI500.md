@@ -16,6 +16,8 @@ Activity 3.4 — Proof of Concept
 
 # 1. Planning & Ontwerp (B1-K1-W1 / W2)
 
+*De diagrammen in 1.7 tot en met 1.10 laten de architectuur zien zoals ik die aan het begin van de sprint had ontworpen. Tijdens de sprint en in de Path A-uitbreidingen daarna zijn er dingen veranderd of bijgekomen. Die staan beschreven in hoofdstuk 4 (Verbetervoorstellen). De diagrammen zijn bewust niet bijgewerkt om het oorspronkelijke ontwerp te tonen.*
+
 ## 1.1 Eisen, wensen en technische uitgangspunten
 
 *[Beschrijf hier de functionele eisen vanuit het TDI 500 projectplan (Werkpakket 3.4). Wat moet het dashboard kunnen? Welke data moet het tonen? Wat zijn de technische randvoorwaarden (browser support, API beschikbaarheid, ontologie-standaarden)?]*
@@ -78,27 +80,31 @@ Wireframes voor alle pagina’s (desktop en mobiel/tablet):
 
 ## 1.7 Sitemap / Routing structure
 
-*[Plak hier de sitemap die de routing structuur toont: / → Dashboard, /contingent/:id → Detail, /about → Info]*
+![Sitemap van de routes in de applicatie](diagrams/sitemap_routing.svg)
 
-*[Screenshot: Sitemap diagram]*
+*Dit diagram laat zien welke routes de applicatie aan het begin van de sprint had. Tijdens Path A is de route `/bag-lookup` toegevoegd voor de installateur-flow; die staat hier nog niet op.*
 
 ## 1.8 Componentendiagram
 
-React component tree met architectuur: Router, ErrorBoundary, ThemeProvider, DashboardProvider, useDashboardData hook, services, config.
+![Componentendiagram van de React-applicatie](diagrams/component_diagram.svg)
 
-*[Screenshot: Componentendiagram]*
+*Dit diagram toont de hoofdstructuur van de React-applicatie: providers (`ThemeProvider`, `DashboardProvider`), de `MainLayout` met `Header` en `Sidebar`, de pagina-componenten, en de servicelaag (`hupieApi`, `dataMapper`, `kpiAggregator`, `decisionEngine`, `contingentService`). De Path A-uitbreidingen `BagLookupPage`, `RoleAwareLanding` en de rolwisselaar staan nog niet op het diagram.*
 
 ## 1.9 UML Class Diagram (TypeScript Interfaces)
 
-Diagram met alle TypeScript interfaces en hun onderlinge relaties. Toont hoe SPARQL/HCO/SAREF data mapt naar de frontend models.
+![UML Class Diagram van het domeinmodel](diagrams/uml_class_diagram.svg)
 
-*[Screenshot: UML Class Diagram]*
+*Dit diagram is gemaakt aan het begin van de sprint (16 maart). Tijdens de sprint heb ik het model op meerdere punten aangepast omdat ik tegen de echte data van de Hupie API aanliep. Daarna zijn er in de Path A-uitbreidingen ook nieuwe types bij gekomen. De belangrijkste verschillen met de huidige code in `src/types/` zijn:*
+
+*`HeatPumpSystem` is uitgebreid: in het diagram staan 5 velden, in de code zijn dat er nu 13 (zoals `measurements[]`, `errorCodes[]` en `kruisProfielCode`). `Measurement` is juist simpeler geworden. `UnitOfMeasure` heb ik helemaal vervangen door een lookup-tabel (`UNIT_MAP`), omdat een eigen interface voor eenheden te ingewikkeld werd voor wat het deed. Het Decision Engine-model is opnieuw opgezet: `DecisionScore` slaat nu een uitspraak per factor op (bijvoorbeeld "COP is acceptabel") in plaats van één score per contingent.*
+
+*Daarnaast zijn er voor Path A-uitbreidingen ongeveer 20 nieuwe types bij gekomen, vooral voor de kruisprofielen, de TNO-catalogus en de BAG-opzoekketen. Ik heb ervoor gekozen om het diagram niet bij te werken: het laat zien wat ik aan het begin had bedacht, en de huidige stand staat in de code zelf.*
 
 ## 1.10 Dataflow-diagram
 
-Volledige dataflow: User selecteert contingent → React → Axios → Hupie API → JSON → dataMapper → kpiAggregator → decisionEngine → useDashboardData → UI.
+![Sequence-diagram van de dataflow van Hupie API naar de UI](diagrams/sequence_diagram.svg)
 
-*[Screenshot: Dataflow / Sequence diagram]*
+*Dit diagram laat de volgorde zien waarin een gebruiker via de UI een SPARQL-query aanroept en de data terugkrijgt: `User → DashboardPage → Hupie API → dataMapper → contingentService → kpiAggregator → decisionEngine → UI`. De stroom klopt nog steeds met de huidige code, alleen begint de flow nu eerst bij `RoleAwareLanding` voordat `DashboardPage` geladen wordt.*
 
 ## 1.11 Onderbouwing technologiekeuzes
 
