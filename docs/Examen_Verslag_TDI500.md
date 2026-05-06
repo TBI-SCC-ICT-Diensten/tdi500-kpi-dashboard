@@ -20,7 +20,36 @@ Activity 3.4 — Proof of Concept
 
 ## 1.1 Eisen, wensen en technische uitgangspunten
 
-*[Beschrijf hier de functionele eisen vanuit het TDI 500 projectplan (Werkpakket 3.4). Wat moet het dashboard kunnen? Welke data moet het tonen? Wat zijn de technische randvoorwaarden (browser support, API beschikbaarheid, ontologie-standaarden)?]*
+Dit hoofdstuk beschrijft de eisen en uitgangspunten zoals die voor deze sprint zijn vastgesteld. Het project valt onder Werkpakket 3.2 van het TDI 500-programma: een MOOI-subsidieproject van TBI/TNO dat als doel heeft de installatie van (hybride) warmtepompen te versnellen. Het projectplan beschrijft een installateursportaal in vijf fases, van een uniform informatieportaal (fase 1) tot integratie met het smart grid (fase 5). Deze sprint richt zich op een Proof of Concept van delen van fase 1, 2 en 3.
+
+*In de Examenafspraken is dit als Werkpakket 3.4 aangeduid. Volgens de huidige TDI 500-projectstructuur (zoals afgestemd met praktijkbegeleider Jeroen Pat) is dit Werkpakket 3.2; ik gebruik die aanduiding in dit verslag.*
+
+### Functionele eisen
+
+De functionele eisen voor deze sprint zijn vastgelegd als user stories (#1 t/m #11, zie 1.2). Op hoofdlijnen moest het dashboard:
+
+- Warmtepompgegevens uit de Hupie API ophalen via SPARQL en deze data uniform tonen, ongeacht de fabrikant van de warmtepomp
+- De ontologie HCO en de standaard SAREF gebruiken om eenheden en eigenschappen op een consistente manier te interpreteren (bijvoorbeeld `saref:isMeasuredIn` automatisch resolven naar °C of kWh)
+- KPI's berekenen en tonen op contingentniveau (groepen woningen met vergelijkbare eigenschappen), niet per individuele woning — dit ondersteunt de contingentenaanpak die centraal staat in TDI 500
+- Een beslissingsondersteuning (Decision Support) bieden waarmee installateurs en planners per contingent advies krijgen over het meest geschikte installatieconcept
+- Werken op desktop, tablet en mobiel (responsief)
+
+### Wensen
+
+Voor deze sprint is geen aparte wensenlijst opgesteld. Het project is een lange-termijn ontwikkeltraject; deze 2-weekse sprint richt zich op de vastgestelde scope voor het examen. De Path A-uitbreidingen (rolwisselaar, BAG-opzoekketen, TNO-catalogus — zie 1.2) zouden in een traditionele projectopzet als wensen geclassificeerd zijn, omdat ze na de oorspronkelijke sprintscope zijn toegevoegd.
+
+### Technische uitgangspunten
+
+De externe technische randvoorwaarden voor deze sprint:
+
+- **Datatoegang:** de Hupie API is de primaire databron voor warmtepompgegevens. Communicatie verloopt via SPARQL queries over HTTPS.
+- **Ontologiestandaarden:** de Heatpump Common Ontology (HCO), SAREF en de ketenstandaarden zijn vastgelegd door TNO en moeten worden gevolgd voor het mappen van inkomende data naar het frontend datamodel.
+- **Browserondersteuning:** de twee meest recente versies van Chrome, Firefox, Edge en Safari. Dit komt overeen met de standaard browserlist van Vite waarmee de applicatie wordt gebouwd.
+- **Hosting:** als Proof of Concept wordt het dashboard online beschikbaar gemaakt zodat de product owner het kan bekijken zonder lokale installatie.
+- **Schaalbaarheid:** voor deze sprint zijn er geen prestatie-eisen geformuleerd. Op termijn moet het dashboard ongeveer 400 datasets kunnen verwerken, maar dat valt buiten de scope van dit examenproject.
+- **Beveiliging en privacy:** de API-credentials worden bewaard in environment variables en niet in de repository; data wordt geanonimiseerd op contingentniveau verwerkt. Verdere onderbouwing in 1.12.
+
+De keuze voor de specifieke technologieën (React, TypeScript, Material UI, ApexCharts, Vitest, etc.) is door mij gemaakt en wordt toegelicht in 1.11.
 
 ## 1.2 User stories met acceptatiecriteria
 
