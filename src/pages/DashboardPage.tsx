@@ -14,6 +14,7 @@ import CopGauge from '../components/charts/CopGauge';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
 import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
+import { useRole } from '../context/RoleContext';
 
 const STATUS_DOT: Record<string, string> = {
   active:  '#16A34A',
@@ -26,6 +27,7 @@ const STATUS_DOT: Record<string, string> = {
 const DashboardPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { role } = useRole();
   const {
     contingents,
     selectedContingent,
@@ -52,12 +54,20 @@ const DashboardPage = () => {
     <Box>
       <Box sx={{ mb: 2.5 }}>
         <Typography variant="h5" fontWeight={700} gutterBottom>
-          KPI Dashboard
+          Overzicht warmtepompen
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Warmtepomp monitoring en inregeling
+          Monitoring van de warmtepomp-installaties per contingent.
         </Typography>
       </Box>
+
+      {role === 'installateur' && (
+        <Alert severity="info" sx={{ mb: 2.5, fontSize: '0.85rem' }}>
+          Deze pagina is primair voor beheerders. Je bekijkt hem
+          momenteel als installateur — schakel naar beheerdermodus
+          voor het volledige monitoring-perspectief.
+        </Alert>
+      )}
 
       {isLoading && (
         <Spinner message="Warmtepompdata ophalen via Hupie API..." />

@@ -10,3 +10,9 @@ Claude.md
 .vercel
 .vite
 coverage
+
+# Obsidian per-machine state
+docs/vault/.obsidian/workspace.json
+docs/vault/.obsidian/workspace-mobile.json
+docs/vault/.obsidian/cache/
+docs/vault/.obsidian/plugins/*/data.json
