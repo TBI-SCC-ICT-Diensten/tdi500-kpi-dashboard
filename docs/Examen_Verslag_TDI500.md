@@ -24,7 +24,240 @@ Activity 3.4 — Proof of Concept
 
 ## 1.2 User stories met acceptatiecriteria
 
-*[Lijst van alle user stories met hun acceptatiecriteria. Verwijs naar de GitHub Issues (#1–#11) of kopieer ze hier.]*
+De user stories voor dit project zijn vastgelegd als GitHub Issues op `Marvel-School/tdi500-kpi-dashboard`. Iedere user story volgt het standaardformaat (*"Als [rol] wil ik [doel] zodat [waarde]"*) met een lijst acceptatiecriteria. De 11 sprintstories (#1 t/m #11) zijn in de planweek vóór de sprint opgesteld; tijdens de sprint is daaraan gewerkt en in de daaropvolgende weken zijn deze afgesloten. Daarnaast zijn er Path A-stories (#50 t/m #53) toegevoegd voor uitbreidingen die na de sprint zijn opgepakt — daarover meer in een aparte sub-sectie verderop.
+
+### Sprintstories
+
+Onderstaande 11 stories vormden de sprint backlog bij de start van de sprint. De volledige tekst van elke story staat op GitHub; de drie meest centrale stories zijn hieronder uitgewerkt.
+
+| # | Titel | Status | Categorie |
+|---|-------|--------|-----------|
+| #1 | [#1: Systeem-ontwerp & architectuurdocumenten](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/1) | Afgerond | Ontwerp |
+| #2 | [#2: Hupie API-authenticatie en -verbinding](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/2) | Afgerond | Backend / API |
+| #3 | [#3: Datamapping — ontologie naar frontend-modellen](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/3) | Afgerond | Datalaag |
+| #4 | [#4: Automatische contingent-koppeling — KPI's filteren per contingent](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/4) | Afgerond | Business logic |
+| #5 | [#5: Dashboard-UI en componentarchitectuur](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/5) | Afgerond | Frontend / UI |
+| #6 | [#6: KPI-visualisatie — grafiekcomponenten](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/6) | Afgerond | Datavisualisatie |
+| #7 | [#7: Beslissingsondersteuning — installatieaanbevelingen](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/7) | Afgerond | Beslissingsondersteuning |
+| #8 | [#8: Testplan en uitvoering](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/8) | Open | Documentatie |
+| #9 | [#9: Verbetervoorstellen — analyse en voorstellen](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/9) | Open | Documentatie |
+| #10 | [#10: Sprint Review / presentatie](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/10) | Open | Ceremonie |
+| #11 | [#11: Retrospective — procesreflectie](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/11) | Open | Ceremonie |
+
+#### #1 Systeem-ontwerp & architectuurdocumenten
+
+> **Als** ontwikkelaar die start met het TDI 500 Contingency Dashboard,
+> **wil ik** een complete set ontwerp- en architectuurdocumenten,
+> **zodat** ik een duidelijke blueprint heb voordat ik begin met coderen en mijn ontwerpproces kan demonstreren voor werkproces B1-K1-W2.
+
+Voorafgaand aan het programmeren van het dashboard moeten de systeemarchitectuur en de gebruikersinterface formeel worden ontworpen. Dit ticket dekt alle visuele en technische blueprints die nodig zijn voor het TDI 500 Contingency Dashboard, zorgt ervoor dat de datamapping vanuit de Heatpump Common Ontology (HCO) is uitgewerkt, en behandelt de standaarden voor privacy, security en ethiek. Alle deliverables uit dit ticket zijn opgenomen in dit examenverslag.
+
+**Acceptatiecriteria:**
+
+*Wireframes (desktop + mobiel):*
+
+- Visuele mockups gemaakt in Figma die de volledige dashboard-layout tonen
+- Wireframes bevatten: contingent-selectie, KPI-grafiekvisualisaties en het beslissingsondersteuningscomponent
+- Zowel desktop- als mobiel/tablet-versies zijn ontworpen
+- Wireframes zijn geëxporteerd (PNG of SVG) en toegevoegd aan het examenverslag
+
+*Componentendiagram (React-architectuur):*
+
+- Diagram toont de React-componentboom / hiërarchie
+- Alle hoofdcomponenten zijn benoemd en hun verantwoordelijkheid is duidelijk (bijv. `<DashboardLayout>`, `<ContingentSelector>`, `<KpiChart>`, `<DecisionPanel>`)
+- Diagram toont welke componenten welke services/hooks gebruiken
+- Diagram bevat de volgende architectuurelementen: React Router-routestructuur, `ErrorBoundary` om de applicatie heen, `ThemeProvider` om de applicatie heen, custom `useDashboardData`-hook en welke componenten deze gebruiken, servicelaag (`hupieApi`, `dataMapper`, `kpiAggregator`, `decisionEngine`), configuratielaag (`config.ts`)
+- Diagram is opgeslagen als afbeelding en toegevoegd aan het examenverslag
+
+*UML class diagram (TypeScript interfaces):*
+
+- Diagram brengt alle TypeScript interfaces en types in kaart
+- Toont hoe ruwe SPARQL-data (volgens HCO- en SAREF-standaarden) is gestructureerd in de code
+- Bevat minimaal: `Measurement`, `KeyPerformanceIndicator`, `UnitOfMeasure`, `Contingent`, `HeatPumpSystem`
+- Toont de relaties tussen interfaces (bijv. een `Measurement` heeft een `UnitOfMeasure`)
+- Diagram is opgeslagen als afbeelding en toegevoegd aan het examenverslag
+
+*Sequence diagram / dataflow:*
+
+- Diagram toont de volledige dataflow:
+  1. Gebruiker selecteert een contingent in de UI
+  2. React-component triggert een request
+  3. Axios verstuurt HTTP POST/GET naar de Hupie API (SPARQL-endpoint)
+  4. Hupie API geeft een JSON-respons terug
+  5. Frontend parseert en mapt data (HCO/SAREF → TypeScript-modellen)
+  6. UI wordt bijgewerkt met KPI-visualisaties
+- Diagram is opgeslagen als afbeelding en toegevoegd aan het examenverslag
+
+*Onderbouwing technologiekeuzes:*
+
+- Schriftelijke uitleg waarom de volgende technologieën zijn gekozen: React 18 met TypeScript, Material UI (MUI v5), ApexCharts, Axios
+- Iedere keuze is kort vergeleken met minstens één alternatief (bijv. "React vs. Vue", "ApexCharts vs. Chart.js")
+- Toegevoegd aan het examenverslag
+
+*Onderbouwing security, privacy en ethiek:*
+
+- **Privacy:** uitleg hoe het dashboard omgaat met potentieel herleidbare data (bijv. anonimisering van adressen uit BAG, alleen geaggregeerde data per contingent)
+- **Security:** uitleg hoe Hupie API-credentials worden beheerd (in `.env`, niet in de repo gecommit, `.env` staat in `.gitignore`, communicatie via HTTPS)
+- **Ethiek:** uitleg hoe KPI-visualisaties eerlijk en niet-misleidend zijn (correcte assen-schalen, geen cherry-picked dataranges)
+- Toegevoegd aan het examenverslag
+
+*Sitemap / routestructuur:*
+
+- Een sitemap toont de pagina-/routestructuur van de applicatie: `/` → Dashboard, `/contingent/:id` → detailweergave per contingent
+- Sitemap is opgeslagen in `/docs/diagrams/`
+- Wireframes zijn gemaakt voor ALLE routes (niet alleen het dashboard), desktop + mobiel
+
+**Status:** Afgerond op 16 maart 2026. Issue: [#1](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/1).
+
+#### #2 Hupie API-authenticatie en -verbinding
+
+> **Als** installateur/planner die het dashboard gebruikt,
+> **wil ik** dat de applicatie verbinding maakt met de Hupie API en warmtepompdata ophaalt,
+> **zodat** ik real-time en historische telemetriedata in het dashboard kan bekijken.
+
+Deze story zet de kern van de HTTP-servicelaag op die de authenticatie en communicatie met het Hupie SPARQL API-endpoint afhandelt. Dit is de fundering waarop alle andere data-afhankelijke features (#3 t/m #7) bouwen — zonder werkende API-verbinding functioneert verder niets. De service moet SPARQL POST/GET-requests naar de Hupie API sturen, de authenticatie regelen en ruwe JSON-responses teruggeven. Data parsing en ontologie-mapping horen bij story #3.
+
+**Acceptatiecriteria:**
+
+*API-service-opzet:*
+
+- Een Axios-gebaseerde API-service is gemaakt in `/src/services/` (bijv. `hupieApi.ts` of `sparqlService.ts`)
+- Service leest API-configuratie uit de centrale config-module (`/src/config/index.ts`), NIET rechtstreeks uit `process.env`
+- De config-module leest environment variables en levert getypte, gevalideerde configuratie
+- Een `.env.example`-bestand staat in de repo-root met de vereiste variabelen (zonder echte waardes)
+- `.env` staat in `.gitignore` en wordt **niet** in de repository gecommit
+- Als vereiste config-waardes ontbreken, logt de service bij opstarten een duidelijke waarschuwing (geen silent failure)
+
+*SPARQL-query-uitvoering:*
+
+- De service kan een SPARQL-query versturen via HTTP POST naar het Hupie-endpoint
+- De service kan een SPARQL-query versturen via HTTP GET als fallback (als POST niet wordt ondersteund voor bepaalde queries)
+- Er is een basis-testquery aanwezig (bijv. een lijst van beschikbare warmtepompsystemen ophalen of een eenvoudige `SELECT` op metingen)
+- De service ontvangt een `200 OK`-respons met geldige JSON-data
+
+*Foutafhandeling:*
+
+- API-timeout is geconfigureerd (bijv. 10 seconden) — request blijft niet onbeperkt hangen
+- HTTP-fouten (4xx, 5xx) worden afgevangen en geven een betekenisvol errorobject terug (geen ruwe Axios-error)
+- Netwerkfouten (geen internet, DNS-fout) worden netjes afgevangen
+- Alle errorstates worden naar de browserconsole gelogd met genoeg context om te debuggen (endpoint-URL, statuscode, errormessage)
+
+*Response-afhandeling:*
+
+- Ruwe JSON-respons van de API wordt teruggegeven aan de aanroepende component/hook
+- Response-structuur is getypt met een TypeScript-interface (bijv. `SparqlResponse` met `results.bindings[]`)
+- Geen datatransformatie in deze service — alleen ruwe respons (transformatie hoort bij story #3)
+
+**Status:** Afgerond op 26 maart 2026. Issue: [#2](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/2).
+
+#### #5 Dashboard-UI en componentarchitectuur
+
+> **Als** installateur/planner die het dashboard opent,
+> **wil ik** een nette, gestructureerde interface met duidelijke navigatie en layout,
+> **zodat** ik snel de warmtepomp-prestatiedata kan vinden en begrijpen die ik nodig heb.
+
+Deze story dekt het kern-frontendskelet — de layout, navigatie, componenthiërarchie en stylingfundering waarin alle andere UI-features (#4 selector, #6 grafieken, #7 beslissingsondersteuning, #16 SET-formulieren) worden geplaatst.
+
+**Acceptatiecriteria:**
+
+*App-shell en layout:*
+
+- `App.tsx` rendert ThemeProvider + ErrorBoundary + BrowserRouter + DashboardProvider
+- Layout bevat header, sidebar en main content-area
+- Layout gebruikt MUI-componenten — geen ruwe HTML-divs voor layoutstructuur
+- Footer is expliciet buiten scope — niet nodig voor deze tool
+- Layout komt overeen met de wireframes uit story #1
+
+*Componenten- en bestandsstructuur:*
+
+- Bestandsstructuur volgt de afgesproken indeling onder `src/`: `config/`, `theme/`, `types/`, `services/`, `hooks/`, `context/`, `components/{common,layout,dashboard,charts}/`, `pages/`
+- Alle stub-componenten zijn vervangen door echte implementaties
+- Alle props zijn getypt via TypeScript-interfaces
+- Geen componentbestand groter dan ~200 regels
+
+*Routing (React Router):*
+
+- Routes gedefinieerd in `App.tsx`: `/` → `DashboardPage`, `/contingent/:id` → `ContingentDetailPage`, `*` → `NotFoundPage`
+- 404-pagina bestaat
+- Sidebar-navigatie markeert de actieve route
+- `/about`-route is expliciet NIET inbegrepen — buiten scope
+
+*ErrorBoundary:*
+
+- `ErrorBoundary` om de hoofd-applicatie-content
+- Fallback toont "Er is iets misgegaan" met een retry-knop
+- ErrorBoundary omhult NIET de header/navigatie
+- Staat in `src/components/common/ErrorBoundary.tsx`
+
+*Custom MUI-thema:*
+
+- Custom thema in `src/theme/theme.ts`
+- Primary: `#1a2b4a` (TDI 500 navy), Secondary: `#ff6b35` (oranje accent), Background: `#f5f6fa`
+- Typografie: Roboto, gewogen koppen
+- `ThemeProvider` om de hele applicatie
+
+*Responsive design:*
+
+- Dashboard bruikbaar op desktop (1440px+) — primaire doelgroep
+- Dashboard bruikbaar op tablet (768px–1024px) — panelen stacken netjes
+- MUI Grid breakpoints worden gebruikt voor responsive gedrag
+- Geen horizontale scrollbar bij ondersteunde viewport-breedtes
+
+*DashboardPage-inhoud:*
+
+- `DashboardPage` is opgebouwd met een echte dashboard-layout: `ContingentSelector` bovenaan, `KpiOverviewPanel` met overzichtskaarten, `KpiChartPanel` met grafieken (placeholder tot #6), `DecisionSupportCard` (placeholder tot #7)
+- Testknoppen ("Test Hupie API", "Test Data Mapping") zijn verwijderd uit de productie-layout
+
+*Loading- en error-states:*
+
+- `Spinner`-component geïmplementeerd (vervangt de placeholder)
+- `EmptyState`-component geïmplementeerd
+- Beide consistent gestyled met het MUI-thema
+
+**Status:** Afgerond op 6 april 2026. Issue: [#5](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/5).
+
+### Aanvullende stories: Path A
+
+Tijdens en na het afsluiten van de geplande sprintscope heb ik vier extra stories opgepakt onder de noemer "Path A": uitbreidingen die het dashboard bruikbaarder maken voor twee gebruikersrollen (installateur en beheerder) en die de TNO-catalogus integreren. De stories zelf waren al in conceptvorm voorbereid; de bijbehorende GitHub Issues zijn echter pas op 24 april aangemaakt, op het moment dat het werk werd opgeleverd. De feature-branches, Pull Requests en commits geven de daadwerkelijke werkvolgorde weer; de issues vatten het werk samen voor traceability.
+
+In een teamsetting zou ik deze uitbreidingen vooraf hebben afgestemd en als losse sprinttickets hebben opgevoerd, zodat de sprintplanning er rekening mee kon houden. Dat is een verbeterpunt dat ik in hoofdstuk 6 (Reflectie) verder bespreek.
+
+| # | Titel | Status | Categorie |
+|---|-------|--------|-----------|
+| #50 | [#50: Path A/1 — TNO-catalogus overnemen: 9 profielen × 4 fabrikanten](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/50) | Afgerond | Datalaag |
+| #51 | [#51: Path A/2 — Rolwisselaar: installateur- versus beheerder-weergave](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/51) | Afgerond | UX / Rollen |
+| #52 | [#52: Path A/3 — Installateur-weergave: BAG-startscherm met aanbevolen instellingen](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/52) | Afgerond | Frontend / UX |
+| #53 | [#53: Path A/4 — Beheerder-weergave: fleet-monitoring dashboard](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/53) | Afgerond | Frontend / UX |
+
+#### #52 Path A/3 Installateur-weergave: BAG-startscherm met aanbevolen instellingen
+
+In de installateur-modus is de primaire gebruikerstaak: adres invoeren → kruisprofiel bepalen → aanbevolen inregelinstellingen opzoeken → (toekomstig) toepassen op de pomp. De bestaande BAG-opzoekpagina dekt al ongeveer 70% van deze workflow. Dit ticket maakt er de feitelijke installateur-startpagina van en voegt de fabrikant-specifieke aanbevelingen uit de TNO-catalogus (story #50) toe.
+
+**Scope:**
+
+- Wanneer de rol `installateur` is, routeert `/` naar de BAG-workflowpagina
+- De paginatitel is gewijzigd in "Inregelen" (workflow-gericht in plaats van feature-gericht)
+- Stap 6 "Aanbevolen instellingen per fabrikant" toegevoegd: een kaart per fabrikant voor het bepaalde kruisprofiel, met alle 11 parameters uit de catalogus
+- `X`-waardes duidelijk gemarkeerd als "Niet opgegeven" met gedempte styling
+- Een fabrikant-filter zodat de installateur op één fabrikant kan focussen
+- Stap 7 "Toepassen op warmtepomp" als **placeholder** (uitgeschakelde knop met tooltip: "In ontwikkeling — toepassen op warmtepomp volgt in een volgende iteratie")
+
+**Acceptatiecriteria:**
+
+- Installateur-rol → `/` toont de BAG-workflow (niet het KPI-dashboard)
+- Paginatitel leest "Inregelen" (of equivalent workflow-gerichte naam)
+- Stap 6 verschijnt nadat het adres is opgezocht en het kruisprofiel is bepaald
+- Alle 4 fabrikanten worden getoond als tabs of kaarten
+- Iedere fabrikant toont de 11 parameters uit de catalogus
+- `X`-waardes worden getoond als "Niet opgegeven" in gedempte stijl
+- Profielen zonder data voor een fabrikant tonen een duidelijke empty state
+- Stap 7-placeholder is aanwezig maar uitgeschakeld met tooltip
+- Render-tests dekken het catalogus-display-component
+- Alle 199+ bestaande tests blijven slagen
+
+**Status:** Afgerond op 24 april 2026. Issue: [#52](https://github.com/Marvel-School/tdi500-kpi-dashboard/issues/52).
+
+Drie issues uit dezelfde repository zijn niet in deze sectie opgenomen omdat ze elders in het verslag thuishoren: #16 (Remote Heat Pump Control — SET-commands) is nog open en valt buiten de huidige scope; #47 (testdekking-verbeteringen) betreft interne engineering en wordt in hoofdstuk 4 als verbetervoorstel besproken; #57 (regressie-fix voor de beheerder-banner) is een bugfix die voortkomt uit testresultaten en eveneens in hoofdstuk 4 aan bod komt.
 
 ## 1.3 Definition of Done
 
