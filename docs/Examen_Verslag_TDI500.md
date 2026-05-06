@@ -28,7 +28,37 @@ Activity 3.4 — Proof of Concept
 
 ## 1.3 Definition of Done
 
-*[Kopieer hier de Definition of Done zoals vastgesteld op het GitHub Projects scrumboard.]*
+*Bron: [docs/vault/Definition of Done.md](vault/Definition%20of%20Done.md). De DoD is ook zichtbaar op het GitHub Projects scrumboard.*
+
+Een ticket mag pas naar 'Done' als alle onderstaande punten gelden:
+
+#### Codekwaliteit
+
+- Code volgt de projectconventies: PascalCase voor componenten, camelCase voor variabelen/functies, één component per bestand
+- TypeScript strict mode — geen `any` types, tenzij gerechtvaardigd
+- Code draait lokaal op `localhost:3000` zonder console-fouten of belangrijke linter-waarschuwingen
+
+#### Versiebeheer
+
+- Werk wordt gedaan op een aparte feature-branch (`feature/[name]`)
+- Feature-branch wordt via een Pull Request op GitHub gemerged in `develop`
+- Commits hebben duidelijke, beschrijvende messages (bijv. `feat:`, `fix:`, `refactor:`)
+
+#### Testen & acceptatie
+
+- Aan alle acceptatiecriteria van de user story is voldaan
+- Feature is getest: happy flow + minimaal 1 alternatief scenario (bijv. lege data, API-fout)
+- Testresultaten zijn vastgelegd met screenshots
+- Als de feature logica bevat (mapping, aggregatie, scoring): Vitest unit tests bestaan en slagen
+
+#### Documentatie (examenbewijs)
+
+- Screenshot van de werkende feature is opgeslagen
+- Screenshot van relevante code is opgeslagen
+- Screenshot van de PR / branch-geschiedenis is opgeslagen
+- Scrumboard is bijgewerkt (ticket verplaatst naar Done)
+
+> **Let op:** Ontwerp- en documentatietickets (#1, #8, #9, #10, #11) volgen hun eigen acceptatiecriteria, maar vereisen wel scrumboard-updates en opgeslagen screenshots.
 
 ## 1.4 Sprint backlog (begin sprint)
 
