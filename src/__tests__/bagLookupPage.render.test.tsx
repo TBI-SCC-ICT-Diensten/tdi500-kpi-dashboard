@@ -11,6 +11,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import BagLookupPage from '../pages/BagLookupPage';
+import { RoleProvider } from '../context/RoleContext';
 import type { BagResult } from '../services/bagService';
 
 // Mock bagService — keep the non-fetch helpers intact so the page can
@@ -47,11 +48,13 @@ vi.mock('../components/bag/WeatherWidget', () => ({
 const theme = createTheme();
 const renderPage = () =>
   render(
-    <MemoryRouter>
-      <ThemeProvider theme={theme}>
-        <BagLookupPage />
-      </ThemeProvider>
-    </MemoryRouter>
+    <RoleProvider>
+      <MemoryRouter>
+        <ThemeProvider theme={theme}>
+          <BagLookupPage />
+        </ThemeProvider>
+      </MemoryRouter>
+    </RoleProvider>
   );
 
 describe('BagLookupPage', () => {

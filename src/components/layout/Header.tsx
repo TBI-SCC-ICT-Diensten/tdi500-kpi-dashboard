@@ -6,10 +6,14 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import WifiIcon from '@mui/icons-material/Wifi';
 import ScienceIcon from '@mui/icons-material/Science';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import BuildIcon from '@mui/icons-material/Build';
+import InsightsIcon from '@mui/icons-material/Insights';
 import {
   getDataSource,
   setDataSource,
@@ -17,10 +21,12 @@ import {
   type DataSource,
 } from '../../services/hupieApi';
 import { useColorMode } from '../../context/ColorModeContext';
+import { useRole } from '../../context/RoleContext';
 
 const Header = () => {
   const [source, setSource] = useState<DataSource>(getDataSource());
   const { mode, toggleColorMode } = useColorMode();
+  const { role, setRole } = useRole();
 
   // Keep the chip in sync if the data source changes elsewhere.
   useEffect(() => subscribeToDataSource(setSource), []);
@@ -57,6 +63,42 @@ const Header = () => {
           clickable
           sx={{ cursor: 'pointer' }}
         />
+        <ToggleButtonGroup
+          value={role}
+          exclusive
+          size="small"
+          onChange={(_, next) => {
+            if (next === 'installateur' || next === 'beheerder') {
+              setRole(next);
+            }
+          }}
+          aria-label="Rolselectie"
+          sx={{
+            '& .MuiToggleButton-root': {
+              textTransform: 'none',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              px: 1.25,
+              py: 0.25,
+              lineHeight: 1.4,
+              color: 'text.secondary',
+              borderColor: 'divider',
+            },
+            '& .MuiToggleButton-root.Mui-selected': {
+              color: 'primary.main',
+              bgcolor: 'action.selected',
+            },
+          }}
+        >
+          <ToggleButton value="installateur" aria-label="Installateur">
+            <BuildIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            Installateur
+          </ToggleButton>
+          <ToggleButton value="beheerder" aria-label="Beheerder">
+            <InsightsIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            Beheerder
+          </ToggleButton>
+        </ToggleButtonGroup>
         <Tooltip title={mode === 'dark' ? 'Licht thema' : 'Donker thema'}>
           <IconButton size="small" onClick={toggleColorMode} sx={{ color: 'text.secondary' }}>
             {mode === 'dark'
