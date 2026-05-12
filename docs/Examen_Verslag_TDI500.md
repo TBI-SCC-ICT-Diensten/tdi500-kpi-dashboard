@@ -324,7 +324,7 @@ Een ticket mag pas naar 'Done' als alle onderstaande punten gelden:
 
 ## 1.4 Sprint backlog (begin sprint)
 
-De volgende screenshot toont het scrumboard op GitHub Projects aan het einde van sprintdag 1 (16 maart 2026), nadat de sprint backlog was geprioriteerd. De bovenste user story heeft de hoogste prioriteit, de onderste de laagste. Op dat moment stonden alle 11 user stories in de kolom **Backlog/Todo**; de eerste story (#1 System Design & Architecture Documents) werd nog dezelfde dag opgepakt en afgerond.
+De volgende screenshot toont het scrumboard op GitHub Projects aan het einde van sprintdag 1 (16 maart 2026), nadat de sprint backlog was geprioriteerd. De bovenste user story heeft de hoogste prioriteit, de onderste de laagste. Op dat moment stonden 10 user stories in de kolom **Backlog/Todo** en was story #1 (System Design & Architecture Documents) al naar **Done** verplaatst — deze ontwerptaak is op dag 1 zelf opgepakt en afgerond.
 
 ![Scrumboard aan het einde van sprintdag 1, met de geprioriteerde sprint backlog](vault/Screenshots/scrumboard/scrumboard_dag_1.png)
 
