@@ -781,21 +781,55 @@ Issue \#7 — Decision Support:
 
 ## 2.3 Screenshots code
 
-Relevante code-screenshots per feature:
+De code-screenshots hieronder zijn gegroepeerd op basis van de datastroom van Hupie API naar UI, in plaats van per user story. Dit volgt de architectuur uit hoofdstuk 1.7 tot en met 1.10 en maakt het makkelijker om de code-laag op een logische volgorde te lezen. Elke stap in de pipeline krijgt één screenshot.
 
-*[Screenshot: Code: hupieApi.ts + config/index.ts]*
+### 1. Configuratie
 
-*[Screenshot: Code: dataMapper.ts + types]*
+![Code: config.ts met environment variables](vault/Screenshots/code/code_config.png)
 
-*[Screenshot: Code: contingentService.ts + kpiAggregator.ts]*
+`config.ts` leest de environment variables in (`VITE_HUPIE_API_URL`, `VITE_HUPIE_API_KEY`, etc.) en exporteert ze als een typed object. Door dit centraal te doen zijn de credentials op één plek beheerbaar en zijn ze nergens hardcoded in de codebase aanwezig.
 
-*[Screenshot: Code: useDashboardData hook]*
+### 2. Hupie API-client
 
-*[Screenshot: Code: DashboardPage component]*
+![Code: hupieApi.ts met Axios en SPARQL-aanroep](vault/Screenshots/code/code_hupieApi.png)
 
-*[Screenshot: Code: chart components]*
+`hupieApi.ts` is de service-laag die met de Hupie SPARQL-endpoint praat via Axios. Hier zit ook de typed error-afhandeling (`RateLimitError`, `ManufacturerServerError`) en de detectie van rate-limit-responses die als HTTP 200 binnenkomen met een fouttekst in de body.
 
-*[Screenshot: Code: decisionEngine.ts + scoringConfig.ts]*
+### 3. SPARQL-queries
+
+![Code: sparqlQueries.ts met de SPARQL query-strings](vault/Screenshots/code/code_sparqlQueries.png)
+
+`sparqlQueries.ts` bevat de SPARQL-querystrings als constanten. Door deze te scheiden van de service-laag kunnen de queries onafhankelijk worden aangepast wanneer de Hupie-ontologie verandert, zonder de Axios-logica te raken.
+
+### 4. Data mapping
+
+![Code: dataMapper.ts die SPARQL responses omzet naar TypeScript objecten](vault/Screenshots/code/code_dataMapper.png)
+
+`dataMapper.ts` zet de rauwe SPARQL-bindings om naar typed TypeScript-objecten (`HeatPumpSystem`, `Measurement`, etc.). De `mapSparqlToHeatPumps`-functie groepeert eerst alle bindings per warmtepomp-URI, en bouwt vervolgens per pomp een compleet object op uit de helpers (`extractMeasurements`, `extractErrorCodes`, `resolveConnectionState`, etc.) die in `ontologyUtils.ts` zijn gedefinieerd.
+
+### 5. Contingent-service
+
+![Code: contingentService.ts die warmtepompen filtert per kruisprofiel](vault/Screenshots/code/code_contingentService.png)
+
+`contingentService.ts` groepeert de getypeerde warmtepompen tot contingenten op basis van het kruisprofiel (`groupHeatPumpsByKruisProfiel`). Warmtepompen zonder kruisprofiel-code worden overgeslagen en gelogd. De Hupie API levert dit veld op dit moment nog niet, dus contingenten worden voorlopig handmatig opgebouwd via `createContingent`; de groeperingsfunctie is wel klaar voor zodra de data beschikbaar komt.
+
+### 6. React data-hook
+
+![Code: useDashboardData hook die de pipeline orchestreert](vault/Screenshots/code/code_useDashboardData.png)
+
+`useDashboardData` is een custom React-hook die de data-load orkestreert. In de zichtbare code wordt de streaming-aanpak getoond: warmtepompen worden incrementeel toegevoegd aan de state zodra ze binnenkomen, met een `requestIdRef`-patroon om stale in-flight responses te negeren als de gebruiker bijvoorbeeld snel van filter wisselt. De pagina-componenten consumeren de uiteindelijke `DashboardData` interface en bevatten zelf geen data-laadlogica.
+
+### 7. Decision Engine
+
+![Code: decisionEngine.ts met per-factor scoring](vault/Screenshots/code/code_decisionEngine.png)
+
+`decisionEngine.ts` produceert de uiteindelijke aanbeveling per contingent op basis van de per-factor scores. Hier zit de "worst wins"-regel: als één factor 'poor' is, wordt de totale score ook 'poor'. Ook de Dutch summary- en actie-teksten worden hier samengesteld op basis van de uiteindelijke score, inclusief expliciete afhandeling voor `'insufficient-data'` wanneer er te weinig betrouwbare data beschikbaar is.
+
+### 8. Dashboard-pagina
+
+![Code: DashboardPage.tsx met componentcompositie](vault/Screenshots/code/code_dashboardPage.png)
+
+`DashboardPage.tsx` is het topcomponent van de hoofdpagina. Het consumeert `useDashboardData` voor de data, leest de kruisprofiel-filters uit de URL-parameters, haalt de scoring-drempels op uit `SCORING_THRESHOLDS_BY_PROFIEL`, en componeert de UI in meerdere states: laden (Spinner), fout (Alert), lege state (EmptyState), of de volledige dashboard-weergave met KPI-cards en charts. Als de gebruiker de rol "installateur" heeft wordt boven aan een banner getoond dat deze pagina primair voor beheerders is.
 
 ## 2.4 Screenshots commit-geschiedenis en branches
 
