@@ -324,33 +324,39 @@ Een ticket mag pas naar 'Done' als alle onderstaande punten gelden:
 
 ## 1.4 Sprint backlog (begin sprint)
 
-Screenshot van het scrumboard aan het begin van de sprint, met user stories geprioriteerd (hoogste bovenaan):
+De volgende screenshot toont het scrumboard op GitHub Projects aan het einde van sprintdag 1 (16 maart 2026), nadat de sprint backlog was geprioriteerd. De bovenste user story heeft de hoogste prioriteit, de onderste de laagste. Op dat moment stonden alle 11 user stories in de kolom **Backlog/Todo**; de eerste story (#1 System Design & Architecture Documents) werd nog dezelfde dag opgepakt en afgerond.
 
-*[Screenshot: Sprint backlog begin sprint — scrumboard_dag_1.png]*
+![Scrumboard aan het einde van sprintdag 1, met de geprioriteerde sprint backlog](vault/Screenshots/scrumboard/scrumboard_dag_1.png)
+
+De volledige lijst van user stories met titels, statussen en links naar de GitHub Issues staat in 1.2 (User stories met acceptatiecriteria).
 
 ## 1.5 Scrumboard screenshots (dagelijks)
 
-Na elke dagelijkse update wordt een screenshot van het scrumboard gemaakt:
+Tijdens de sprint zijn niet voor elke werkdag scrumboard-screenshots vastgelegd. Voor de eerste drie sprintdagen (16, 17 en 18 maart) zijn er beelden bewaard; deze tonen samen de voortgang van de eerste twee user stories die zijn opgepakt. Voor de overige sprintdagen is de daadwerkelijke voortgang afleidbaar uit de GitHub-issuesgeschiedenis (sluitdatums per issue) en de commit-history op de feature-branches.
 
-*[Screenshot: Dag 1 — Ma 16 mrt]*
+#### Dag 1 — Maandag 16 maart
 
-*[Screenshot: Dag 2 — Di 17 mrt]*
+![Scrumboard aan het einde van sprintdag 1](vault/Screenshots/scrumboard/scrumboard_dag_1.png)
 
-*[Screenshot: Dag 3 — Wo 18 mrt]*
+Aan het einde van dag 1 staan alle 11 user stories in **Backlog/Todo**. Story #1 (System Design & Architecture Documents) is al verplaatst naar **Done** — deze ontwerptaak is op dag 1 zelf opgepakt en afgerond. De rest van de stories wacht nog op verdere planning.
 
-*[Screenshot: Dag 4 — Do 19 mrt]*
+#### Dag 2 — Dinsdag 17 maart
 
-*[Screenshot: Dag 5 — Vr 20 mrt]*
+![Scrumboard aan het einde van sprintdag 2](vault/Screenshots/scrumboard/scrumboard_dag_2.png)
 
-*[Screenshot: Dag 6 — Ma 23 mrt]*
+Op dag 2 is story #2 (Hupie API Authentication & Connection) opgepakt en staat nu in **In Progress**. Stories #3 en #4 zijn vanuit de Backlog naar de **Sprint Backlog** verplaatst om voor te bereiden op de komende dagen.
 
-*[Screenshot: Dag 7 — Di 24 mrt]*
+#### Dag 3 — Woensdag 18 maart
 
-*[Screenshot: Dag 8 — Wo 25 mrt]*
+![Scrumboard aan het einde van sprintdag 3](vault/Screenshots/scrumboard/scrumboard_dag_3.png)
 
-*[Screenshot: Dag 9 — Do 26 mrt]*
+Op dag 3 is story #2 afgerond en naar **Done** verplaatst, en is story #3 (Data Mapping — Ontology to Frontend Models) opgepakt in **In Progress**. Story #4 staat klaar in de Sprint Backlog. De API-verbinding werkt nu en het werk verschuift naar het mappen van inkomende data naar het frontend-datamodel.
 
-*[Screenshot: Dag 10 — Vr 27 mrt]*
+#### Dag 4 t/m dag 10
+
+Voor de overige sprintdagen zijn geen scrumboard-screenshots beschikbaar. De voortgang in deze periode is af te leiden uit de sluitdatums van de GitHub-issues (#3 op 31 maart, #4 op 2 april, #5 op 6 april, #6 op 6 april, #7 op 9 april) en uit de commit-geschiedenis op de feature-branches. De volledige lijst staat in 1.2.
+
+In hoofdstuk 4 (Verbetervoorstellen) is dit als VV-21 opgenomen: in een toekomstige sprint zou ik dagelijkse scrumboard-screenshots als vaste werkroutine vastleggen, zodat het procesbewijs volledig is.
 
 ## 1.6 Wireframes
 
