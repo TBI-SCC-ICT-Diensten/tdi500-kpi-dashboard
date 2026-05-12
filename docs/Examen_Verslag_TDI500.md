@@ -731,53 +731,67 @@ Aanvullend zijn vier Path A-stories (#50 t/m #53) na de oorspronkelijke sprintsc
 
 ## 2.2 Screenshots uitgewerkte functionaliteiten
 
-Per feature: screenshot van de werkende functionaliteit met een korte beschrijving.
+Per feature: een screenshot van de werkende functionaliteit met een korte beschrijving. Sommige screenshots dekken meerdere user stories tegelijk, omdat de bijbehorende UI op één scherm samenkomt. Waar dat zo is, wordt dat in de tekst aangegeven.
 
-Issue \#2 — Hupie API Connection:
+De screenshots zijn gemaakt in twee modi:
 
-*[Beschrijving van wat je hebt gebouwd]*
+- **Live** — verbonden met de Hupie API (te zien aan de groene `Hupie API (live)`-badge in de header). Dit toont wat de echte API momenteel oplevert.
+- **Mock** — een ingebouwde mock-modus met realistische voorbeelddata (te zien aan de oranje `Mock data`-badge). Dit toont hoe het dashboard eruitziet wanneer alle datavelden gevuld zijn.
 
-*[Screenshot: API Connection — werkende feature]*
+De mock-modus is bewust toegevoegd tijdens de sprint, omdat de Hupie API nog niet alle datavelden levert die het dashboard ondersteunt (bijvoorbeeld foutcodes en COP-waarden ontbreken voor sommige pompen). Hierdoor kan het volledige UI-gedrag worden getoond zonder afhankelijk te zijn van data die de API nog niet beschikbaar stelt.
 
-Issue \#3 — Data Mapping:
+### API-verbinding (story #2)
 
-*[Beschrijving]*
+![Screenshot van een succesvolle test van de Hupie API-verbinding](vault/Screenshots/features/feature_api_test_success.png)
 
-*[Screenshot: Data Mapping — werkende feature]*
+Deze screenshot toont een succesvolle test van de Hupie API-verbinding. De applicatie authenticeert via het two-phase auth-patroon (zie 2.3.2 voor de bijbehorende code) en haalt warmtepompdata op via SPARQL. De `Hupie API (live)`-badge in de header van de overige live-screenshots verwijst hiernaar.
 
-Issue \#4 — Contingent Link:
+### Hoofddashboard — live data (stories #3, #5, #6, #7)
 
-*[Beschrijving]*
+![Screenshot van het hoofddashboard met live Hupie API-data, kruisprofiel C2 geselecteerd](vault/Screenshots/features/feature_dashboard_live.png)
 
-*[Screenshot: Contingent Link — werkende feature]*
+Dit is het hoofddashboard met live data uit de Hupie API, ingesteld op kruisprofiel **C2** (slecht geïsoleerd, radiatorsysteem). Vier KPI-cards bovenaan tonen efficiëntie (COP-gemiddelde), betrouwbaarheid (connectiviteit), en twee inregelingscijfers. De COP Gauge rechts toont het gemiddelde tegenover de profieldrempel. Onderin staat het installatieadvies: bij C2 met de huidige data komt de Decision Engine tot het oordeel **"Onvoldoende"**, met daaronder de factoranalyse die laat zien dat geen COP-data beschikbaar is via de Hupie API.
 
-Issue \#5 — Dashboard UI:
+Deze screenshot toont user story #3 (Data Mapping — de KPI-waarden zijn afkomstig uit getypeerde objecten), story #5 (Dashboard UI — de layout en compositie), story #6 (KPI Visualization — gauge en kaarten), en story #7 (Decision Support — het algeheel oordeel met factoranalyse).
 
-*[Beschrijving]*
+### Hoofddashboard — mock data
 
-*[Screenshot: Dashboard UI — desktop]*
+![Screenshot van het hoofddashboard met mock data, kruisprofiel B2 geselecteerd, met algeheel oordeel "Acceptabel"](vault/Screenshots/features/feature_dashboard_mock.png)
 
-*[Screenshot: Dashboard UI — tablet]*
+Hetzelfde hoofddashboard in mock-modus, ingesteld op kruisprofiel **B2** (matig geïsoleerd). Hier zijn alle datavelden gevuld: gemiddelde COP van 3.2 (boven de drempel van 2.5), 80% connectiviteit, 2 storingsmeldingen. De Decision Engine komt nu tot het oordeel **"Acceptabel"** — een ander resultaat dan in live-modus, dankzij de rijkere mock-data. De factoranalyse onderin laat zien dat de COP-factor met 3.20 boven de profieldrempel van 2.5 ligt en daarom als "Goed" wordt gescoord.
 
-Issue \#6 — KPI Charts:
+Door live en mock naast elkaar te tonen wordt zichtbaar dat de UI-laag werkt zoals bedoeld; de variatie in oordeel komt voort uit verschillen in databeschikbaarheid, niet uit verschillen in code.
 
-*[Beschrijving]*
+### KPI-grafieken (story #6)
 
-*[Screenshot: KPI Charts — line chart]*
+![Screenshot van de KPI-grafieken op het hoofddashboard: temperatuurtrend en energieverbruik-vergelijking](vault/Screenshots/features/feature_charts_mock.png)
 
-*[Screenshot: KPI Charts — bar chart]*
+Onder de KPI-cards op het hoofddashboard staan twee chart-componenten, hier zichtbaar in mock-modus omdat live data nog onvolledig is voor deze visualisaties. De **Temperatuurtrend** toont per warmtepomp de actuele ruimtetemperatuur en het setpoint naast elkaar. De **Energieverbruik vergelijking** toont het elektriciteitsverbruik per pomp. Beide zijn gebouwd met ApexCharts (zie 1.11 voor de keuze van deze chart-library).
 
-*[Screenshot: KPI Charts — gauge chart]*
+### Contingent-detailpagina (story #4)
 
-*[Screenshot: KPI Summary Cards]*
+![Screenshot van de contingent-detailpagina met 5 mock-warmtepompen en zichtbare foutcodes](vault/Screenshots/features/feature_contingent_detail.png)
 
-Issue \#7 — Decision Support:
+Door op een contingent te klikken vanaf het hoofddashboard kom je op de contingent-detailpagina. Hier worden alle warmtepompen binnen het geselecteerde kruisprofiel getoond, elk met apparaatinformatie, meetwaarden (ruimtetemperatuur, setpoint, waterdruk, COP, energieverbruik), en eventuele foutcodes met severity-aanduidingen (W042 warning, F101 high, F042 critical). De pagina ondersteunt zowel de **Installateur**- als de **Beheerder**-rol via de rolwisselaar in de header.
 
-*[Beschrijving]*
+### BAG-opzoekketen — installateur-view (Path A)
 
-*[Screenshot: Decision Support — good recommendation]*
+![Screenshot van de BAG-opzoekketen met postcode 3025NM huisnummer 11, met succesvolle PDOK-respons](vault/Screenshots/features/feature_bag_lookup.png)
 
-*[Screenshot: Decision Support — poor recommendation]*
+De installateur-view biedt een BAG-opzoekketen op `/bag-lookup`. De gebruiker voert een postcode en huisnummer in (hier: 3025NM 11); de applicatie haalt vervolgens via de PDOK BAG API het bouwjaar, oppervlakte, gebruiksdoel en de woonplaats op. Op basis van het bouwjaar wordt automatisch een isolatieniveau ingeschat (hier: Klasse B, hoge betrouwbaarheid omdat het bouwjaar 2008 voldoende informatie geeft). Deze functionaliteit is na de oorspronkelijke sprintscope toegevoegd als Path A-werk (zie 1.2).
+
+### TNO-catalogus integratie (Path A)
+
+![Screenshot van de TNO-catalogus met aanbevolen instellingen per fabrikant (Intergas, Bosch, Remeha, Alklima)](vault/Screenshots/features/feature_tno_catalogus.png)
+
+Na het bepalen van het kruisprofiel toont de BAG-opzoekketen de aanbevolen inregelinstellingen per fabrikant. De data komt uit de TNO TDI 500-catalogus (oktober 2024, geverifieerd februari 2026) en wordt getoond in tabbladen per fabrikant (Intergas, Bosch, Remeha, Alklima). Per warmtepomptype zijn aanbevolen waarden voor max. aanvoertemperatuur, stooklijn, hybride modus en andere instellingen beschikbaar; velden die de fabrikant niet heeft opgegeven worden expliciet als "Niet opgegeven" weergegeven in plaats van leeg of nul.
+
+### Gaps en verbetervoorstellen
+
+De volgende elementen uit het oorspronkelijke template-overzicht zijn niet als aparte screenshots opgenomen, en worden hier eerlijk benoemd:
+
+- **Tablet- en mobiele weergaven** zijn niet apart vastgelegd. Het dashboard maakt gebruik van MUI-breakpoints die de layout automatisch aanpassen, maar dedicated mobile-first ontwerpen ontbreken. Dit is opgenomen als VV-22 in hoofdstuk 4.
+- **Meerdere onderscheidbare contingenten naast elkaar** zijn niet zichtbaar in live-modus omdat de Hupie API momenteel geen `kruisProfielCode` per warmtepomp levert. Alle live-pompen vallen daarom in het geselecteerde kruisprofiel; de groeperingslogica is wel geïmplementeerd (zie 2.3.5) en klaar voor zodra de API-data beschikbaar komt.
 
 ## 2.3 Screenshots code
 
