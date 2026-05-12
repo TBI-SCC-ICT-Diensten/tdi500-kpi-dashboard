@@ -360,21 +360,61 @@ In hoofdstuk 4 (Verbetervoorstellen) is dit als VV-21 opgenomen: in een toekomst
 
 ## 1.6 Wireframes
 
-Wireframes voor alle pagina’s (desktop en mobiel/tablet):
+In de planweek voor de sprint heb ik wireframes gemaakt in Figma voor de belangrijkste pagina's van het dashboard. Hieronder staan de uitgewerkte schermen, gegroepeerd per pagina-type.
 
-*[Plak hier de wireframes voor /, /contingent/:id, en /about — desktop en mobiel versies.]*
+### Hoofddashboard
 
-*[Screenshot: Wireframe: Dashboard (/) — Desktop]*
+![Wireframe van het hoofddashboard, desktopvariant](wireframes/01_Dashboard_Desktop.png)
 
-*[Screenshot: Wireframe: Dashboard (/) — Mobiel]*
+Het hoofddashboard toont een overzicht van alle warmtepompen en de geaggregeerde KPI's per contingent. Bovenaan staan filterknoppen voor isolatie- en aanvoertemperatuurklasse (de twee assen van het kruisprofiel); daaronder de KPI-cards en grafieken.
 
-*[Screenshot: Wireframe: Contingent Detail (/contingent/:id) — Desktop]*
+### Detailpagina per contingent
 
-*[Screenshot: Wireframe: Contingent Detail (/contingent/:id) — Mobiel]*
+De detailpagina voor een specifiek contingent is opgebouwd uit meerdere tabbladen, elk met een eigen focus. Hieronder staan de wireframes per tab.
 
-*[Screenshot: Wireframe: About (/about) — Desktop]*
+![Wireframe van de Live-tab op de contingent-detailpagina](wireframes/02_Detail_Live_Desktop.png)
 
-*[Screenshot: Wireframe: About (/about) — Mobiel]*
+De **Live-tab** toont real-time telemetrie per warmtepomp in het contingent: aanvoertemperatuur, retourtemperatuur, COP, en de actuele storingen.
+
+![Wireframe van de Storingen-tab](wireframes/03_Detail_Storingen_Desktop.png)
+
+De **Storingen-tab** geeft een filterbare lijst van actuele en historische storingen, met foutcodes en tijdstempels.
+
+![Wireframe van de Historie-tab](wireframes/04_Detail_Historie_Desktop.png)
+
+De **Historie-tab** laat een tijdlijn zien van gebeurtenissen per warmtepomp in het contingent.
+
+![Wireframe van de Trends-tab](wireframes/05_Detail_Trends_Desktop.png)
+
+De **Trends-tab** toont grafieken van sensorwaarden over de tijd (temperatuur, druk, energieverbruik), zodat afwijkingen visueel kunnen worden gespot.
+
+![Wireframe van de Instellingen-tab](wireframes/07_Detail_Instellingen_Desktop.png)
+
+De **Instellingen-tab** is bedoeld voor het op afstand wijzigen van warmtepompinstellingen (setpoints, stooklijn).
+
+![Wireframe van de Automatisering-tab](wireframes/08_Detail_Automatisering_Desktop.png)
+
+De **Automatisering-tab** schetst hoe automatische optimalisatie en regels per contingent gepresenteerd zouden worden (fase 4-functionaliteit uit het projectplan).
+
+### Schermen voor latere fases
+
+De volgende twee wireframes zijn geschetst voor functionaliteit die buiten deze sprintscope viel, maar wel deel uitmaakt van de bredere TDI 500-visie (zie hoofdstuk 1.1, fases 2 en 5 van het projectplan):
+
+![Wireframe van het Onderhoudsscherm](wireframes/06_Onderhoud_Desktop.png)
+
+Het **Onderhoudsscherm** hoort bij fase 2 (predictive maintenance) en toont een planning van voorspeld onderhoud per warmtepomp.
+
+![Wireframe van het Wijkdashboard](wireframes/09_Wijkdashboard_Desktop.png)
+
+Het **Wijkdashboard** hoort bij fase 5 (smart grid integratie) en toont KPI's geaggregeerd op wijkniveau in plaats van per contingent.
+
+### Mobiele en tablet wireframes
+
+In de wireframe-set zijn nog geen aparte ontwerpen voor mobiel en tablet uitgewerkt. De responsive implementatie volgt de breakpoints van Material UI (MUI), die de layout automatisch herschikt op kleinere schermen. Dat werkt voor de huidige Proof of Concept, maar voor een productieversie zou ik aparte mobile-first wireframes opstellen. Dit is als verbetervoorstel VV-22 opgenomen in hoofdstuk 4.
+
+### Path A: ontbrekende wireframes
+
+De wireframes zijn gemaakt vóór de Path A-uitbreidingen. Voor de BAG-opzoekpagina (`/bag-lookup`) en de rolwisselaar zijn dus geen wireframes beschikbaar; deze schermen zijn rechtstreeks in code uitgewerkt op basis van iteratief overleg met de praktijkbegeleider.
 
 ## 1.7 Sitemap / Routing structure
 
