@@ -799,11 +799,25 @@ Relevante code-screenshots per feature:
 
 ## 2.4 Screenshots commit-geschiedenis en branches
 
-*[Screenshot: GitHub — branch overzicht]*
+Hieronder staan drie screenshots van de GitHub-omgeving van dit project. Ze laten respectievelijk zien hoe het versiebeheer is opgezet, hoe de commits zijn georganiseerd, en hoe een Pull Request eruitziet bij dit project.
 
-*[Screenshot: GitHub — commit history]*
+### Branch overzicht
 
-*[Screenshot: GitHub — Pull Request voorbeeld]*
+![Branches-pagina van de repository met merged en actieve branches](vault/Screenshots/git/git_branches.png)
+
+Dit is het bovenste gedeelte van de branches-pagina. Er zijn drie hoofdtypen branches te zien: `main` (default, productie), `develop` (integratie), en feature-branches voor losse stukken werk (zoals `docs/verslag-ch1-eisen` of `chore/add-screenshot-assets`). De feature-branches gebruiken een prefix-conventie: `docs/` voor verslag-werk, `chore/` voor onderhoudstaken, `fix/` voor bugfixes, `feature/` voor functionaliteit. Sommige merged branches zijn nog zichtbaar in deze lijst; de auto-delete-instelling voor branches is later in het project aangezet, dus eerdere branches blijven staan.
+
+### Commit-geschiedenis
+
+![Commit-geschiedenis op de develop-branch met verified commits](vault/Screenshots/git/git_commits.png)
+
+De commit-geschiedenis op `develop` laat zien dat elke commit voldoet aan drie kenmerken: een conventional commit-message (zoals `docs(verslag):`, `fix(verslag):`, `chore:`), een **Verified** badge (commits zijn met GPG ondertekend), en een groen vinkje voor de CI-checks (2/2 of 3/3 geslaagd). De pull request-merges zijn zichtbaar als losse commits omdat de squash-merge-strategie wordt gebruikt: elk PR resulteert in één commit op develop.
+
+### Pull Request voorbeeld
+
+![Voorbeeld van een Pull Request: PR #63 voor het invullen van hoofdstuk 1.2](vault/Screenshots/git/git_pull_request.png)
+
+Dit is Pull Request #63, die hoofdstuk 1.2 van dit verslag invulde. Elk PR in dit project volgt een vaste structuur: een **Summary**-paragraaf bovenaan, een **What changed**-lijst met de concrete wijzigingen, en een **What's NOT in this PR**-paragraaf die de scope expliciet afbakent. Wanneer er aanvullende context nodig is (zoals bij dit PR de Path A timestamp note), staat dat in een aparte sectie. De CI-checks aan de rechterkant en de Vercel-deployment onderaan tonen automatische validatie voordat een PR samengevoegd kan worden.
 
 # 3. Testen (B1-K1-W4)
 
