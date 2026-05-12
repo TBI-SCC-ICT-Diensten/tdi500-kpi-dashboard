@@ -709,7 +709,25 @@ Deze maatregelen zijn geïmplementeerd als onderdeel van het ontwerpproces (priv
 
 ## 2.1 Lijst toegewezen user stories
 
-*[Lijst van alle user stories die je hebt uitgewerkt, met issue-nummers.]*
+In hoofdstuk 1.2 staat de volledige lijst van 15 user stories die voor deze sprint zijn vastgesteld en opgepakt. Hieronder volgt een compactere blik op wat daadwerkelijk is opgeleverd, gegroepeerd naar type.
+
+### Sprintstories die als werkende functionaliteit zijn opgeleverd
+
+- **#1 System Design & Architecture Documents** — opgeleverd als ontwerpdocumenten in `docs/diagrams/` en de inhoud van hoofdstuk 1 van dit verslag
+- **#2 Hupie API Authentication & Connection** — werkende SPARQL-verbinding via Axios met typed errors, rate-limit detectie en two-phase auth-pattern
+- **#3 Data Mapping — Ontology to Frontend Models** — service-laag die SPARQL-responses omzet naar typed TypeScript-objecten, met HCO/SAREF unit-resolution
+- **#4 Automated Contingent Link — Filter KPIs by Contingent** — filtering van warmtepompen op kruisprofiel met URL-parameter-state
+- **#5 Dashboard UI & Component Architecture** — React-applicatie met providers, MainLayout, en pagina-componenten (zie 1.8 voor componentendiagram)
+- **#6 KPI Visualization — Chart Components** — ApexCharts-implementatie voor temperatuur-trends, energie-vergelijking en COP-gauge
+- **#7 Decision Support Interface — Installation Recommendations** — per-factor scoring met overall verdict en expliciete `insufficient-data` afhandeling
+
+### Documentatie- en ceremoniestories
+
+De stories #8 (Test Plan & Execution), #9 (Verbetervoorstellen), #10 (Sprint Review / Presentatie) en #11 (Retrospective) zijn niet als code-feature opgeleverd maar als onderdelen van dit verslag zelf — respectievelijk in hoofdstuk 3, hoofdstuk 4, en hoofdstuk 6. Op het scrumboard staan deze nog als "open" omdat ze pas formeel sluiten bij oplevering van het verslag.
+
+### Path A-stories (zie 1.2)
+
+Aanvullend zijn vier Path A-stories (#50 t/m #53) na de oorspronkelijke sprintscope opgeleverd: TNO-catalogus-integratie, rolwisselaar, installateur-view met BAG-opzoekketen, en beheerder-view. De timing van deze stories en de honest acknowledgment over de issue-aanmaakdata staan in 1.2.
 
 ## 2.2 Screenshots uitgewerkte functionaliteiten
 
