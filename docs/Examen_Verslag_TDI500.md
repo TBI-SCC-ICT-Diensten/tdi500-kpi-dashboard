@@ -871,15 +871,38 @@ Dit is Pull Request #63, die hoofdstuk 1.2 van dit verslag invulde. Elk PR in di
 
 ## 3.1 Testplan
 
-*[Beschrijf het testplan: twee-laags aanpak (Vitest voor logica, handmatig voor UI). Wat wordt getest, hoe, met welke data, wat is pass/fail.]*
+Het testen van het dashboard volgt een bewuste tweelaagse aanpak:
+
+1. **Automatische tests (Vitest)** voor de logica-laag: de services en utilities waar correctheid het moeilijkst met het oog te controleren is (de Decision Engine, data mapping, KPI-aggregatie, ontologie-conversie). Deze laag wordt geautomatiseerd getest zodat een regressie direct zichtbaar wordt bij elke commit.
+2. **Handmatige tests** voor de UI-laag: de pagina's, charts en de React-specifieke hook-logica. Deze zijn handmatig gecontroleerd in de browser (zie 3.3), omdat visuele controle voor een Proof of Concept directer en betrouwbaarder is dan geautomatiseerde render-tests. Geautomatiseerde UI-tests zijn een bewuste volgende stap, opgenomen als verbetervoorstel in hoofdstuk 4.
+
+De Definition of Done (1.3) en de keuze voor Vitest als testframework (1.11) zijn in hoofdstuk 1 onderbouwd; dit hoofdstuk laat de uitvoering zien. User story #8 (Test Plan & Execution) wordt door dit hoofdstuk afgedekt.
+
+Wat per laag wordt getest, met welke data, en het pass/fail-criterium:
+
+- **Logica-laag**: getest met vaste fixtures (voorbeeldwarmtepompen en SPARQL-responses). Pass = de functie geeft de verwachte getypeerde output; fail = afwijking van de verwachte waarde of een onverwachte exception.
+- **UI-laag**: getest in de browser met zowel live Hupie-data als de mock-modus. Pass = het scherm toont de juiste waarden en gedraagt zich correct bij interactie; fail = verkeerde weergave, crash, of niet-werkende interactie.
 
 ## 3.2 Automatische testen (Vitest)
 
-Unit tests voor de data- en logica-laag:
+De automatische testsuite bestaat uit 229 tests verdeeld over 27 testbestanden, allemaal uitgevoerd met Vitest. De volledige suite slaagt:
 
-*[Screenshot: Vitest terminal output — alle tests passing]*
+```
+ Test Files  27 passed (27)
+      Tests  229 passed (229)
+   Duration  10.39s
+```
 
-*[Kopieer of beschrijf de test resultaten. Bij een initieel gefaalde test: screenshot van fout + fix + screenshot van geslaagde hertest.]*
+De tests zijn georganiseerd per laag:
+
+- **Services / businesslogica (18 bestanden)** — onder andere `decisionEngine`, `dataMapper`, `kpiAggregator`, `weatherService`, `sparqlQueries`, `contingentService`, `bagService`, `tnoCatalogus` en `ontologyUtils`. Dit is de kern van de logica-laag en heeft de hoogste dekking (zie 3.5).
+- **Hooks / context (3 bestanden)** — `copContext`, `roleContext`, en `useDashboardData`. Let op: `useDashboardData.test.ts` test de integratie van de services die de hook samenstelt (contingent-constructie + KPI-aggregatie), niet de React-lifecycle-code van de hook zelf. Die React-code is handmatig getest, conform de tweelaagse aanpak.
+- **Componenten (5 bestanden)** — render-tests voor onder andere `aanbevolenInstellingen`, `bagLookupPage`, en `mainLayout` auto-navigatie.
+- **Integratie (1 bestand)** — `pipeline.integration` test de volledige datastroom van API tot KPI in samenhang.
+
+Bij het draaien van de testsuite verschijnt in `roleContext.test.tsx` de logregel `Error: useRole must be used within a RoleProvider`. Dit is geen falende test maar een bewust geteste foutpad-assertie: de test controleert dat de hook een fout gooit wanneer hij buiten de provider wordt gebruikt.
+
+Er is geen falende-test-naar-fix cyclus om te tonen, omdat de tests gedurende de ontwikkeling zijn meegegroeid met de code in plaats van achteraf zijn toegevoegd. Waar tests tijdens het ontwikkelen faalden, is dat opgelost vóór de commit; de commit-historie laat groene checks zien op elke merge (zie 2.4).
 
 ## 3.3 Handmatige testscenario’s
 
