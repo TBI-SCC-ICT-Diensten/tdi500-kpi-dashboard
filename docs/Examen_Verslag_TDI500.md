@@ -979,20 +979,23 @@ T7.5 (alle foutcodes) schiet een warmtepomp met meerdere foutcodes in en control
 
 ## 3.4 Test summary table
 
-*[Vul de tabel in na het uitvoeren van alle testen]*
+Waar 3.3 elk testscenario afzonderlijk beschrijft, vat deze tabel de resultaten per user story samen: hoeveel scenario's er zijn, hoe ze gedekt zijn (unit, E2E of handmatig), en het totaalresultaat.
 
-| **Test ID** | **Type**  | **Feature**      | **Beschrijving**              | **Resultaat**   |
-|-------------|-----------|------------------|-------------------------------|-----------------|
-| T-AUTO-3.1  | Auto      | Data Mapping     | parseMeasurements valid input | *[PASS/FAIL]* |
-| T-AUTO-3.2  | Auto      | Data Mapping     | parseMeasurements empty       | *[PASS/FAIL]* |
-| T-AUTO-4.1  | Auto      | KPI Aggregator   | aggregateKPIs valid           | *[PASS/FAIL]* |
-| T-AUTO-7.1  | Auto      | Decision Engine  | evaluateContingent good       | *[PASS/FAIL]* |
-| T2.1        | Handmatig | API Connection   | Happy flow — 200 OK           | *[PASS/FAIL]* |
-| T2.2        | Handmatig | API Connection   | Invalid credentials           | *[PASS/FAIL]* |
-| T4.1        | Handmatig | Contingent Link  | Select contingent             | *[PASS/FAIL]* |
-| T5.1        | Handmatig | Dashboard UI     | Desktop layout                | *[PASS/FAIL]* |
-| T6.1        | Handmatig | KPI Charts       | Charts with real data         | *[PASS/FAIL]* |
-| T7.1        | Handmatig | Decision Support | Good recommendation           | *[PASS/FAIL]* |
+| Issue | Scenario's | Unit | E2E | Handmatig | Resultaat |
+|-------|-----------|------|-----|-----------|-----------|
+| #2 API Connection | 4 | 1 | 3 | – | 4/4 PASS |
+| #3 Data Mapping | 4 | 4 | – | – | 4/4 PASS |
+| #4 Contingent Link | 4 | – | 3 | 1 | 4/4 PASS |
+| #5 Dashboard UI | 4 | – | 4 | – | 4/4 PASS |
+| #6 KPI Charts | 4 | – | 4 | – | 4/4 PASS |
+| #7 Decision Support | 5 | 3 | 2 | – | 5/5 PASS |
+| **Totaal** | **25** | **8** | **16** | **1** | **25/25 PASS** |
+
+Voetnoot: T7.1 wordt zowel door een E2E-test als een unit-test gedekt; in de tellingen hierboven is dit scenario één keer geteld onder E2E (de hoogste dekkingslaag).
+
+Van de 25 scenario's zijn er 24 geautomatiseerd getest (8 via unit tests, 16 via E2E) en 1 handmatig (T4.3, snel wisselen tussen kruisprofielen). Alle 25 scenario's slagen.
+
+De unit tests dekken de logica-laag: de data mapping (mapSparqlToHeatPumps en extractMeasurements in dataMapper.ts), de KPI-aggregatie (aggregateKpisForContingent in kpiAggregator.ts) en de Decision Engine (evaluateContingent in decisionEngine.ts). Dit zijn de functies waar de correctheid het moeilijkst met het oog te controleren is, dus daar levert geautomatiseerd testen de meeste zekerheid op. De E2E-tests dekken de UI-laag en de foutafhandeling, die in een echte browser worden gecontroleerd (zie 3.1 en 3.3).
 
 ## 3.5 Conclusies uit testen
 
