@@ -205,6 +205,7 @@ const DashboardPage = () => {
 
                     <Button
                       size="small"
+                      data-testid="contingent-detail-link"
                       onClick={() => navigate(`/contingent/${selectedContingent.id}`)}
                       sx={{ mt: 1, fontSize: '0.75rem', color: 'primary.main',
                             textTransform: 'none', p: 0, minWidth: 0 }}
