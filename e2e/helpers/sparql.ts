@@ -24,6 +24,27 @@ export function listResponse(pumps: Array<{ uri: string; id: string }>): SparqlR
   };
 }
 
+/**
+ * Builds a detail response for one pump, optionally carrying a COP value.
+ * A COP measurement row matches what dataMapper reads: the `cop` marker var
+ * (truthy) + a numeric `value` + a `unit` (om-2/one, COP is unitless).
+ * With no cop, returns a single heatpump-only row so the pump still renders.
+ */
+export function detailResponse(opts: { uri: string; cop?: number }): SparqlResponse {
+  const bindings: SparqlBinding[] = [];
+  if (opts.cop !== undefined) {
+    bindings.push({
+      heatpump: { type: 'uri', value: opts.uri, datatype: null },
+      cop: { type: 'uri', value: 'https://marker/cop' },
+      value: { type: 'literal', value: String(opts.cop) },
+      unit: { type: 'uri', value: 'http://www.ontology-of-units-of-measure.org/resource/om-2/one' },
+    });
+  } else {
+    bindings.push({ heatpump: { type: 'uri', value: opts.uri, datatype: null } });
+  }
+  return { head: { vars: ['heatpump', 'cop', 'value', 'unit'] }, results: { bindings } };
+}
+
 export interface ErrorCodeInput {
   code: string;
   message: string;
