@@ -63,7 +63,7 @@ const KpiOverviewPanel = ({ kpis }: KpiOverviewPanelProps) => {
 
       <Grid container spacing={2}>
         {kpis.map((kpi) => (
-          <Grid item xs={6} key={kpi.id}>
+          <Grid item xs={12} md={6} key={kpi.id}>
             <Card
               data-testid={`kpi-card-${kpi.id}`}
               variant="outlined"
