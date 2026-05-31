@@ -1037,17 +1037,63 @@ Per bevinding: het probleem, de ernst, en wie het raakt. De feedback uit de spri
 
 ## 4.3 Verbetervoorstellen
 
-Voorstel 1 (functioneel):
+Op basis van de bronnen en interpretatie in 4.1 en 4.2 zijn hieronder zeven verbetervoorstellen uitgewerkt. De nummering sluit aan op de bestaande verbetervoorstellen-lijst (VV-21 en VV-22 zijn eerder in dit verslag al genoemd). Elk voorstel heeft een bron, het probleem, het voorstel, een nieuwe user story met acceptatiecriteria, een MoSCoW-prioriteit en een tijdsinschatting. De user stories komen in 4.4 op de product backlog.
 
-*[Bron \| Probleem \| Voorstel \| Nieuwe user story + acceptatiecriteria \| Prioriteit (MoSCoW) \| Geschatte tijd]*
+### VV-21 — Scrumboard-screenshots als vaste routine
+- **Bron:** Retrospective / proceswaarneming (4.1)
+- **Probleem:** De dagelijkse scrumboard-screenshots zijn alleen voor dag 1 t/m 3 vastgelegd, waardoor de sprint-documentatie onvolledig is.
+- **Voorstel:** Een vaste dagelijkse routine waarbij aan het eind van elke werkdag een scrumboard-screenshot wordt gemaakt en opgeslagen met een vaste naamconventie.
+- **Nieuwe user story:** Als student wil ik elke dag herinnerd worden om een scrumboard-screenshot te maken, zodat mijn sprint-documentatie compleet is. Acceptatie: dagelijkse reminder ingesteld; vaste naamconventie; screenshots van dag 1 tot einde sprint aanwezig.
+- **Prioriteit:** Could-have
+- **Geschatte tijd:** 0,5 dag
 
-Voorstel 2 (technisch):
+### VV-22 — Mobile-first wireframes
+- **Bron:** Retrospective / ontwerpfase (1.6 en 2.x)
+- **Probleem:** De wireframes zijn alleen voor desktop gemaakt, waardoor smalle schermen pas laat in beeld kwamen en de responsive problemen niet vooraf waren voorzien.
+- **Voorstel:** Bij een volgend project eerst mobile-first wireframes maken (telefoon → tablet → desktop), zodat responsive gedrag vanaf het ontwerp wordt meegenomen.
+- **Nieuwe user story:** Als ontwerper wil ik wireframes mobile-first opzetten, zodat de layout op alle schermformaten vanaf het begin klopt. Acceptatie: wireframes voor telefoon, tablet én desktop; breakpoints benoemd; review vóór implementatie.
+- **Prioriteit:** Should-have
+- **Geschatte tijd:** 1 dag
 
-*[Bron \| Probleem \| Voorstel \| Nieuwe user story + acceptatiecriteria \| Prioriteit (MoSCoW) \| Geschatte tijd]*
+### VV-23 — Responsive layout voor telefoon (<600px)
+- **Bron:** Testresultaten / handmatige test T5.2 (hoofdstuk 3)
+- **Probleem:** De responsive fix dekt tablet (iPad), maar telefoon (<600px) is niet ondersteund — de views zijn daar nog niet bruikbaar. Hangt samen met VV-22.
+- **Voorstel:** De bestaande responsive aanpak (collapsible drawer, breakpoints) uitbreiden naar telefoonbreedte, met een E2E-test die overflow op <600px controleert, zoals de bestaande 768px-test.
+- **Nieuwe user story:** Als installateur wil ik het dashboard op mijn telefoon kunnen gebruiken, zodat ik in het veld niet afhankelijk ben van een groter scherm. Acceptatie: geen horizontale overflow op 375px en 414px; navigatie bruikbaar; E2E-test dekt <600px.
+- **Prioriteit:** Should-have
+- **Geschatte tijd:** 2 dagen
 
-Voorstel 3 (proces):
+### VV-24 — Rapid-switch test automatiseren (T4.3)
+- **Bron:** Testresultaten (hoofdstuk 3 — het enige handmatige scenario)
+- **Probleem:** Het scenario "snel wisselen tussen kruisprofielen" (T4.3) wordt handmatig getest en beschermt dus niet automatisch tegen regressie van de stale-response-afhandeling.
+- **Voorstel:** Een E2E-test die snel achter elkaar van kruisprofiel wisselt en controleert dat alleen de data van het laatst gekozen profiel wordt getoond.
+- **Nieuwe user story:** Als ontwikkelaar wil ik dat het snel-wisselen-scenario geautomatiseerd getest is, zodat een wijziging aan de data-laadlogica niet ongemerkt stale data introduceert. Acceptatie: E2E-test wisselt ≥3 profielen snel; assert dat de getoonde data bij het laatste profiel hoort; test draait mee in de suite.
+- **Prioriteit:** Could-have
+- **Geschatte tijd:** 0,5 dag
 
-*[Bron \| Probleem \| Voorstel \| Nieuwe user story + acceptatiecriteria \| Prioriteit (MoSCoW) \| Geschatte tijd]*
+### VV-25 — Unit- en E2E-coverage samenvoegen tot één meting
+- **Bron:** Testresultaten / coverage-analyse (3.5)
+- **Probleem:** Het coverage-cijfer meet alleen de unit-laag; de E2E-dekking van de UI telt niet mee, dus het cijfer onderschat de werkelijke dekking.
+- **Voorstel:** Playwright met coverage-instrumentatie draaien en de E2E-coverage samenvoegen met de unit-coverage tot één gemeten cijfer, zodat de UI-laag zichtbaar wordt in de rapportage.
+- **Nieuwe user story:** Als ontwikkelaar wil ik één gecombineerd coverage-cijfer voor unit én E2E, zodat ik een eerlijk beeld heb van hoe goed de hele applicatie gedekt is. Acceptatie: E2E-coverage gemeten; samengevoegd rapport; UI-laag niet langer 0%.
+- **Prioriteit:** Could-have
+- **Geschatte tijd:** 1 dag
+
+### VV-26 — API-sleutels via backend-proxy
+- **Bron:** Retrospective / API-configuratie (4.1)
+- **Probleem:** De API-sleutels komen via VITE_-variabelen in de client-bundle terecht en zijn zichtbaar in de browser. Beperkt risico in de exam-context, maar een echt probleem bij productie.
+- **Voorstel:** Bij een productie-uitrol de externe API-aanroepen via een eigen backend-proxy laten lopen, zodat de sleutels server-side blijven en niet in de client-bundle staan.
+- **Nieuwe user story:** Als beheerder wil ik dat API-sleutels niet in de browser zichtbaar zijn, zodat de applicatie veilig naar productie kan. Acceptatie: externe calls lopen via een backend-endpoint; geen VITE_-sleutel in de client-bundle; sleutels in server-side env.
+- **Prioriteit:** Could-have (voor nu) — bij een productie-uitrol een Must-have
+- **Geschatte tijd:** 3 dagen
+
+### VV-27 — CI-integratie (GitHub Actions)
+- **Bron:** Retrospective / proceswaarneming (4.1)
+- **Probleem:** De tests draaien nu alleen lokaal en handmatig; er is geen automatische controle bij elke push, dus een gebroken test kan ongemerkt op develop komen.
+- **Voorstel:** Een GitHub Actions-workflow die bij elke push en pull request de unit-tests, de E2E-tests en de build draait.
+- **Nieuwe user story:** Als ontwikkelaar wil ik dat tests automatisch draaien bij elke push, zodat een regressie wordt opgevangen voordat code wordt gemerged. Acceptatie: workflow draait unit + E2E + build:check; PR's tonen de status; merge geblokkeerd bij falende tests.
+- **Prioriteit:** Should-have
+- **Geschatte tijd:** 1 dag
 
 ## 4.4 Nieuwe user stories op product backlog
 
