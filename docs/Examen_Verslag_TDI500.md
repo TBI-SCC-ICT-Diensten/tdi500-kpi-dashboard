@@ -1011,25 +1011,29 @@ De unit tests dekken de logica-laag: de data mapping (mapSparqlToHeatPumps en ex
 
 ## 4.1 Analyse informatiebronnen
 
-Testresultaten:
+De verbetervoorstellen in dit hoofdstuk komen uit vier bronnen die ik tijdens het project heb verzameld.
 
-*[Welke testen faalden? Welke edge cases waren problematisch?]*
+**Testresultaten.** Alle 25 testscenario's slagen (hoofdstuk 3), maar het testen zelf bracht ook punten naar boven. De unit-coverage meet alleen de logica-laag: de services scoren hoog (96–100% voor de kern-services), maar de charts, hooks en de dashboard- en detailpagina's staan op 0% unit-coverage. Die UI-laag wordt wel door de E2E-tests gedekt, maar die dekking wordt niet meegemeten in het coverage-cijfer. Daarnaast is één testscenario (T4.3, snel wisselen tussen kruisprofielen) nog handmatig in plaats van geautomatiseerd, en draaien de tests nu alleen lokaal — niet automatisch bij elke push.
 
-Feedback sprint review (Jeroen Pat):
+**Feedback sprint review (Jeroen Pat).** *[PLACEHOLDER — nog in te vullen op basis van echte notities van de sprint review. Niet invullen tot de echte feedback bekend is.]*
 
-*[Wat zei Jeroen tijdens de review? Positief? Verzoeken? Issues?]*
+**Retrospective bevindingen.** Tijdens het project kwamen drie bevindingen naar voren. Ten eerste bleek bij het uitwerken van de testaanpak dat een grotere herstructurering (de installateur-first redesign) eerst extra test-scaffolding nodig had om niet stilletjes de datapijplijn te breken — dit is opgepakt in issue #47 (test-coverage hardening). Ten tweede bleek de responsive layout bij handmatige controle stuk: de views liepen over op tablet- en telefoonbreedte. Ten derde werd tijdens het werk aan de API-configuratie duidelijk dat de API-sleutels via VITE_-variabelen in de client-bundle terechtkomen en dus in de browser zichtbaar zijn.
 
-Retrospective bevindingen:
-
-*[Procesproblemenm, tijdsinschatting, werkwijze]*
-
-Bugs / GitHub Issues:
-
-*[Bugs gevonden tijdens de sprint die niet zijn opgelost]*
+**Bugs en GitHub Issues.** De GitHub-issues hielden bevindingen bij die tijdens het werk ontstonden. Issue #57 betrof een regressie waarbij de beheerder-banner op /bag-lookup niet rendrede doordat een auto-nav useEffect bij het laden al wegnavigeerde; dit is tijdens de sprint opgelost met een useRef die de vorige rol bijhoudt, zodat de auto-nav alleen bij een echte rolwissel afgaat. Issue #47 legde daarnaast de bestaande tech-debt VV-16 (variabele-shadowing in de data mapping) vast en beschermde die met een regressietest.
 
 ## 4.2 Interpretatie bevindingen
 
-*[Per bevinding: wat is het onderliggende probleem? Hoe ernstig? Wie wordt geraakt?]*
+Per bevinding: het probleem, de ernst, en wie het raakt. De feedback uit de sprint review (4.1) wordt hier meegenomen zodra die is ingevuld.
+
+**Responsive layout (tablet en telefoon).** Probleem: de views waren niet geoptimaliseerd voor smalle schermen — bij iPad-portret liepen ze over, en telefoon (<600px) is helemaal niet ondersteund. Ernst: medium. Wie geraakt: installateurs die het dashboard in het veld op een tablet of telefoon willen gebruiken. Het tablet-deel is inmiddels opgelost (zie hoofdstuk 3); telefoon blijft open.
+
+**API-sleutels in de client-bundle.** Probleem: de VITE_-sleutels worden door Vite in de browser-bundle ingebakken en zijn dus zichtbaar voor iedereen die de gedeployde site bekijkt. Ernst: hoog bij een echte productie-uitrol, beperkt in de huidige exam-context (schoolproject, geen gevoelige gebruikersdata). Wie geraakt: de beveiliging zodra de app productie zou gaan — niet de huidige opzet.
+
+**Coverage-meting dekt maar één laag.** Probleem: het coverage-cijfer meet alleen de unit-laag; de E2E-dekking van de UI wordt niet meegemeten, dus het cijfer onderschat de werkelijke dekking. Ernst: laag (de tests bestaan wél, ze worden alleen niet samen gemeten). Wie geraakt: ikzelf en een eventuele opvolger, bij het inschatten van hoe goed de UI gedekt is.
+
+**Handmatige test T4.3 en lokaal draaien.** Probleem: het scenario "snel wisselen tussen kruisprofielen" wordt handmatig gecontroleerd in plaats van geautomatiseerd, en de tests draaien alleen lokaal in plaats van automatisch bij elke push. Ernst: laag. Wie geraakt: toekomstige wijzigingen kunnen ongemerkt iets breken zonder dat een test of een geautomatiseerde controle dat opvangt.
+
+**Ontbrekende scrumboard-screenshots (dag 4 en verder).** Probleem: de dagelijkse scrumboard-screenshots zijn alleen voor dag 1 tot en met 3 vastgelegd. Ernst: laag (procesmatig). Wie geraakt: de volledigheid van de sprint-documentatie.
 
 ## 4.3 Verbetervoorstellen
 
