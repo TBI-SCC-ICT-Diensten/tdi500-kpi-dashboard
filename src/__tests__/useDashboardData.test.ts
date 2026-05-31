@@ -37,12 +37,6 @@ describe('KPI aggregation for selected contingent', () => {
     expect(kpis).toHaveLength(4);
   });
 
-  it('returns empty array when no contingent is selected', () => {
-    // When selectedContingent is null, kpis should be []
-    const kpis: ReturnType<typeof aggregateKpisForContingent> = [];
-    expect(kpis).toHaveLength(0);
-  });
-
   it('KPI categories cover efficiency, reliability, and commissioning', () => {
     const pumps = [makeHeatPump({ id: 'hp1' })];
     const contingent = createContingent('contingent-B2', 'Test', 'B2', pumps);
