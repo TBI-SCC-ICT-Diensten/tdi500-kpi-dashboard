@@ -5,13 +5,16 @@ import InboxIcon from '@mui/icons-material/Inbox';
 interface EmptyStateProps {
   message?: string;
   subMessage?: string;
+  'data-testid'?: string;
 }
 
 const EmptyState = ({
   message = 'Geen data beschikbaar',
   subMessage,
+  'data-testid': dataTestId,
 }: EmptyStateProps) => (
   <Box
+    data-testid={dataTestId}
     sx={{
       display: 'flex',
       flexDirection: 'column',

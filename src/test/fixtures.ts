@@ -84,6 +84,7 @@ export function makeKpis(overrides: {
 } = {}): KeyPerformanceIndicator[] {
   return [
     {
+      id: 'cop',
       name: 'Gemiddelde COP',
       value: overrides.copValue ?? 3.8,
       unit: '',
@@ -92,6 +93,7 @@ export function makeKpis(overrides: {
       description: 'Test COP',
     },
     {
+      id: 'connectivity',
       name: 'Connectiviteit',
       value: overrides.connectValue ?? 100,
       unit: '%',
@@ -100,6 +102,7 @@ export function makeKpis(overrides: {
       description: 'Test connectivity',
     },
     {
+      id: 'storingen',
       name: 'Storingen',
       value: overrides.storingenValue ?? 0,
       unit: 'meldingen',
@@ -108,6 +111,7 @@ export function makeKpis(overrides: {
       description: 'Test storingen',
     },
     {
+      id: 'inregelsnelheid',
       name: 'Inregelsnelheid',
       value: 0,
       unit: 'min',

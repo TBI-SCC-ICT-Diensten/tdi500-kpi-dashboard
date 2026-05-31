@@ -55,6 +55,7 @@ const Header = () => {
           </Typography>
         </Box>
         <Chip
+          data-testid="datasource-chip"
           icon={source === 'live' ? <WifiIcon /> : <ScienceIcon />}
           label={source === 'live' ? 'Hupie API (live)' : 'Mock data'}
           size="small"
@@ -90,11 +91,11 @@ const Header = () => {
             },
           }}
         >
-          <ToggleButton value="installateur" aria-label="Installateur">
+          <ToggleButton value="installateur" aria-label="Installateur" data-testid="role-installateur">
             <BuildIcon sx={{ fontSize: 14, mr: 0.5 }} />
             Installateur
           </ToggleButton>
-          <ToggleButton value="beheerder" aria-label="Beheerder">
+          <ToggleButton value="beheerder" aria-label="Beheerder" data-testid="role-beheerder">
             <InsightsIcon sx={{ fontSize: 14, mr: 0.5 }} />
             Beheerder
           </ToggleButton>
