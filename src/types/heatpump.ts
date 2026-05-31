@@ -116,6 +116,7 @@ export interface Contingent {
 }
 
 export interface KeyPerformanceIndicator {
+  id: string;
   name: string;
   value: number;
   unit: string;

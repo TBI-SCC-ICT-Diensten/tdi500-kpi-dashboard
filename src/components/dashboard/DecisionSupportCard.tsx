@@ -78,7 +78,7 @@ const DecisionSupportCard = ({
   const profileCode = state.selectedContingentId ? state.selectedContingentId.replace('contingent-', '') : null;
 
   return (
-    <Paper variant="outlined" sx={{ p: 2 }}>
+    <Paper data-testid="decision-card" variant="outlined" sx={{ p: 2 }}>
 
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
@@ -110,6 +110,7 @@ const DecisionSupportCard = ({
             Algeheel oordeel:
           </Typography>
           <Chip
+            data-testid="decision-verdict"
             label={scoreLabel[overallScore]}
             size="small"
             sx={{

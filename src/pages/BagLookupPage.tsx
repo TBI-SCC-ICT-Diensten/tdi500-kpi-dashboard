@@ -162,6 +162,7 @@ const BagLookupPage = () => {
             size="small"
             sx={{ width: 140 }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            inputProps={{ 'data-testid': 'bag-postcode-input' }}
           />
           <TextField
             label="Huisnummer"
@@ -171,6 +172,7 @@ const BagLookupPage = () => {
             size="small"
             sx={{ width: 120 }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            inputProps={{ 'data-testid': 'bag-huisnummer-input' }}
           />
           <Button
             variant="contained"
@@ -178,6 +180,7 @@ const BagLookupPage = () => {
             onClick={handleSearch}
             disabled={loading || !postcode.trim() || !huisnummer.trim()}
             sx={{ height: 40, alignSelf: 'center' }}
+            data-testid="bag-submit"
           >
             Ophalen
           </Button>
@@ -191,12 +194,12 @@ const BagLookupPage = () => {
       )}
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+        <Alert severity="error" sx={{ mb: 3 }} data-testid="bag-error">{error}</Alert>
       )}
 
       {/* Step 2: BAG result */}
       {bagResult && !loading && (
-        <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
+        <Paper data-testid="bag-result" variant="outlined" sx={{ p: 3, mb: 3 }}>
           <Typography variant="overline" color="text.secondary"
             sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}>
             Stap 2 — BAG-resultaat
