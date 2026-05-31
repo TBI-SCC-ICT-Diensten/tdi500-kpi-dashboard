@@ -25,24 +25,43 @@ export function listResponse(pumps: Array<{ uri: string; id: string }>): SparqlR
 }
 
 /**
- * Builds a detail response for one pump, optionally carrying a COP value.
+ * Builds a detail response for one pump, optionally carrying a COP value
+ * and/or device-spec name fields (manufacturer / model).
+ *
  * A COP measurement row matches what dataMapper reads: the `cop` marker var
  * (truthy) + a numeric `value` + a `unit` (om-2/one, COP is unitless).
- * With no cop, returns a single heatpump-only row so the pump still renders.
+ *
+ * `manufacturer` / `model` are the binding vars extractDeviceSpecs reads; the
+ * UI renders `manufacturer — model` as the prominent pump-card title (and the
+ * manufacturer on the dashboard pump-status rows). Supplying them lets a spec
+ * inject a human-readable pump name. With only `uri`, returns a single
+ * heatpump-only row so the pump still renders.
  */
-export function detailResponse(opts: { uri: string; cop?: number }): SparqlResponse {
-  const bindings: SparqlBinding[] = [];
-  if (opts.cop !== undefined) {
-    bindings.push({
-      heatpump: { type: 'uri', value: opts.uri, datatype: null },
-      cop: { type: 'uri', value: 'https://marker/cop' },
-      value: { type: 'literal', value: String(opts.cop) },
-      unit: { type: 'uri', value: 'http://www.ontology-of-units-of-measure.org/resource/om-2/one' },
-    });
-  } else {
-    bindings.push({ heatpump: { type: 'uri', value: opts.uri, datatype: null } });
+export function detailResponse(opts: {
+  uri: string;
+  cop?: number;
+  manufacturer?: string;
+  model?: string;
+}): SparqlResponse {
+  const vars = ['heatpump'];
+  const row: SparqlBinding = {
+    heatpump: { type: 'uri', value: opts.uri, datatype: null },
+  };
+  if (opts.manufacturer !== undefined) {
+    row.manufacturer = { type: 'literal', value: opts.manufacturer };
+    vars.push('manufacturer');
   }
-  return { head: { vars: ['heatpump', 'cop', 'value', 'unit'] }, results: { bindings } };
+  if (opts.model !== undefined) {
+    row.model = { type: 'literal', value: opts.model };
+    vars.push('model');
+  }
+  if (opts.cop !== undefined) {
+    row.cop = { type: 'uri', value: 'https://marker/cop' };
+    row.value = { type: 'literal', value: String(opts.cop) };
+    row.unit = { type: 'uri', value: 'http://www.ontology-of-units-of-measure.org/resource/om-2/one' };
+    vars.push('cop', 'value', 'unit');
+  }
+  return { head: { vars }, results: { bindings: [row] } };
 }
 
 export interface ErrorCodeInput {
