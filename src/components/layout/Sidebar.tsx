@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -18,6 +19,10 @@ import type React from 'react';
 
 interface SidebarProps {
   width: number;
+  /** Whether the temporary (below-md) overlay drawer is open. */
+  mobileOpen: boolean;
+  /** Closes the temporary drawer (also called after a nav click). */
+  onClose: () => void;
 }
 
 interface NavItem {
@@ -57,7 +62,7 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-const Sidebar = ({ width }: SidebarProps) => {
+const Sidebar = ({ width, mobileOpen, onClose }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -67,21 +72,8 @@ const Sidebar = ({ width }: SidebarProps) => {
 
   const contingentId = state.selectedContingentId || 'contingent-B2';
 
-  return (
-    <Box
-      sx={{
-        width,
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        height: '100vh',
-        bgcolor: 'background.paper',
-        borderRight: '1px solid',
-        borderColor: 'divider',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+  const drawerContent = (
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ px: 2.5, py: 2 }}>
         <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', lineHeight: 1.2 }}>
           TDI 500
@@ -109,7 +101,7 @@ const Sidebar = ({ width }: SidebarProps) => {
             <ListItem key={path} disablePadding sx={{ mb: 0.25 }}>
               <ListItemButton
                 selected={isActive}
-                onClick={() => navigate(navPath)}
+                onClick={() => { navigate(navPath); onClose(); }}
                 sx={{
                   borderRadius: 1,
                   borderLeft: '3px solid transparent',
@@ -142,6 +134,41 @@ const Sidebar = ({ width }: SidebarProps) => {
         })}
       </List>
     </Box>
+  );
+
+  // Explicit light paper styling so the dormant dark-blue MuiDrawer theme
+  // override (theme.ts) does NOT activate now that the sidebar is a real
+  // Drawer — preserves the pre-existing light rail look.
+  const paperSx = {
+    width,
+    boxSizing: 'border-box' as const,
+    backgroundColor: 'background.paper',
+    color: 'text.primary',
+    borderRight: '1px solid',
+    borderColor: 'divider',
+  };
+
+  return (
+    <>
+      {/* Permanent rail at md+ — unchanged from the previous fixed sidebar */}
+      <Drawer
+        variant="permanent"
+        open
+        sx={{ display: { xs: 'none', md: 'block' }, '& .MuiDrawer-paper': paperSx }}
+      >
+        {drawerContent}
+      </Drawer>
+      {/* Temporary overlay below md — toggled by the Header hamburger */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': paperSx }}
+      >
+        {drawerContent}
+      </Drawer>
+    </>
   );
 };
 
