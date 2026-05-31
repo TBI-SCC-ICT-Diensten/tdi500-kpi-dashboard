@@ -44,4 +44,30 @@ test.describe('T5.3 — long names do not break layout (live, intercepted)', () 
     const overflow = await horizontalOverflow(page);
     expect(overflow).toBeLessThanOrEqual(0);
   });
+
+  test('long pump name does not cause horizontal overflow at 768px', async ({ page }) => {
+    const uri = pumpUri('long-name-pump-02');
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await seedBeheerderRole(page);
+    await interceptHupie(page, {
+      onList: () => listResponse([{ uri, id: 'long-name-pump-02' }]),
+      onDetail: () => detailResponse({ uri, cop: 3.2, manufacturer: LONG_NAME }),
+    });
+
+    await page.goto('/');
+    await expect(page.getByTestId('decision-card')).toBeVisible({ timeout: 15000 });
+
+    await page.getByTestId('contingent-detail-link').click();
+    await expect(page).toHaveURL(/\/contingent\//);
+
+    const card = page.getByTestId('contingent-pump-card').first();
+    await expect(card).toBeVisible({ timeout: 10000 });
+    // The long name is actually present at the narrower width too.
+    await expect(card).toContainText('noordvleugel unit 47B reserve');
+
+    // Narrower viewport (iPad portrait): the long name must still wrap without
+    // pushing the page wider than the viewport.
+    const overflow = await horizontalOverflow(page);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
 });
