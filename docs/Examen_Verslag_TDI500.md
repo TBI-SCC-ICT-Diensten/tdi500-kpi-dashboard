@@ -1097,9 +1097,21 @@ Op basis van de bronnen en interpretatie in 4.1 en 4.2 zijn hieronder zeven verb
 
 ## 4.4 Nieuwe user stories op product backlog
 
-*[Beschrijf de nieuwe user stories die zijn toegevoegd aan het GitHub Projects scrumboard.]*
+De zeven verbetervoorstellen uit 4.3 zijn als user stories op de product backlog (GitHub Projects) gezet, zodat ze als concrete vervolgstappen vastliggen. De volledige user story en acceptatiecriteria per voorstel staan in 4.3; onderstaande tabel vat samen wat er op de backlog is gezet, met de prioriteit en de bijbehorende VV.
 
-*[Screenshot: Product backlog met nieuwe user stories]*
+| VV | User story (kort) | Categorie | Prioriteit | Geschatte tijd |
+|----|-------------------|-----------|------------|----------------|
+| VV-21 | Dagelijkse scrumboard-screenshots als vaste routine | Proces | Could-have | 0,5 dag |
+| VV-22 | Mobile-first wireframes bij een volgend project | Functioneel/ontwerp | Should-have | 1 dag |
+| VV-23 | Responsive layout voor telefoon (<600px) | Functioneel/technisch | Should-have | 2 dagen |
+| VV-24 | Snel-wisselen-scenario (T4.3) automatiseren | Technisch | Could-have | 0,5 dag |
+| VV-25 | Unit- en E2E-coverage samenvoegen tot één meting | Technisch | Could-have | 1 dag |
+| VV-26 | API-sleutels via een backend-proxy | Technisch/security | Could-have (nu) / Must-have (productie) | 3 dagen |
+| VV-27 | CI-integratie met GitHub Actions | Proces/technisch | Should-have | 1 dag |
+
+Onderstaande screenshot toont de zeven nieuwe user stories op het GitHub Projects board.
+
+![Product backlog met de zeven nieuwe user stories (VV-21 t/m VV-27) op het GitHub Projects board](vault/Screenshots/scrumboard/product_backlog_vvs.png)
 
 # 5. Overleg (B1-K2-W1)
 
