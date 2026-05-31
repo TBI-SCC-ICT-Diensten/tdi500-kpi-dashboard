@@ -27,6 +27,7 @@ export const calculateCopKpi = (
                                     'critical';
 
   return {
+    id: 'cop',
     name: 'Gemiddelde COP',
     value: Math.round(averageCop * 100) / 100,
     unit: '',
@@ -45,6 +46,7 @@ export const calculateConnectivityKpi = (
 ): KeyPerformanceIndicator => {
   if (heatPumps.length === 0) {
     return {
+      id: 'connectivity',
       name: 'Connectiviteit',
       value: 0,
       unit: '%',
@@ -63,6 +65,7 @@ export const calculateConnectivityKpi = (
                          'critical';
 
   return {
+    id: 'connectivity',
     name: 'Connectiviteit',
     value: percentage,
     unit: '%',
@@ -94,6 +97,7 @@ export const calculateStoringenKpi = (
                   'critical';
 
   return {
+    id: 'storingen',
     name: 'Storingen',
     value: count,
     unit: 'meldingen',
@@ -112,6 +116,7 @@ export const calculateStoringenKpi = (
  */
 export const calculateInregelsnelheidKpi = (): KeyPerformanceIndicator => {
   return {
+    id: 'inregelsnelheid',
     name: 'Inregelsnelheid',
     value: 0,
     unit: 'min',

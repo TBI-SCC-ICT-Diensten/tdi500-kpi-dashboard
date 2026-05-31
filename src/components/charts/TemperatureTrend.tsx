@@ -43,7 +43,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
 
   if (!hasData) {
     return (
-      <Paper variant="outlined" sx={{ p: 2, borderLeft: '3px solid #0EA5E9' }}>
+      <Paper data-testid="chart-temperature-trend" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #0EA5E9' }}>
         <Typography variant="overline" color="text.secondary"
           sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
           Temperatuurtrend
@@ -93,7 +93,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
   };
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, borderLeft: '3px solid #0EA5E9' }}>
+    <Paper data-testid="chart-temperature-trend" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #0EA5E9' }}>
       <Typography variant="overline" color="text.secondary"
         sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
         Temperatuurtrend

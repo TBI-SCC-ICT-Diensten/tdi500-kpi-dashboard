@@ -22,7 +22,7 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
 
   if (pumpsWithEnergy.length === 0) {
     return (
-      <Paper variant="outlined" sx={{ p: 2, borderLeft: '3px solid #6366F1' }}>
+      <Paper data-testid="chart-energy-comparison" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #6366F1' }}>
         <Typography variant="overline" color="text.secondary"
           sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
           Energieverbruik vergelijking
@@ -79,7 +79,7 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
   const series = [{ name: 'Energieverbruik (kWh)', data: values }];
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, borderLeft: '3px solid #6366F1' }}>
+    <Paper data-testid="chart-energy-comparison" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #6366F1' }}>
       <Typography variant="overline" color="text.secondary"
         sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
         Energieverbruik vergelijking
