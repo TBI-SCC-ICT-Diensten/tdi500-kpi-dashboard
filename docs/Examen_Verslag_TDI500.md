@@ -999,13 +999,13 @@ De unit tests dekken de logica-laag: de data mapping (mapSparqlToHeatPumps en ex
 
 ## 3.5 Conclusies uit testen
 
-Conclusie per feature:
+**Per user story.** Alle acceptatiecriteria van de geteste user stories zijn behaald. Van de 25 testscenario's slagen er 25 (zie 3.3 en 3.4): de API-verbinding handelt fouten correct af, de data mapping levert de juiste getypeerde output, het contingent-overzicht en de detailpagina werken, de charts renderen ook bij lege en extreme data, en de Decision Engine geeft de verwachte oordelen. Geen enkel scenario faalt.
 
-*[Per feature: hoeveel tests geslaagd/gefaald, zijn acceptatiecriteria behaald, bekende issues.]*
+**De drielaagse aanpak werkte.** De combinatie van unit tests (logica), E2E-tests (UI en foutafhandeling) en handmatige controle heeft elkaar goed aangevuld. Een concreet voorbeeld: de tablet-weergave (T5.2) bleek bij handmatige controle stuk te zijn — de views liepen over op iPad-portretbreedte. Dat heb ik opgelost en daarna vastgelegd met een geautomatiseerde E2E-test, zodat het probleem niet opnieuw kan terugkomen. Dat is precies wat de drie lagen samen opleveren: een probleem vinden, oplossen, en bewaken.
 
-Algehele conclusie:
+**Over de coverage-cijfers.** De unit-test coverage komt uit op ongeveer 50,9% van de statements. Dat cijfer vraagt om uitleg, want het meet alleen de logica-laag. De services scoren daar hoog (96–100%) — dat is bewust, want dat is de code waar correctheid het moeilijkst met het oog te controleren is. De charts, de hooks en de dashboard- en detailpagina's staan op 0% unit-coverage, maar dat betekent niet dat ze ongetest zijn: die worden gedekt door de E2E-tests, die de UI in een echte browser doorlopen. Het punt is dat Playwright de gebouwde app test zonder coverage-instrumentatie, dus die E2E-dekking telt niet mee in het unit-coverage cijfer. Ik claim daarom niet dat de "echte" dekking veel hoger ligt — ik kan alleen zeggen dat het cijfer van 50,9% één laag meet, en dat de UI-laag door een andere laag tests wordt gedekt. Het samenvoegen van unit- en E2E-coverage tot één gemeten cijfer is een verbetervoorstel in hoofdstuk 4.
 
-*[Algemene kwaliteit van de applicatie. Sterke punten. Verbeterpunten (input voor verbetervoorstellen).]*
+**Bekende punten voor later.** Eén scenario (T4.3, snel wisselen tussen kruisprofielen) wordt nog handmatig getest in plaats van geautomatiseerd. De responsive layout is opgelost voor tablet (iPad), maar nog niet voor telefoon (<600px). Beide punten, plus het meten van E2E-coverage, komen terug als verbetervoorstel in hoofdstuk 4.
 
 # 4. Verbetervoorstellen (B1-K1-W5)
 
