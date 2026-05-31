@@ -154,7 +154,7 @@ const DashboardPage = () => {
           {selectedContingent && (
             <>
               {/* Two-column section: KPIs + Installatieadvies | COP gauge + fleet list */}
-              <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, alignItems: { xs: 'stretch', md: 'flex-start' } }}>
 
                 {/* Left column */}
                 <Box sx={{ flex: 2, minWidth: 0 }}>
@@ -166,7 +166,7 @@ const DashboardPage = () => {
                 </Box>
 
                 {/* Right column */}
-                <Box sx={{ flex: 1, minWidth: 280 }}>
+                <Box sx={{ flex: 1, minWidth: { xs: 'auto', md: 280 } }}>
                   <CopGauge kpis={kpis} minCop={minCop} />
 
                   {/* Fleet status list */}

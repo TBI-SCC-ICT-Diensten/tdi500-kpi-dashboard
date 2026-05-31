@@ -23,6 +23,14 @@ test.describe('Responsive — no horizontal overflow at iPad portrait (768px)', 
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
+  test('T5.2 — dashboard has no horizontal overflow at 768px', async ({ page }) => {
+    await seedBeheerderRole(page);
+    await page.goto('/');
+    await expect(page.getByTestId('decision-card')).toBeVisible({ timeout: 15000 });
+    const overflow = await hasHorizontalOverflow(page);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+
   test('T5.2 — BAG lookup has no horizontal overflow at 768px', async ({ page }) => {
     // BAG lookup is the installateur landing; navigate directly
     await page.goto('/bag-lookup');
