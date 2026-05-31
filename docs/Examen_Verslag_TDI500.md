@@ -538,6 +538,8 @@ Vitest is gekozen voor de geautomatiseerde unit tests van de data- en logica-laa
 
 De test-syntax is vrijwel identiek aan Jest (describe, it, expect), waardoor bestaande kennis direct toepasbaar is. Het verschil is dat Vitest sneller opstart en beter integreert met moderne TypeScript-projecten zonder extra configuratie.
 
+Vitest is van het begin af aan gekozen voor de logica-tests. Playwright heb ik later in het project toegevoegd, toen ik besloot om de UI-tests te automatiseren in plaats van ze alleen handmatig te doen. Dat was een bewuste uitbreiding tijdens de testfase: ik merkte dat handmatig klikken niet genoeg zekerheid gaf en dat geautomatiseerde browsertests de foutscenario's veel betrouwbaarder konden afdekken. Deze keuze werk ik verder uit in hoofdstuk 3 en kom ik als leerpunt terug in hoofdstuk 4.
+
 ##### Overwogen alternatieven
 
 |  |  |  |
@@ -871,17 +873,21 @@ Dit is Pull Request #63, die hoofdstuk 1.2 van dit verslag invulde. Elk PR in di
 
 ## 3.1 Testplan
 
-Het testen van het dashboard volgt een bewuste tweelaagse aanpak:
+Het testen van het dashboard volgt een bewuste drielaagse aanpak:
 
-1. **Automatische tests (Vitest)** voor de logica-laag: de services en utilities waar correctheid het moeilijkst met het oog te controleren is (de Decision Engine, data mapping, KPI-aggregatie, ontologie-conversie). Deze laag wordt geautomatiseerd getest zodat een regressie direct zichtbaar wordt bij elke commit.
-2. **Handmatige tests** voor de UI-laag: de pagina's, charts en de React-specifieke hook-logica. Deze zijn handmatig gecontroleerd in de browser (zie 3.3), omdat visuele controle voor een Proof of Concept directer en betrouwbaarder is dan geautomatiseerde render-tests. Geautomatiseerde UI-tests zijn een bewuste volgende stap, opgenomen als verbetervoorstel in hoofdstuk 4.
+1. Unit tests (Vitest) voor de logica-laag: de services en utilities waar correctheid het moeilijkst met het oog te controleren is (de Decision Engine, de data mapping, de KPI-aggregatie, de ontologie-conversie). Deze laag wordt geautomatiseerd getest zodat een regressie direct zichtbaar wordt.
 
-De Definition of Done (1.3) en de keuze voor Vitest als testframework (1.11) zijn in hoofdstuk 1 onderbouwd; dit hoofdstuk laat de uitvoering zien. User story #8 (Test Plan & Execution) wordt door dit hoofdstuk afgedekt.
+2. End-to-end tests (Playwright) voor de UI-laag: de pagina's, charts en gebruikersflows worden in een echte browser getest, inclusief foutafhandeling (mislukte API-calls, trage responses, lege of extreme data) via netwerk-interceptie. Deze laag dekt het gedrag dat unit tests niet kunnen verifiëren — wat de gebruiker daadwerkelijk ziet en doet.
 
-Wat per laag wordt getest, met welke data, en het pass/fail-criterium:
+3. Handmatige tests voor het kleine restant dat niet geautomatiseerd is. Na het bouwen van de E2E-laag is hiervan nog één scenario over: snel wisselen tussen kruisprofielen (T4.3). Dit heb ik handmatig gecontroleerd.
 
-- **Logica-laag**: getest met vaste fixtures (voorbeeldwarmtepompen en SPARQL-responses). Pass = de functie geeft de verwachte getypeerde output; fail = afwijking van de verwachte waarde of een onverwachte exception.
-- **UI-laag**: getest in de browser met zowel live Hupie-data als de mock-modus. Pass = het scherm toont de juiste waarden en gedraagt zich correct bij interactie; fail = verkeerde weergave, crash, of niet-werkende interactie.
+De Definition of Done (1.3) en de keuze voor Vitest en Playwright (1.11) zijn in hoofdstuk 1 onderbouwd; dit hoofdstuk laat de uitvoering zien. User story #8 (Test Plan & Execution) wordt door dit hoofdstuk afgedekt.
+
+Wat per laag wordt getest, met welke data en het pass/fail-criterium:
+
+- Logica-laag (unit): getest met vaste fixtures (voorbeeldwarmtepompen en SPARQL-responses). Pass = de functie geeft de verwachte getypeerde output; fail = afwijking of een onverwachte exception.
+- UI-laag (E2E): getest in een echte browser, deels in mock-modus (deterministische data) en deels in live-modus met onderschepte API-responses, om foutscenario's gecontroleerd af te dwingen. Pass = het scherm toont de juiste staat (data, fout, of laad-indicator); fail = verkeerde weergave, crash of vastlopen.
+- Handmatige laag: gecontroleerd in de browser. Pass = correct gedrag bij visuele inspectie; fail = layout-breuk of verkeerd gedrag.
 
 ## 3.2 Automatische testen (Vitest)
 
@@ -906,51 +912,70 @@ Er is geen falende-test-naar-fix cyclus om te tonen, omdat de tests gedurende de
 
 ## 3.3 Handmatige testscenario’s
 
-*[Per user story: test ID, actie, verwacht resultaat, werkelijk resultaat, screenshot, verdict. Gebruik de T[issue].[test] naamgeving.]*
+De onderstaande tabellen tonen per user story de uitgevoerde testscenario's, met het type test (unit, E2E, of handmatig), de bewijsbron en het resultaat. De visuele bevestiging van werkende functionaliteit staat in 2.2.
 
-Issue \#2 — API Connection:
+Issue #2 — API Connection
 
-*[T2.1 Happy flow, T2.2 Invalid credentials, T2.3 API unreachable, T2.4 Malformed URL]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T2.1 | Happy flow — geldige respons | Unit + screenshot | hupieApiTwoPhase.test.ts, 2.2 | PASS |
+| T2.2 | Ongeldige credentials (401) | E2E | api-failure.live.e2e.ts (401) | PASS |
+| T2.3 | API onbereikbaar | E2E | api-failure.live.e2e.ts (abort) | PASS |
+| T2.4 | Verkeerde URL | E2E | api-failure.live.e2e.ts (abort) | PASS |
 
-*[Screenshot: T2.1 — Happy flow]*
+T2.3 en T2.4 worden door hetzelfde mechanisme afgedekt: een mislukte verbinding leidt in beide gevallen tot dezelfde foutafhandeling. De E2E-test verifieert dat de applicatie bij 401, 500 én een afgebroken verbinding de foutmelding correct toont.
 
-*[Screenshot: T2.2 — Invalid credentials]*
+Issue #3 — Data Mapping
 
-*[Screenshot: T2.3 — API unreachable]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T3.1 | Happy flow — geldige bindings | Unit | dataMapper.test.ts | PASS |
+| T3.2 | Ontbrekende velden | Unit | dataMapper.test.ts | PASS |
+| T3.3 | Onbekende URI | Unit | dataMapper.test.ts | PASS |
+| T3.4 | Lege respons | Unit | dataMapper.test.ts | PASS |
 
-Issue \#3 — Data Mapping:
+Issue #4 — Contingent Link
 
-*[T3.1 Happy flow, T3.2 Missing fields, T3.3 Unknown URI, T3.4 Empty response]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T4.1 | Contingent selecteren | E2E + screenshot | contingent.e2e.ts, 2.2 | PASS |
+| T4.2 | Leeg contingent | E2E | edge-data.live.e2e.ts (empty-state) | PASS |
+| T4.3 | Snel wisselen tussen profielen | Handmatig | Browser-controle | PASS |
+| T4.4 | Laden mislukt | E2E | api-failure.live.e2e.ts (500) | PASS |
 
-*[Screenshot: T3.1 — Happy flow]*
+T4.3 (snel wisselen tussen kruisprofielen) test de stale-response-afhandeling in useDashboardData (zie 2.3.6). Dit heb ik handmatig gecontroleerd: bij snel wisselen toont het dashboard altijd de data van het laatst geselecteerde profiel, zonder verouderde data. Het automatiseren hiervan is opgenomen als verbetervoorstel in hoofdstuk 4.
 
-Issue \#4 — Contingent Link:
+Issue #5 — Dashboard UI
 
-*[T4.1 Happy flow, T4.2 Empty contingent, T4.3 Rapid switching, T4.4 Loading fails]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T5.1 | Desktop layout | E2E + screenshot | dashboard.e2e.ts, 2.2 | PASS |
+| T5.2 | Tablet layout (iPad) | E2E | responsive.e2e.ts (dashboard/contingent/BAG @768) | PASS |
+| T5.3 | Lange namen | E2E | long-names.live.e2e.ts (desktop + 768) | PASS |
+| T5.4 | Trage respons | E2E | slow-response.live.e2e.ts | PASS |
 
-*[Screenshot: T4.1 — Happy flow]*
+T5.2 (tablet-weergave) is in eerste instantie handmatig getest en bleek niet goed te werken: de views liepen over bij iPad-portretbreedte (768px). Na een fix (zie 4) heb ik dit geautomatiseerd met responsive.e2e.ts, die voor alle drie de views controleert dat er geen horizontale overflow is op 768px. De telefoon-weergave (<600px) valt buiten de scope en is een verbetervoorstel in hoofdstuk 4. T5.3 (lange namen) wordt afgedekt door long-names.live.e2e.ts: een warmtepomp met een extreem lange naam wordt ingeschoten en de test controleert dat de naam netjes afbreekt zonder de layout te breken.
 
-Issue \#5 — Dashboard UI:
+Issue #6 — KPI Charts
 
-*[T5.1 Desktop, T5.2 Tablet, T5.3 Long names, T5.4 Slow response]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T6.1 | Charts met data | E2E + screenshot | dashboard.e2e.ts, 2.2 | PASS |
+| T6.2 | Enkel datapunt | E2E | edge-data.live.e2e.ts | PASS |
+| T6.3 | Geen data | E2E | edge-data.live.e2e.ts (empty-state) | PASS |
+| T6.4 | Extreme waarden | E2E | edge-data.live.e2e.ts (COP 99) | PASS |
 
-*[Screenshot: T5.1 — Desktop layout]*
+Issue #7 — Decision Support
 
-*[Screenshot: T5.2 — Tablet layout]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T7.1 | Goede/acceptabele score | E2E + unit + screenshot | dashboard.e2e.ts, decisionEngine.test.ts, 2.2 | PASS |
+| T7.2 | Slechte score | Unit + screenshot | decisionEngine.test.ts, 2.2 | PASS |
+| T7.3 | Onvoldoende data | Unit | decisionEngine.test.ts | PASS |
+| T7.4 | Ontbrekende KPI's | Unit | decisionEngine.test.ts | PASS |
+| T7.5 | Alle foutcodes | E2E | decision-errors.live.e2e.ts | PASS |
 
-Issue \#6 — KPI Charts:
-
-*[T6.1 Happy flow, T6.2 Single data point, T6.3 No data, T6.4 Extreme values]*
-
-*[Screenshot: T6.1 — Happy flow]*
-
-Issue \#7 — Decision Support:
-
-*[T7.1 Good score, T7.2 Poor score, T7.3 Insufficient data, T7.4 Missing KPIs, T7.5 All errors]*
-
-*[Screenshot: T7.1 — Good score]*
-
-*[Screenshot: T7.2 — Poor score]*
+T7.5 (alle foutcodes) schiet een warmtepomp met meerdere foutcodes in en controleert dat de foutcodes correct worden getoond op de contingent-detailpagina.
 
 ## 3.4 Test summary table
 
