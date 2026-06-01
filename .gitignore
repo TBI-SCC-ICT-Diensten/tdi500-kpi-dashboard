@@ -16,3 +16,9 @@ docs/vault/.obsidian/workspace.json
 docs/vault/.obsidian/workspace-mobile.json
 docs/vault/.obsidian/cache/
 docs/vault/.obsidian/plugins/*/data.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

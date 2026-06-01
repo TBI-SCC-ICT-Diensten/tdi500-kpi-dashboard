@@ -10,6 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:live": "playwright test --project=chromium-live",
     "build:check": "tsc --noEmit && npm run build"
   },
   "repository": {
@@ -26,6 +28,7 @@
   "homepage": "https://github.com/TBI-SCC-ICT-Diensten/tdi500-kpi-dashboard#readme",
   "devDependencies": {
     "@emotion/babel-plugin": "^11.13.5",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^25.5.0",

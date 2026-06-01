@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
@@ -34,6 +34,13 @@ const MainLayout = () => {
   // See #57.
   const prevRoleRef = useRef<Role>(role);
 
+  // Mobile/tablet-portrait drawer state. Only relevant below the `md`
+  // breakpoint, where the sidebar is a temporary overlay; at md+ the
+  // permanent rail ignores this.
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
+  const handleDrawerClose = () => setMobileOpen(false);
+
   useEffect(() => {
     // Skip the initial mount and any re-run where role hasn't changed
     // (e.g. a pathname-only change). Only an actual role flip should
@@ -54,9 +61,13 @@ const MainLayout = () => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar width={SIDEBAR_WIDTH} />
-      <Box sx={{ flexGrow: 1, ml: `${SIDEBAR_WIDTH}px` }}>
-        <Header />
+      <Sidebar
+        width={SIDEBAR_WIDTH}
+        mobileOpen={mobileOpen}
+        onClose={handleDrawerClose}
+      />
+      <Box sx={{ flexGrow: 1, ml: { xs: 0, md: `${SIDEBAR_WIDTH}px` } }}>
+        <Header onMenuClick={handleDrawerToggle} />
         <Box component="main" sx={{ p: 3 }}>
           <Outlet />
         </Box>

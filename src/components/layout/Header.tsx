@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import MenuIcon from '@mui/icons-material/Menu';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import WifiIcon from '@mui/icons-material/Wifi';
@@ -23,7 +24,12 @@ import {
 import { useColorMode } from '../../context/ColorModeContext';
 import { useRole } from '../../context/RoleContext';
 
-const Header = () => {
+interface HeaderProps {
+  /** Opens the temporary sidebar drawer; only rendered below md. */
+  onMenuClick?: () => void;
+}
+
+const Header = ({ onMenuClick }: HeaderProps) => {
   const [source, setSource] = useState<DataSource>(getDataSource());
   const { mode, toggleColorMode } = useColorMode();
   const { role, setRole } = useRole();
@@ -46,6 +52,14 @@ const Header = () => {
       sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}
     >
       <Toolbar sx={{ gap: 2 }}>
+        <IconButton
+          aria-label="menu"
+          edge="start"
+          onClick={onMenuClick}
+          sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 1, color: 'text.secondary' }}
+        >
+          <MenuIcon />
+        </IconButton>
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h6" fontWeight={700} color="primary.main" sx={{ lineHeight: 1.2 }}>
             Installateursportaal
@@ -55,6 +69,7 @@ const Header = () => {
           </Typography>
         </Box>
         <Chip
+          data-testid="datasource-chip"
           icon={source === 'live' ? <WifiIcon /> : <ScienceIcon />}
           label={source === 'live' ? 'Hupie API (live)' : 'Mock data'}
           size="small"
@@ -90,11 +105,11 @@ const Header = () => {
             },
           }}
         >
-          <ToggleButton value="installateur" aria-label="Installateur">
+          <ToggleButton value="installateur" aria-label="Installateur" data-testid="role-installateur">
             <BuildIcon sx={{ fontSize: 14, mr: 0.5 }} />
             Installateur
           </ToggleButton>
-          <ToggleButton value="beheerder" aria-label="Beheerder">
+          <ToggleButton value="beheerder" aria-label="Beheerder" data-testid="role-beheerder">
             <InsightsIcon sx={{ fontSize: 14, mr: 0.5 }} />
             Beheerder
           </ToggleButton>

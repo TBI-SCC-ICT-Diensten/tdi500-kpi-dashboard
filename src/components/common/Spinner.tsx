@@ -4,10 +4,12 @@ import Typography from '@mui/material/Typography';
 
 interface SpinnerProps {
   message?: string;
+  'data-testid'?: string;
 }
 
-const Spinner = ({ message = 'Laden...' }: SpinnerProps) => (
+const Spinner = ({ message = 'Laden...', 'data-testid': dataTestId }: SpinnerProps) => (
   <Box
+    data-testid={dataTestId}
     sx={{
       display: 'flex',
       flexDirection: 'column',

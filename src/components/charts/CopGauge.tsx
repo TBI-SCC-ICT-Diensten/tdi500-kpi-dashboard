@@ -67,7 +67,7 @@ const CopGauge = ({ kpis, minCop = 2.5 }: CopGaugeProps) => {
   };
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, height: '100%', borderLeft: '3px solid #16A34A' }}>
+    <Paper data-testid="cop-gauge" variant="outlined" sx={{ p: 2, height: '100%', borderLeft: '3px solid #16A34A' }}>
       <Typography variant="overline" color="text.secondary"
         sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
         COP Gauge
