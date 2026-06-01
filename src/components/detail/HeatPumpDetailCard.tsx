@@ -110,7 +110,7 @@ const HeatPumpDetailCard = ({
   };
 
   return (
-    <Paper variant="outlined" sx={{ p: 2 }}>
+    <Paper data-testid="contingent-pump-card" variant="outlined" sx={{ p: 2 }}>
 
       {/* ── Header: manufacturer/model (prominent) + status dot ─── */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between',
@@ -306,6 +306,7 @@ const HeatPumpDetailCard = ({
             const sev = getSeveritySx(ec.severity, isDark);
             return (
               <Box key={ec.code}
+                data-testid="pump-error-code"
                 sx={{
                   display: 'flex', alignItems: 'flex-start', gap: 0.75,
                   p: '6px 10px', mb: 0.5,

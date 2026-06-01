@@ -324,51 +324,97 @@ Een ticket mag pas naar 'Done' als alle onderstaande punten gelden:
 
 ## 1.4 Sprint backlog (begin sprint)
 
-Screenshot van het scrumboard aan het begin van de sprint, met user stories geprioriteerd (hoogste bovenaan):
+De volgende screenshot toont het scrumboard op GitHub Projects aan het einde van sprintdag 1 (16 maart 2026), nadat de sprint backlog was geprioriteerd. De bovenste user story heeft de hoogste prioriteit, de onderste de laagste. Op dat moment stonden 10 user stories in de kolom **Backlog/Todo** en was story #1 (System Design & Architecture Documents) al naar **Done** verplaatst — deze ontwerptaak is op dag 1 zelf opgepakt en afgerond.
 
-*[Screenshot: Sprint backlog begin sprint — scrumboard_dag_1.png]*
+![Scrumboard aan het einde van sprintdag 1, met de geprioriteerde sprint backlog](vault/Screenshots/scrumboard/scrumboard_dag_1.png)
+
+De volledige lijst van user stories met titels, statussen en links naar de GitHub Issues staat in 1.2 (User stories met acceptatiecriteria).
 
 ## 1.5 Scrumboard screenshots (dagelijks)
 
-Na elke dagelijkse update wordt een screenshot van het scrumboard gemaakt:
+Tijdens de sprint zijn niet voor elke werkdag scrumboard-screenshots vastgelegd. Voor de eerste drie sprintdagen (16, 17 en 18 maart) zijn er beelden bewaard; deze tonen samen de voortgang van de eerste twee user stories die zijn opgepakt. Voor de overige sprintdagen is de daadwerkelijke voortgang afleidbaar uit de GitHub-issuesgeschiedenis (sluitdatums per issue) en de commit-history op de feature-branches.
 
-*[Screenshot: Dag 1 — Ma 16 mrt]*
+#### Dag 1 — Maandag 16 maart
 
-*[Screenshot: Dag 2 — Di 17 mrt]*
+![Scrumboard aan het einde van sprintdag 1](vault/Screenshots/scrumboard/scrumboard_dag_1.png)
 
-*[Screenshot: Dag 3 — Wo 18 mrt]*
+Aan het einde van dag 1 staan alle 11 user stories in **Backlog/Todo**. Story #1 (System Design & Architecture Documents) is al verplaatst naar **Done** — deze ontwerptaak is op dag 1 zelf opgepakt en afgerond. De rest van de stories wacht nog op verdere planning.
 
-*[Screenshot: Dag 4 — Do 19 mrt]*
+#### Dag 2 — Dinsdag 17 maart
 
-*[Screenshot: Dag 5 — Vr 20 mrt]*
+![Scrumboard aan het einde van sprintdag 2](vault/Screenshots/scrumboard/scrumboard_dag_2.png)
 
-*[Screenshot: Dag 6 — Ma 23 mrt]*
+Op dag 2 is story #2 (Hupie API Authentication & Connection) opgepakt en staat nu in **In Progress**. Stories #3 en #4 zijn vanuit de Backlog naar de **Sprint Backlog** verplaatst om voor te bereiden op de komende dagen.
 
-*[Screenshot: Dag 7 — Di 24 mrt]*
+#### Dag 3 — Woensdag 18 maart
 
-*[Screenshot: Dag 8 — Wo 25 mrt]*
+![Scrumboard aan het einde van sprintdag 3](vault/Screenshots/scrumboard/scrumboard_dag_3.png)
 
-*[Screenshot: Dag 9 — Do 26 mrt]*
+Op dag 3 is story #2 afgerond en naar **Done** verplaatst, en is story #3 (Data Mapping — Ontology to Frontend Models) opgepakt in **In Progress**. Story #4 staat klaar in de Sprint Backlog. De API-verbinding werkt nu en het werk verschuift naar het mappen van inkomende data naar het frontend-datamodel.
 
-*[Screenshot: Dag 10 — Vr 27 mrt]*
+#### Dag 4 t/m dag 10
+
+Voor de overige sprintdagen zijn geen scrumboard-screenshots beschikbaar. De voortgang in deze periode is af te leiden uit de sluitdatums van de GitHub-issues (#3 op 31 maart, #4 op 2 april, #5 op 6 april, #6 op 6 april, #7 op 9 april) en uit de commit-geschiedenis op de feature-branches. De volledige lijst staat in 1.2.
+
+In hoofdstuk 4 (Verbetervoorstellen) is dit als VV-21 opgenomen: in een toekomstige sprint zou ik dagelijkse scrumboard-screenshots als vaste werkroutine vastleggen, zodat het procesbewijs volledig is.
 
 ## 1.6 Wireframes
 
-Wireframes voor alle pagina’s (desktop en mobiel/tablet):
+In de planweek voor de sprint heb ik wireframes gemaakt in Figma voor de belangrijkste pagina's van het dashboard. Hieronder staan de uitgewerkte schermen, gegroepeerd per pagina-type.
 
-*[Plak hier de wireframes voor /, /contingent/:id, en /about — desktop en mobiel versies.]*
+### Hoofddashboard
 
-*[Screenshot: Wireframe: Dashboard (/) — Desktop]*
+![Wireframe van het hoofddashboard, desktopvariant](wireframes/01_Dashboard_Desktop.png)
 
-*[Screenshot: Wireframe: Dashboard (/) — Mobiel]*
+Het hoofddashboard toont een overzicht van alle warmtepompen en de geaggregeerde KPI's per contingent. Bovenaan staan filterknoppen voor isolatie- en aanvoertemperatuurklasse (de twee assen van het kruisprofiel); daaronder de KPI-cards en grafieken.
 
-*[Screenshot: Wireframe: Contingent Detail (/contingent/:id) — Desktop]*
+### Detailpagina per contingent
 
-*[Screenshot: Wireframe: Contingent Detail (/contingent/:id) — Mobiel]*
+De detailpagina voor een specifiek contingent is opgebouwd uit meerdere tabbladen, elk met een eigen focus. Hieronder staan de wireframes per tab.
 
-*[Screenshot: Wireframe: About (/about) — Desktop]*
+![Wireframe van de Live-tab op de contingent-detailpagina](wireframes/02_Detail_Live_Desktop.png)
 
-*[Screenshot: Wireframe: About (/about) — Mobiel]*
+De **Live-tab** toont real-time telemetrie per warmtepomp in het contingent: aanvoertemperatuur, retourtemperatuur, COP, en de actuele storingen.
+
+![Wireframe van de Storingen-tab](wireframes/03_Detail_Storingen_Desktop.png)
+
+De **Storingen-tab** geeft een filterbare lijst van actuele en historische storingen, met foutcodes en tijdstempels.
+
+![Wireframe van de Historie-tab](wireframes/04_Detail_Historie_Desktop.png)
+
+De **Historie-tab** laat een tijdlijn zien van gebeurtenissen per warmtepomp in het contingent.
+
+![Wireframe van de Trends-tab](wireframes/05_Detail_Trends_Desktop.png)
+
+De **Trends-tab** toont grafieken van sensorwaarden over de tijd (temperatuur, druk, energieverbruik), zodat afwijkingen visueel kunnen worden gespot.
+
+![Wireframe van de Instellingen-tab](wireframes/07_Detail_Instellingen_Desktop.png)
+
+De **Instellingen-tab** is bedoeld voor het op afstand wijzigen van warmtepompinstellingen (setpoints, stooklijn).
+
+![Wireframe van de Automatisering-tab](wireframes/08_Detail_Automatisering_Desktop.png)
+
+De **Automatisering-tab** schetst hoe automatische optimalisatie en regels per contingent gepresenteerd zouden worden (fase 4-functionaliteit uit het projectplan).
+
+### Schermen voor latere fases
+
+De volgende twee wireframes zijn geschetst voor functionaliteit die buiten deze sprintscope viel, maar wel deel uitmaakt van de bredere TDI 500-visie (zie hoofdstuk 1.1, fases 2 en 5 van het projectplan):
+
+![Wireframe van het Onderhoudsscherm](wireframes/06_Onderhoud_Desktop.png)
+
+Het **Onderhoudsscherm** hoort bij fase 2 (predictive maintenance) en toont een planning van voorspeld onderhoud per warmtepomp.
+
+![Wireframe van het Wijkdashboard](wireframes/09_Wijkdashboard_Desktop.png)
+
+Het **Wijkdashboard** hoort bij fase 5 (smart grid integratie) en toont KPI's geaggregeerd op wijkniveau in plaats van per contingent.
+
+### Mobiele en tablet wireframes
+
+In de wireframe-set zijn nog geen aparte ontwerpen voor mobiel en tablet uitgewerkt. De responsive implementatie volgt de breakpoints van Material UI (MUI), die de layout automatisch herschikt op kleinere schermen. Dat werkt voor de huidige Proof of Concept, maar voor een productieversie zou ik aparte mobile-first wireframes opstellen. Dit is als verbetervoorstel VV-22 opgenomen in hoofdstuk 4.
+
+### Path A: ontbrekende wireframes
+
+De wireframes zijn gemaakt vóór de Path A-uitbreidingen. Voor de BAG-opzoekpagina (`/bag-lookup`) en de rolwisselaar zijn dus geen wireframes beschikbaar; deze schermen zijn rechtstreeks in code uitgewerkt op basis van iteratief overleg met de praktijkbegeleider.
 
 ## 1.7 Sitemap / Routing structure
 
@@ -491,6 +537,8 @@ Voor dit project is de timeout-configuratie bijzonder relevant: de SPARQL-querie
 Vitest is gekozen voor de geautomatiseerde unit tests van de data- en logica-laag (dataMapper, kpiAggregator, decisionEngine). Vitest is compatibel met de Vite-bundler die in veel React-projecten wordt gebruikt, en biedt een snelle test-uitvoering dankzij native ES-module support.
 
 De test-syntax is vrijwel identiek aan Jest (describe, it, expect), waardoor bestaande kennis direct toepasbaar is. Het verschil is dat Vitest sneller opstart en beter integreert met moderne TypeScript-projecten zonder extra configuratie.
+
+Vitest is van het begin af aan gekozen voor de logica-tests. Playwright heb ik later in het project toegevoegd, toen ik besloot om de UI-tests te automatiseren in plaats van ze alleen handmatig te doen. Dat was een bewuste uitbreiding tijdens de testfase: ik merkte dat handmatig klikken niet genoeg zekerheid gaf en dat geautomatiseerde browsertests de foutscenario's veel betrouwbaarder konden afdekken. Deze keuze werk ik verder uit in hoofdstuk 3 en kom ik als leerpunt terug in hoofdstuk 4.
 
 ##### Overwogen alternatieven
 
@@ -663,216 +711,407 @@ Deze maatregelen zijn geïmplementeerd als onderdeel van het ontwerpproces (priv
 
 ## 2.1 Lijst toegewezen user stories
 
-*[Lijst van alle user stories die je hebt uitgewerkt, met issue-nummers.]*
+In hoofdstuk 1.2 staat de volledige lijst van 15 user stories die voor deze sprint zijn vastgesteld en opgepakt. Hieronder volgt een compactere blik op wat daadwerkelijk is opgeleverd, gegroepeerd naar type.
+
+### Sprintstories die als werkende functionaliteit zijn opgeleverd
+
+- **#1 System Design & Architecture Documents** — opgeleverd als ontwerpdocumenten in `docs/diagrams/` en de inhoud van hoofdstuk 1 van dit verslag
+- **#2 Hupie API Authentication & Connection** — werkende SPARQL-verbinding via Axios met typed errors, rate-limit detectie en two-phase auth-pattern
+- **#3 Data Mapping — Ontology to Frontend Models** — service-laag die SPARQL-responses omzet naar typed TypeScript-objecten, met HCO/SAREF unit-resolution
+- **#4 Automated Contingent Link — Filter KPIs by Contingent** — filtering van warmtepompen op kruisprofiel met URL-parameter-state
+- **#5 Dashboard UI & Component Architecture** — React-applicatie met providers, MainLayout, en pagina-componenten (zie 1.8 voor componentendiagram)
+- **#6 KPI Visualization — Chart Components** — ApexCharts-implementatie voor temperatuur-trends, energie-vergelijking en COP-gauge
+- **#7 Decision Support Interface — Installation Recommendations** — per-factor scoring met overall verdict en expliciete `insufficient-data` afhandeling
+
+### Documentatie- en ceremoniestories
+
+De stories #8 (Test Plan & Execution), #9 (Verbetervoorstellen), #10 (Sprint Review / Presentatie) en #11 (Retrospective) zijn niet als code-feature opgeleverd maar als onderdelen van dit verslag zelf — respectievelijk in hoofdstuk 3, hoofdstuk 4, en hoofdstuk 6. Op het scrumboard staan deze nog als "open" omdat ze pas formeel sluiten bij oplevering van het verslag.
+
+### Path A-stories (zie 1.2)
+
+Aanvullend zijn vier Path A-stories (#50 t/m #53) na de oorspronkelijke sprintscope opgeleverd: TNO-catalogus-integratie, rolwisselaar, installateur-view met BAG-opzoekketen, en beheerder-view. De timing van deze stories en de honest acknowledgment over de issue-aanmaakdata staan in 1.2.
 
 ## 2.2 Screenshots uitgewerkte functionaliteiten
 
-Per feature: screenshot van de werkende functionaliteit met een korte beschrijving.
+Per feature: een screenshot van de werkende functionaliteit met een korte beschrijving. Sommige screenshots dekken meerdere user stories tegelijk, omdat de bijbehorende UI op één scherm samenkomt. Waar dat zo is, wordt dat in de tekst aangegeven.
 
-Issue \#2 — Hupie API Connection:
+De screenshots zijn gemaakt in twee modi:
 
-*[Beschrijving van wat je hebt gebouwd]*
+- **Live** — verbonden met de Hupie API (te zien aan de groene `Hupie API (live)`-badge in de header). Dit toont wat de echte API momenteel oplevert.
+- **Mock** — een ingebouwde mock-modus met realistische voorbeelddata (te zien aan de oranje `Mock data`-badge). Dit toont hoe het dashboard eruitziet wanneer alle datavelden gevuld zijn.
 
-*[Screenshot: API Connection — werkende feature]*
+De mock-modus is bewust toegevoegd tijdens de sprint, omdat de Hupie API nog niet alle datavelden levert die het dashboard ondersteunt (bijvoorbeeld foutcodes en COP-waarden ontbreken voor sommige pompen). Hierdoor kan het volledige UI-gedrag worden getoond zonder afhankelijk te zijn van data die de API nog niet beschikbaar stelt.
 
-Issue \#3 — Data Mapping:
+### API-verbinding (story #2)
 
-*[Beschrijving]*
+![Screenshot van een succesvolle test van de Hupie API-verbinding](vault/Screenshots/features/feature_api_test_success.png)
 
-*[Screenshot: Data Mapping — werkende feature]*
+Deze screenshot toont een succesvolle test van de Hupie API-verbinding. De applicatie authenticeert via het two-phase auth-patroon (zie 2.3.2 voor de bijbehorende code) en haalt warmtepompdata op via SPARQL. De `Hupie API (live)`-badge in de header van de overige live-screenshots verwijst hiernaar.
 
-Issue \#4 — Contingent Link:
+### Hoofddashboard — live data (stories #3, #5, #6, #7)
 
-*[Beschrijving]*
+![Screenshot van het hoofddashboard met live Hupie API-data, kruisprofiel C2 geselecteerd](vault/Screenshots/features/feature_dashboard_live.png)
 
-*[Screenshot: Contingent Link — werkende feature]*
+Dit is het hoofddashboard met live data uit de Hupie API, ingesteld op kruisprofiel **C2** (slecht geïsoleerd, radiatorsysteem). Vier KPI-cards bovenaan tonen efficiëntie (COP-gemiddelde), betrouwbaarheid (connectiviteit), en twee inregelingscijfers. De COP Gauge rechts toont het gemiddelde tegenover de profieldrempel. Onderin staat het installatieadvies: bij C2 met de huidige data komt de Decision Engine tot het oordeel **"Onvoldoende"**, met daaronder de factoranalyse die laat zien dat geen COP-data beschikbaar is via de Hupie API.
 
-Issue \#5 — Dashboard UI:
+Deze screenshot toont user story #3 (Data Mapping — de KPI-waarden zijn afkomstig uit getypeerde objecten), story #5 (Dashboard UI — de layout en compositie), story #6 (KPI Visualization — gauge en kaarten), en story #7 (Decision Support — het algeheel oordeel met factoranalyse).
 
-*[Beschrijving]*
+### Hoofddashboard — mock data
 
-*[Screenshot: Dashboard UI — desktop]*
+![Screenshot van het hoofddashboard met mock data, kruisprofiel B2 geselecteerd, met algeheel oordeel "Acceptabel"](vault/Screenshots/features/feature_dashboard_mock.png)
 
-*[Screenshot: Dashboard UI — tablet]*
+Hetzelfde hoofddashboard in mock-modus, ingesteld op kruisprofiel **B2** (matig geïsoleerd). Hier zijn alle datavelden gevuld: gemiddelde COP van 3.2 (boven de drempel van 2.5), 80% connectiviteit, 2 storingsmeldingen. De Decision Engine komt nu tot het oordeel **"Acceptabel"** — een ander resultaat dan in live-modus, dankzij de rijkere mock-data. De factoranalyse onderin laat zien dat de COP-factor met 3.20 boven de profieldrempel van 2.5 ligt en daarom als "Goed" wordt gescoord.
 
-Issue \#6 — KPI Charts:
+Door live en mock naast elkaar te tonen wordt zichtbaar dat de UI-laag werkt zoals bedoeld; de variatie in oordeel komt voort uit verschillen in databeschikbaarheid, niet uit verschillen in code.
 
-*[Beschrijving]*
+### KPI-grafieken (story #6)
 
-*[Screenshot: KPI Charts — line chart]*
+![Screenshot van de KPI-grafieken op het hoofddashboard: temperatuurtrend en energieverbruik-vergelijking](vault/Screenshots/features/feature_charts_mock.png)
 
-*[Screenshot: KPI Charts — bar chart]*
+Onder de KPI-cards op het hoofddashboard staan twee chart-componenten, hier zichtbaar in mock-modus omdat live data nog onvolledig is voor deze visualisaties. De **Temperatuurtrend** toont per warmtepomp de actuele ruimtetemperatuur en het setpoint naast elkaar. De **Energieverbruik vergelijking** toont het elektriciteitsverbruik per pomp. Beide zijn gebouwd met ApexCharts (zie 1.11 voor de keuze van deze chart-library).
 
-*[Screenshot: KPI Charts — gauge chart]*
+### Contingent-detailpagina (story #4)
 
-*[Screenshot: KPI Summary Cards]*
+![Screenshot van de contingent-detailpagina met 5 mock-warmtepompen en zichtbare foutcodes](vault/Screenshots/features/feature_contingent_detail.png)
 
-Issue \#7 — Decision Support:
+Door op een contingent te klikken vanaf het hoofddashboard kom je op de contingent-detailpagina. Hier worden alle warmtepompen binnen het geselecteerde kruisprofiel getoond, elk met apparaatinformatie, meetwaarden (ruimtetemperatuur, setpoint, waterdruk, COP, energieverbruik), en eventuele foutcodes met severity-aanduidingen (W042 warning, F101 high, F042 critical). De pagina ondersteunt zowel de **Installateur**- als de **Beheerder**-rol via de rolwisselaar in de header.
 
-*[Beschrijving]*
+### BAG-opzoekketen — installateur-view (Path A)
 
-*[Screenshot: Decision Support — good recommendation]*
+![Screenshot van de BAG-opzoekketen met postcode 3025NM huisnummer 11, met succesvolle PDOK-respons](vault/Screenshots/features/feature_bag_lookup.png)
 
-*[Screenshot: Decision Support — poor recommendation]*
+De installateur-view biedt een BAG-opzoekketen op `/bag-lookup`. De gebruiker voert een postcode en huisnummer in (hier: 3025NM 11); de applicatie haalt vervolgens via de PDOK BAG API het bouwjaar, oppervlakte, gebruiksdoel en de woonplaats op. Op basis van het bouwjaar wordt automatisch een isolatieniveau ingeschat (hier: Klasse B, hoge betrouwbaarheid omdat het bouwjaar 2008 voldoende informatie geeft). Deze functionaliteit is na de oorspronkelijke sprintscope toegevoegd als Path A-werk (zie 1.2).
+
+### TNO-catalogus integratie (Path A)
+
+![Screenshot van de TNO-catalogus met aanbevolen instellingen per fabrikant (Intergas, Bosch, Remeha, Alklima)](vault/Screenshots/features/feature_tno_catalogus.png)
+
+Na het bepalen van het kruisprofiel toont de BAG-opzoekketen de aanbevolen inregelinstellingen per fabrikant. De data komt uit de TNO TDI 500-catalogus (oktober 2024, geverifieerd februari 2026) en wordt getoond in tabbladen per fabrikant (Intergas, Bosch, Remeha, Alklima). Per warmtepomptype zijn aanbevolen waarden voor max. aanvoertemperatuur, stooklijn, hybride modus en andere instellingen beschikbaar; velden die de fabrikant niet heeft opgegeven worden expliciet als "Niet opgegeven" weergegeven in plaats van leeg of nul.
+
+### Gaps en verbetervoorstellen
+
+De volgende elementen uit het oorspronkelijke template-overzicht zijn niet als aparte screenshots opgenomen, en worden hier eerlijk benoemd:
+
+- **Tablet- en mobiele weergaven** zijn niet apart vastgelegd. Het dashboard maakt gebruik van MUI-breakpoints die de layout automatisch aanpassen, maar dedicated mobile-first ontwerpen ontbreken. Dit is opgenomen als VV-22 in hoofdstuk 4.
+- **Meerdere onderscheidbare contingenten naast elkaar** zijn niet zichtbaar in live-modus omdat de Hupie API momenteel geen `kruisProfielCode` per warmtepomp levert. Alle live-pompen vallen daarom in het geselecteerde kruisprofiel; de groeperingslogica is wel geïmplementeerd (zie 2.3.5) en klaar voor zodra de API-data beschikbaar komt.
 
 ## 2.3 Screenshots code
 
-Relevante code-screenshots per feature:
+De code-screenshots hieronder zijn gegroepeerd op basis van de datastroom van Hupie API naar UI, in plaats van per user story. Dit volgt de architectuur uit hoofdstuk 1.7 tot en met 1.10 en maakt het makkelijker om de code-laag op een logische volgorde te lezen. Elke stap in de pipeline krijgt één screenshot.
 
-*[Screenshot: Code: hupieApi.ts + config/index.ts]*
+### 1. Configuratie
 
-*[Screenshot: Code: dataMapper.ts + types]*
+![Code: config.ts met environment variables](vault/Screenshots/code/code_config.png)
 
-*[Screenshot: Code: contingentService.ts + kpiAggregator.ts]*
+`config.ts` leest de environment variables in (`VITE_HUPIE_API_URL`, `VITE_HUPIE_API_KEY`, etc.) en exporteert ze als een typed object. Door dit centraal te doen zijn de credentials op één plek beheerbaar en zijn ze nergens hardcoded in de codebase aanwezig.
 
-*[Screenshot: Code: useDashboardData hook]*
+### 2. Hupie API-client
 
-*[Screenshot: Code: DashboardPage component]*
+![Code: hupieApi.ts met Axios en SPARQL-aanroep](vault/Screenshots/code/code_hupieApi.png)
 
-*[Screenshot: Code: chart components]*
+`hupieApi.ts` is de service-laag die met de Hupie SPARQL-endpoint praat via Axios. Hier zit ook de typed error-afhandeling (`RateLimitError`, `ManufacturerServerError`) en de detectie van rate-limit-responses die als HTTP 200 binnenkomen met een fouttekst in de body.
 
-*[Screenshot: Code: decisionEngine.ts + scoringConfig.ts]*
+### 3. SPARQL-queries
+
+![Code: sparqlQueries.ts met de SPARQL query-strings](vault/Screenshots/code/code_sparqlQueries.png)
+
+`sparqlQueries.ts` bevat de SPARQL-querystrings als constanten. Door deze te scheiden van de service-laag kunnen de queries onafhankelijk worden aangepast wanneer de Hupie-ontologie verandert, zonder de Axios-logica te raken.
+
+### 4. Data mapping
+
+![Code: dataMapper.ts die SPARQL responses omzet naar TypeScript objecten](vault/Screenshots/code/code_dataMapper.png)
+
+`dataMapper.ts` zet de rauwe SPARQL-bindings om naar typed TypeScript-objecten (`HeatPumpSystem`, `Measurement`, etc.). De `mapSparqlToHeatPumps`-functie groepeert eerst alle bindings per warmtepomp-URI, en bouwt vervolgens per pomp een compleet object op uit de helpers (`extractMeasurements`, `extractErrorCodes`, `resolveConnectionState`, etc.) die in `ontologyUtils.ts` zijn gedefinieerd.
+
+### 5. Contingent-service
+
+![Code: contingentService.ts die warmtepompen filtert per kruisprofiel](vault/Screenshots/code/code_contingentService.png)
+
+`contingentService.ts` groepeert de getypeerde warmtepompen tot contingenten op basis van het kruisprofiel (`groupHeatPumpsByKruisProfiel`). Warmtepompen zonder kruisprofiel-code worden overgeslagen en gelogd. De Hupie API levert dit veld op dit moment nog niet, dus contingenten worden voorlopig handmatig opgebouwd via `createContingent`; de groeperingsfunctie is wel klaar voor zodra de data beschikbaar komt.
+
+### 6. React data-hook
+
+![Code: useDashboardData hook die de pipeline orchestreert](vault/Screenshots/code/code_useDashboardData.png)
+
+`useDashboardData` is een custom React-hook die de data-load orkestreert. In de zichtbare code wordt de streaming-aanpak getoond: warmtepompen worden incrementeel toegevoegd aan de state zodra ze binnenkomen, met een `requestIdRef`-patroon om stale in-flight responses te negeren als de gebruiker bijvoorbeeld snel van filter wisselt. De pagina-componenten consumeren de uiteindelijke `DashboardData` interface en bevatten zelf geen data-laadlogica.
+
+### 7. Decision Engine
+
+![Code: decisionEngine.ts met per-factor scoring](vault/Screenshots/code/code_decisionEngine.png)
+
+`decisionEngine.ts` produceert de uiteindelijke aanbeveling per contingent op basis van de per-factor scores. Hier zit de "worst wins"-regel: als één factor 'poor' is, wordt de totale score ook 'poor'. Ook de Dutch summary- en actie-teksten worden hier samengesteld op basis van de uiteindelijke score, inclusief expliciete afhandeling voor `'insufficient-data'` wanneer er te weinig betrouwbare data beschikbaar is.
+
+### 8. Dashboard-pagina
+
+![Code: DashboardPage.tsx met componentcompositie](vault/Screenshots/code/code_dashboardPage.png)
+
+`DashboardPage.tsx` is het topcomponent van de hoofdpagina. Het consumeert `useDashboardData` voor de data, leest de kruisprofiel-filters uit de URL-parameters, haalt de scoring-drempels op uit `SCORING_THRESHOLDS_BY_PROFIEL`, en componeert de UI in meerdere states: laden (Spinner), fout (Alert), lege state (EmptyState), of de volledige dashboard-weergave met KPI-cards en charts. Als de gebruiker de rol "installateur" heeft wordt boven aan een banner getoond dat deze pagina primair voor beheerders is.
 
 ## 2.4 Screenshots commit-geschiedenis en branches
 
-*[Screenshot: GitHub — branch overzicht]*
+Hieronder staan drie screenshots van de GitHub-omgeving van dit project. Ze laten respectievelijk zien hoe het versiebeheer is opgezet, hoe de commits zijn georganiseerd, en hoe een Pull Request eruitziet bij dit project.
 
-*[Screenshot: GitHub — commit history]*
+### Branch overzicht
 
-*[Screenshot: GitHub — Pull Request voorbeeld]*
+![Branches-pagina van de repository met merged en actieve branches](vault/Screenshots/git/git_branches.png)
+
+Dit is het bovenste gedeelte van de branches-pagina. Er zijn drie hoofdtypen branches te zien: `main` (default, productie), `develop` (integratie), en feature-branches voor losse stukken werk (zoals `docs/verslag-ch1-eisen` of `chore/add-screenshot-assets`). De feature-branches gebruiken een prefix-conventie: `docs/` voor verslag-werk, `chore/` voor onderhoudstaken, `fix/` voor bugfixes, `feature/` voor functionaliteit. Sommige merged branches zijn nog zichtbaar in deze lijst; de auto-delete-instelling voor branches is later in het project aangezet, dus eerdere branches blijven staan.
+
+### Commit-geschiedenis
+
+![Commit-geschiedenis op de develop-branch met verified commits](vault/Screenshots/git/git_commits.png)
+
+De commit-geschiedenis op `develop` laat zien dat elke commit voldoet aan drie kenmerken: een conventional commit-message (zoals `docs(verslag):`, `fix(verslag):`, `chore:`), een **Verified** badge (commits zijn met GPG ondertekend), en een groen vinkje voor de CI-checks (2/2 of 3/3 geslaagd). De pull request-merges zijn zichtbaar als losse commits omdat de squash-merge-strategie wordt gebruikt: elk PR resulteert in één commit op develop.
+
+### Pull Request voorbeeld
+
+![Voorbeeld van een Pull Request: PR #63 voor het invullen van hoofdstuk 1.2](vault/Screenshots/git/git_pull_request.png)
+
+Dit is Pull Request #63, die hoofdstuk 1.2 van dit verslag invulde. Elk PR in dit project volgt een vaste structuur: een **Summary**-paragraaf bovenaan, een **What changed**-lijst met de concrete wijzigingen, en een **What's NOT in this PR**-paragraaf die de scope expliciet afbakent. Wanneer er aanvullende context nodig is (zoals bij dit PR de Path A timestamp note), staat dat in een aparte sectie. De CI-checks aan de rechterkant en de Vercel-deployment onderaan tonen automatische validatie voordat een PR samengevoegd kan worden.
 
 # 3. Testen (B1-K1-W4)
 
 ## 3.1 Testplan
 
-*[Beschrijf het testplan: twee-laags aanpak (Vitest voor logica, handmatig voor UI). Wat wordt getest, hoe, met welke data, wat is pass/fail.]*
+Het testen van het dashboard volgt een bewuste drielaagse aanpak:
+
+1. Unit tests (Vitest) voor de logica-laag: de services en utilities waar correctheid het moeilijkst met het oog te controleren is (de Decision Engine, de data mapping, de KPI-aggregatie, de ontologie-conversie). Deze laag wordt geautomatiseerd getest zodat een regressie direct zichtbaar wordt.
+
+2. End-to-end tests (Playwright) voor de UI-laag: de pagina's, charts en gebruikersflows worden in een echte browser getest, inclusief foutafhandeling (mislukte API-calls, trage responses, lege of extreme data) via netwerk-interceptie. Deze laag dekt het gedrag dat unit tests niet kunnen verifiëren — wat de gebruiker daadwerkelijk ziet en doet.
+
+3. Handmatige tests voor het kleine restant dat niet geautomatiseerd is. Na het bouwen van de E2E-laag is hiervan nog één scenario over: snel wisselen tussen kruisprofielen (T4.3). Dit heb ik handmatig gecontroleerd.
+
+De Definition of Done (1.3) en de keuze voor Vitest en Playwright (1.11) zijn in hoofdstuk 1 onderbouwd; dit hoofdstuk laat de uitvoering zien. User story #8 (Test Plan & Execution) wordt door dit hoofdstuk afgedekt.
+
+Wat per laag wordt getest, met welke data en het pass/fail-criterium:
+
+- Logica-laag (unit): getest met vaste fixtures (voorbeeldwarmtepompen en SPARQL-responses). Pass = de functie geeft de verwachte getypeerde output; fail = afwijking of een onverwachte exception.
+- UI-laag (E2E): getest in een echte browser, deels in mock-modus (deterministische data) en deels in live-modus met onderschepte API-responses, om foutscenario's gecontroleerd af te dwingen. Pass = het scherm toont de juiste staat (data, fout, of laad-indicator); fail = verkeerde weergave, crash of vastlopen.
+- Handmatige laag: gecontroleerd in de browser. Pass = correct gedrag bij visuele inspectie; fail = layout-breuk of verkeerd gedrag.
 
 ## 3.2 Automatische testen (Vitest)
 
-Unit tests voor de data- en logica-laag:
+De automatische testsuite bestaat uit 229 tests verdeeld over 27 testbestanden, allemaal uitgevoerd met Vitest. De volledige suite slaagt:
 
-*[Screenshot: Vitest terminal output — alle tests passing]*
+```
+ Test Files  27 passed (27)
+      Tests  229 passed (229)
+   Duration  10.39s
+```
 
-*[Kopieer of beschrijf de test resultaten. Bij een initieel gefaalde test: screenshot van fout + fix + screenshot van geslaagde hertest.]*
+De tests zijn georganiseerd per laag:
+
+- **Services / businesslogica (18 bestanden)** — onder andere `decisionEngine`, `dataMapper`, `kpiAggregator`, `weatherService`, `sparqlQueries`, `contingentService`, `bagService`, `tnoCatalogus` en `ontologyUtils`. Dit is de kern van de logica-laag en heeft de hoogste dekking (zie 3.5).
+- **Hooks / context (3 bestanden)** — `copContext`, `roleContext`, en `useDashboardData`. Let op: `useDashboardData.test.ts` test de integratie van de services die de hook samenstelt (contingent-constructie + KPI-aggregatie), niet de React-lifecycle-code van de hook zelf. Die React-code is handmatig getest, conform de tweelaagse aanpak.
+- **Componenten (5 bestanden)** — render-tests voor onder andere `aanbevolenInstellingen`, `bagLookupPage`, en `mainLayout` auto-navigatie.
+- **Integratie (1 bestand)** — `pipeline.integration` test de volledige datastroom van API tot KPI in samenhang.
+
+Bij het draaien van de testsuite verschijnt in `roleContext.test.tsx` de logregel `Error: useRole must be used within a RoleProvider`. Dit is geen falende test maar een bewust geteste foutpad-assertie: de test controleert dat de hook een fout gooit wanneer hij buiten de provider wordt gebruikt.
+
+Er is geen falende-test-naar-fix cyclus om te tonen, omdat de tests gedurende de ontwikkeling zijn meegegroeid met de code in plaats van achteraf zijn toegevoegd. Waar tests tijdens het ontwikkelen faalden, is dat opgelost vóór de commit; de commit-historie laat groene checks zien op elke merge (zie 2.4).
 
 ## 3.3 Handmatige testscenario’s
 
-*[Per user story: test ID, actie, verwacht resultaat, werkelijk resultaat, screenshot, verdict. Gebruik de T[issue].[test] naamgeving.]*
+De onderstaande tabellen tonen per user story de uitgevoerde testscenario's, met het type test (unit, E2E, of handmatig), de bewijsbron en het resultaat. De visuele bevestiging van werkende functionaliteit staat in 2.2.
 
-Issue \#2 — API Connection:
+Issue #2 — API Connection
 
-*[T2.1 Happy flow, T2.2 Invalid credentials, T2.3 API unreachable, T2.4 Malformed URL]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T2.1 | Happy flow — geldige respons | Unit + screenshot | hupieApiTwoPhase.test.ts, 2.2 | PASS |
+| T2.2 | Ongeldige credentials (401) | E2E | api-failure.live.e2e.ts (401) | PASS |
+| T2.3 | API onbereikbaar | E2E | api-failure.live.e2e.ts (abort) | PASS |
+| T2.4 | Verkeerde URL | E2E | api-failure.live.e2e.ts (abort) | PASS |
 
-*[Screenshot: T2.1 — Happy flow]*
+T2.3 en T2.4 worden door hetzelfde mechanisme afgedekt: een mislukte verbinding leidt in beide gevallen tot dezelfde foutafhandeling. De E2E-test verifieert dat de applicatie bij 401, 500 én een afgebroken verbinding de foutmelding correct toont.
 
-*[Screenshot: T2.2 — Invalid credentials]*
+Issue #3 — Data Mapping
 
-*[Screenshot: T2.3 — API unreachable]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T3.1 | Happy flow — geldige bindings | Unit | dataMapper.test.ts | PASS |
+| T3.2 | Ontbrekende velden | Unit | dataMapper.test.ts | PASS |
+| T3.3 | Onbekende URI | Unit | dataMapper.test.ts | PASS |
+| T3.4 | Lege respons | Unit | dataMapper.test.ts | PASS |
 
-Issue \#3 — Data Mapping:
+Issue #4 — Contingent Link
 
-*[T3.1 Happy flow, T3.2 Missing fields, T3.3 Unknown URI, T3.4 Empty response]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T4.1 | Contingent selecteren | E2E + screenshot | contingent.e2e.ts, 2.2 | PASS |
+| T4.2 | Leeg contingent | E2E | edge-data.live.e2e.ts (empty-state) | PASS |
+| T4.3 | Snel wisselen tussen profielen | Handmatig | Browser-controle | PASS |
+| T4.4 | Laden mislukt | E2E | api-failure.live.e2e.ts (500) | PASS |
 
-*[Screenshot: T3.1 — Happy flow]*
+T4.3 (snel wisselen tussen kruisprofielen) test de stale-response-afhandeling in useDashboardData (zie 2.3.6). Dit heb ik handmatig gecontroleerd: bij snel wisselen toont het dashboard altijd de data van het laatst geselecteerde profiel, zonder verouderde data. Het automatiseren hiervan is opgenomen als verbetervoorstel in hoofdstuk 4.
 
-Issue \#4 — Contingent Link:
+Issue #5 — Dashboard UI
 
-*[T4.1 Happy flow, T4.2 Empty contingent, T4.3 Rapid switching, T4.4 Loading fails]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T5.1 | Desktop layout | E2E + screenshot | dashboard.e2e.ts, 2.2 | PASS |
+| T5.2 | Tablet layout (iPad) | E2E | responsive.e2e.ts (dashboard/contingent/BAG @768) | PASS |
+| T5.3 | Lange namen | E2E | long-names.live.e2e.ts (desktop + 768) | PASS |
+| T5.4 | Trage respons | E2E | slow-response.live.e2e.ts | PASS |
 
-*[Screenshot: T4.1 — Happy flow]*
+T5.2 (tablet-weergave) is in eerste instantie handmatig getest en bleek niet goed te werken: de views liepen over bij iPad-portretbreedte (768px). Na een fix (zie 4) heb ik dit geautomatiseerd met responsive.e2e.ts, die voor alle drie de views controleert dat er geen horizontale overflow is op 768px. De telefoon-weergave (<600px) valt buiten de scope en is een verbetervoorstel in hoofdstuk 4. T5.3 (lange namen) wordt afgedekt door long-names.live.e2e.ts: een warmtepomp met een extreem lange naam wordt ingeschoten en de test controleert dat de naam netjes afbreekt zonder de layout te breken.
 
-Issue \#5 — Dashboard UI:
+Issue #6 — KPI Charts
 
-*[T5.1 Desktop, T5.2 Tablet, T5.3 Long names, T5.4 Slow response]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T6.1 | Charts met data | E2E + screenshot | dashboard.e2e.ts, 2.2 | PASS |
+| T6.2 | Enkel datapunt | E2E | edge-data.live.e2e.ts | PASS |
+| T6.3 | Geen data | E2E | edge-data.live.e2e.ts (empty-state) | PASS |
+| T6.4 | Extreme waarden | E2E | edge-data.live.e2e.ts (COP 99) | PASS |
 
-*[Screenshot: T5.1 — Desktop layout]*
+Issue #7 — Decision Support
 
-*[Screenshot: T5.2 — Tablet layout]*
+| Test ID | Scenario | Type | Bewijs | Resultaat |
+|---------|----------|------|--------|-----------|
+| T7.1 | Goede/acceptabele score | E2E + unit + screenshot | dashboard.e2e.ts, decisionEngine.test.ts, 2.2 | PASS |
+| T7.2 | Slechte score | Unit + screenshot | decisionEngine.test.ts, 2.2 | PASS |
+| T7.3 | Onvoldoende data | Unit | decisionEngine.test.ts | PASS |
+| T7.4 | Ontbrekende KPI's | Unit | decisionEngine.test.ts | PASS |
+| T7.5 | Alle foutcodes | E2E | decision-errors.live.e2e.ts | PASS |
 
-Issue \#6 — KPI Charts:
-
-*[T6.1 Happy flow, T6.2 Single data point, T6.3 No data, T6.4 Extreme values]*
-
-*[Screenshot: T6.1 — Happy flow]*
-
-Issue \#7 — Decision Support:
-
-*[T7.1 Good score, T7.2 Poor score, T7.3 Insufficient data, T7.4 Missing KPIs, T7.5 All errors]*
-
-*[Screenshot: T7.1 — Good score]*
-
-*[Screenshot: T7.2 — Poor score]*
+T7.5 (alle foutcodes) schiet een warmtepomp met meerdere foutcodes in en controleert dat de foutcodes correct worden getoond op de contingent-detailpagina.
 
 ## 3.4 Test summary table
 
-*[Vul de tabel in na het uitvoeren van alle testen]*
+Waar 3.3 elk testscenario afzonderlijk beschrijft, vat deze tabel de resultaten per user story samen: hoeveel scenario's er zijn, hoe ze gedekt zijn (unit, E2E of handmatig), en het totaalresultaat.
 
-| **Test ID** | **Type**  | **Feature**      | **Beschrijving**              | **Resultaat**   |
-|-------------|-----------|------------------|-------------------------------|-----------------|
-| T-AUTO-3.1  | Auto      | Data Mapping     | parseMeasurements valid input | *[PASS/FAIL]* |
-| T-AUTO-3.2  | Auto      | Data Mapping     | parseMeasurements empty       | *[PASS/FAIL]* |
-| T-AUTO-4.1  | Auto      | KPI Aggregator   | aggregateKPIs valid           | *[PASS/FAIL]* |
-| T-AUTO-7.1  | Auto      | Decision Engine  | evaluateContingent good       | *[PASS/FAIL]* |
-| T2.1        | Handmatig | API Connection   | Happy flow — 200 OK           | *[PASS/FAIL]* |
-| T2.2        | Handmatig | API Connection   | Invalid credentials           | *[PASS/FAIL]* |
-| T4.1        | Handmatig | Contingent Link  | Select contingent             | *[PASS/FAIL]* |
-| T5.1        | Handmatig | Dashboard UI     | Desktop layout                | *[PASS/FAIL]* |
-| T6.1        | Handmatig | KPI Charts       | Charts with real data         | *[PASS/FAIL]* |
-| T7.1        | Handmatig | Decision Support | Good recommendation           | *[PASS/FAIL]* |
+| Issue | Scenario's | Unit | E2E | Handmatig | Resultaat |
+|-------|-----------|------|-----|-----------|-----------|
+| #2 API Connection | 4 | 1 | 3 | – | 4/4 PASS |
+| #3 Data Mapping | 4 | 4 | – | – | 4/4 PASS |
+| #4 Contingent Link | 4 | – | 3 | 1 | 4/4 PASS |
+| #5 Dashboard UI | 4 | – | 4 | – | 4/4 PASS |
+| #6 KPI Charts | 4 | – | 4 | – | 4/4 PASS |
+| #7 Decision Support | 5 | 3 | 2 | – | 5/5 PASS |
+| **Totaal** | **25** | **8** | **16** | **1** | **25/25 PASS** |
+
+Voetnoot: T7.1 wordt zowel door een E2E-test als een unit-test gedekt; in de tellingen hierboven is dit scenario één keer geteld onder E2E (de hoogste dekkingslaag).
+
+Van de 25 scenario's zijn er 24 geautomatiseerd getest (8 via unit tests, 16 via E2E) en 1 handmatig (T4.3, snel wisselen tussen kruisprofielen). Alle 25 scenario's slagen.
+
+De unit tests dekken de logica-laag: de data mapping (mapSparqlToHeatPumps en extractMeasurements in dataMapper.ts), de KPI-aggregatie (aggregateKpisForContingent in kpiAggregator.ts) en de Decision Engine (evaluateContingent in decisionEngine.ts). Dit zijn de functies waar de correctheid het moeilijkst met het oog te controleren is, dus daar levert geautomatiseerd testen de meeste zekerheid op. De E2E-tests dekken de UI-laag en de foutafhandeling, die in een echte browser worden gecontroleerd (zie 3.1 en 3.3).
 
 ## 3.5 Conclusies uit testen
 
-Conclusie per feature:
+**Per user story.** Alle acceptatiecriteria van de geteste user stories zijn behaald. Van de 25 testscenario's slagen er 25 (zie 3.3 en 3.4): de API-verbinding handelt fouten correct af, de data mapping levert de juiste getypeerde output, het contingent-overzicht en de detailpagina werken, de charts renderen ook bij lege en extreme data, en de Decision Engine geeft de verwachte oordelen. Geen enkel scenario faalt.
 
-*[Per feature: hoeveel tests geslaagd/gefaald, zijn acceptatiecriteria behaald, bekende issues.]*
+**De drielaagse aanpak werkte.** De combinatie van unit tests (logica), E2E-tests (UI en foutafhandeling) en handmatige controle heeft elkaar goed aangevuld. Een concreet voorbeeld: de tablet-weergave (T5.2) bleek bij handmatige controle stuk te zijn — de views liepen over op iPad-portretbreedte. Dat heb ik opgelost en daarna vastgelegd met een geautomatiseerde E2E-test, zodat het probleem niet opnieuw kan terugkomen. Dat is precies wat de drie lagen samen opleveren: een probleem vinden, oplossen, en bewaken.
 
-Algehele conclusie:
+**Over de coverage-cijfers.** De unit-test coverage komt uit op ongeveer 50,9% van de statements. Dat cijfer vraagt om uitleg, want het meet alleen de logica-laag. De services scoren daar hoog (96–100%) — dat is bewust, want dat is de code waar correctheid het moeilijkst met het oog te controleren is. De charts, de hooks en de dashboard- en detailpagina's staan op 0% unit-coverage, maar dat betekent niet dat ze ongetest zijn: die worden gedekt door de E2E-tests, die de UI in een echte browser doorlopen. Het punt is dat Playwright de gebouwde app test zonder coverage-instrumentatie, dus die E2E-dekking telt niet mee in het unit-coverage cijfer. Ik claim daarom niet dat de "echte" dekking veel hoger ligt — ik kan alleen zeggen dat het cijfer van 50,9% één laag meet, en dat de UI-laag door een andere laag tests wordt gedekt. Het samenvoegen van unit- en E2E-coverage tot één gemeten cijfer is een verbetervoorstel in hoofdstuk 4.
 
-*[Algemene kwaliteit van de applicatie. Sterke punten. Verbeterpunten (input voor verbetervoorstellen).]*
+**Bekende punten voor later.** Eén scenario (T4.3, snel wisselen tussen kruisprofielen) wordt nog handmatig getest in plaats van geautomatiseerd. De responsive layout is opgelost voor tablet (iPad), maar nog niet voor telefoon (<600px). Beide punten, plus het meten van E2E-coverage, komen terug als verbetervoorstel in hoofdstuk 4.
 
 # 4. Verbetervoorstellen (B1-K1-W5)
 
 ## 4.1 Analyse informatiebronnen
 
-Testresultaten:
+De verbetervoorstellen in dit hoofdstuk komen uit vier bronnen die ik tijdens het project heb verzameld.
 
-*[Welke testen faalden? Welke edge cases waren problematisch?]*
+**Testresultaten.** Alle 25 testscenario's slagen (hoofdstuk 3), maar het testen zelf bracht ook punten naar boven. De unit-coverage meet alleen de logica-laag: de services scoren hoog (96–100% voor de kern-services), maar de charts, hooks en de dashboard- en detailpagina's staan op 0% unit-coverage. Die UI-laag wordt wel door de E2E-tests gedekt, maar die dekking wordt niet meegemeten in het coverage-cijfer. Daarnaast is één testscenario (T4.3, snel wisselen tussen kruisprofielen) nog handmatig in plaats van geautomatiseerd, en draaien de tests nu alleen lokaal — niet automatisch bij elke push.
 
-Feedback sprint review (Jeroen Pat):
+**Feedback sprint review (Jeroen Pat).** *[PLACEHOLDER — nog in te vullen op basis van echte notities van de sprint review. Niet invullen tot de echte feedback bekend is.]*
 
-*[Wat zei Jeroen tijdens de review? Positief? Verzoeken? Issues?]*
+**Retrospective bevindingen.** Tijdens het project kwamen drie bevindingen naar voren. Ten eerste bleek bij het uitwerken van de testaanpak dat een grotere herstructurering (de installateur-first redesign) eerst extra test-scaffolding nodig had om niet stilletjes de datapijplijn te breken — dit is opgepakt in issue #47 (test-coverage hardening). Ten tweede bleek de responsive layout bij handmatige controle stuk: de views liepen over op tablet- en telefoonbreedte. Ten derde werd tijdens het werk aan de API-configuratie duidelijk dat de API-sleutels via VITE_-variabelen in de client-bundle terechtkomen en dus in de browser zichtbaar zijn.
 
-Retrospective bevindingen:
-
-*[Procesproblemenm, tijdsinschatting, werkwijze]*
-
-Bugs / GitHub Issues:
-
-*[Bugs gevonden tijdens de sprint die niet zijn opgelost]*
+**Bugs en GitHub Issues.** De GitHub-issues hielden bevindingen bij die tijdens het werk ontstonden. Issue #57 betrof een regressie waarbij de beheerder-banner op /bag-lookup niet rendrede doordat een auto-nav useEffect bij het laden al wegnavigeerde; dit is tijdens de sprint opgelost met een useRef die de vorige rol bijhoudt, zodat de auto-nav alleen bij een echte rolwissel afgaat. Issue #47 legde daarnaast de bestaande tech-debt VV-16 (variabele-shadowing in de data mapping) vast en beschermde die met een regressietest.
 
 ## 4.2 Interpretatie bevindingen
 
-*[Per bevinding: wat is het onderliggende probleem? Hoe ernstig? Wie wordt geraakt?]*
+Per bevinding: het probleem, de ernst, en wie het raakt. De feedback uit de sprint review (4.1) wordt hier meegenomen zodra die is ingevuld.
+
+**Responsive layout (tablet en telefoon).** Probleem: de views waren niet geoptimaliseerd voor smalle schermen — bij iPad-portret liepen ze over, en telefoon (<600px) is helemaal niet ondersteund. Ernst: medium. Wie geraakt: installateurs die het dashboard in het veld op een tablet of telefoon willen gebruiken. Het tablet-deel is inmiddels opgelost (zie hoofdstuk 3); telefoon blijft open.
+
+**API-sleutels in de client-bundle.** Probleem: de VITE_-sleutels worden door Vite in de browser-bundle ingebakken en zijn dus zichtbaar voor iedereen die de gedeployde site bekijkt. Ernst: hoog bij een echte productie-uitrol, beperkt in de huidige exam-context (schoolproject, geen gevoelige gebruikersdata). Wie geraakt: de beveiliging zodra de app productie zou gaan — niet de huidige opzet.
+
+**Coverage-meting dekt maar één laag.** Probleem: het coverage-cijfer meet alleen de unit-laag; de E2E-dekking van de UI wordt niet meegemeten, dus het cijfer onderschat de werkelijke dekking. Ernst: laag (de tests bestaan wél, ze worden alleen niet samen gemeten). Wie geraakt: ikzelf en een eventuele opvolger, bij het inschatten van hoe goed de UI gedekt is.
+
+**Handmatige test T4.3 en lokaal draaien.** Probleem: het scenario "snel wisselen tussen kruisprofielen" wordt handmatig gecontroleerd in plaats van geautomatiseerd, en de tests draaien alleen lokaal in plaats van automatisch bij elke push. Ernst: laag. Wie geraakt: toekomstige wijzigingen kunnen ongemerkt iets breken zonder dat een test of een geautomatiseerde controle dat opvangt.
+
+**Ontbrekende scrumboard-screenshots (dag 4 en verder).** Probleem: de dagelijkse scrumboard-screenshots zijn alleen voor dag 1 tot en met 3 vastgelegd. Ernst: laag (procesmatig). Wie geraakt: de volledigheid van de sprint-documentatie.
 
 ## 4.3 Verbetervoorstellen
 
-Voorstel 1 (functioneel):
+Op basis van de bronnen en interpretatie in 4.1 en 4.2 zijn hieronder zeven verbetervoorstellen uitgewerkt. De nummering sluit aan op de bestaande verbetervoorstellen-lijst (VV-21 en VV-22 zijn eerder in dit verslag al genoemd). Elk voorstel heeft een bron, het probleem, het voorstel, een nieuwe user story met acceptatiecriteria, een MoSCoW-prioriteit en een tijdsinschatting. De user stories komen in 4.4 op de product backlog.
 
-*[Bron \| Probleem \| Voorstel \| Nieuwe user story + acceptatiecriteria \| Prioriteit (MoSCoW) \| Geschatte tijd]*
+### VV-21 — Scrumboard-screenshots als vaste routine
+- **Bron:** Retrospective / proceswaarneming (4.1)
+- **Probleem:** De dagelijkse scrumboard-screenshots zijn alleen voor dag 1 t/m 3 vastgelegd, waardoor de sprint-documentatie onvolledig is.
+- **Voorstel:** Een vaste dagelijkse routine waarbij aan het eind van elke werkdag een scrumboard-screenshot wordt gemaakt en opgeslagen met een vaste naamconventie.
+- **Nieuwe user story:** Als student wil ik elke dag herinnerd worden om een scrumboard-screenshot te maken, zodat mijn sprint-documentatie compleet is. Acceptatie: dagelijkse reminder ingesteld; vaste naamconventie; screenshots van dag 1 tot einde sprint aanwezig.
+- **Prioriteit:** Could-have
+- **Geschatte tijd:** 0,5 dag
 
-Voorstel 2 (technisch):
+### VV-22 — Mobile-first wireframes
+- **Bron:** Retrospective / ontwerpfase (1.6 en 2.x)
+- **Probleem:** De wireframes zijn alleen voor desktop gemaakt, waardoor smalle schermen pas laat in beeld kwamen en de responsive problemen niet vooraf waren voorzien.
+- **Voorstel:** Bij een volgend project eerst mobile-first wireframes maken (telefoon → tablet → desktop), zodat responsive gedrag vanaf het ontwerp wordt meegenomen.
+- **Nieuwe user story:** Als ontwerper wil ik wireframes mobile-first opzetten, zodat de layout op alle schermformaten vanaf het begin klopt. Acceptatie: wireframes voor telefoon, tablet én desktop; breakpoints benoemd; review vóór implementatie.
+- **Prioriteit:** Should-have
+- **Geschatte tijd:** 1 dag
 
-*[Bron \| Probleem \| Voorstel \| Nieuwe user story + acceptatiecriteria \| Prioriteit (MoSCoW) \| Geschatte tijd]*
+### VV-23 — Responsive layout voor telefoon (<600px)
+- **Bron:** Testresultaten / handmatige test T5.2 (hoofdstuk 3)
+- **Probleem:** De responsive fix dekt tablet (iPad), maar telefoon (<600px) is niet ondersteund — de views zijn daar nog niet bruikbaar. Hangt samen met VV-22.
+- **Voorstel:** De bestaande responsive aanpak (collapsible drawer, breakpoints) uitbreiden naar telefoonbreedte, met een E2E-test die overflow op <600px controleert, zoals de bestaande 768px-test.
+- **Nieuwe user story:** Als installateur wil ik het dashboard op mijn telefoon kunnen gebruiken, zodat ik in het veld niet afhankelijk ben van een groter scherm. Acceptatie: geen horizontale overflow op 375px en 414px; navigatie bruikbaar; E2E-test dekt <600px.
+- **Prioriteit:** Should-have
+- **Geschatte tijd:** 2 dagen
 
-Voorstel 3 (proces):
+### VV-24 — Rapid-switch test automatiseren (T4.3)
+- **Bron:** Testresultaten (hoofdstuk 3 — het enige handmatige scenario)
+- **Probleem:** Het scenario "snel wisselen tussen kruisprofielen" (T4.3) wordt handmatig getest en beschermt dus niet automatisch tegen regressie van de stale-response-afhandeling.
+- **Voorstel:** Een E2E-test die snel achter elkaar van kruisprofiel wisselt en controleert dat alleen de data van het laatst gekozen profiel wordt getoond.
+- **Nieuwe user story:** Als ontwikkelaar wil ik dat het snel-wisselen-scenario geautomatiseerd getest is, zodat een wijziging aan de data-laadlogica niet ongemerkt stale data introduceert. Acceptatie: E2E-test wisselt ≥3 profielen snel; assert dat de getoonde data bij het laatste profiel hoort; test draait mee in de suite.
+- **Prioriteit:** Could-have
+- **Geschatte tijd:** 0,5 dag
 
-*[Bron \| Probleem \| Voorstel \| Nieuwe user story + acceptatiecriteria \| Prioriteit (MoSCoW) \| Geschatte tijd]*
+### VV-25 — Unit- en E2E-coverage samenvoegen tot één meting
+- **Bron:** Testresultaten / coverage-analyse (3.5)
+- **Probleem:** Het coverage-cijfer meet alleen de unit-laag; de E2E-dekking van de UI telt niet mee, dus het cijfer onderschat de werkelijke dekking.
+- **Voorstel:** Playwright met coverage-instrumentatie draaien en de E2E-coverage samenvoegen met de unit-coverage tot één gemeten cijfer, zodat de UI-laag zichtbaar wordt in de rapportage.
+- **Nieuwe user story:** Als ontwikkelaar wil ik één gecombineerd coverage-cijfer voor unit én E2E, zodat ik een eerlijk beeld heb van hoe goed de hele applicatie gedekt is. Acceptatie: E2E-coverage gemeten; samengevoegd rapport; UI-laag niet langer 0%.
+- **Prioriteit:** Could-have
+- **Geschatte tijd:** 1 dag
+
+### VV-26 — API-sleutels via backend-proxy
+- **Bron:** Retrospective / API-configuratie (4.1)
+- **Probleem:** De API-sleutels komen via VITE_-variabelen in de client-bundle terecht en zijn zichtbaar in de browser. Beperkt risico in de exam-context, maar een echt probleem bij productie.
+- **Voorstel:** Bij een productie-uitrol de externe API-aanroepen via een eigen backend-proxy laten lopen, zodat de sleutels server-side blijven en niet in de client-bundle staan.
+- **Nieuwe user story:** Als beheerder wil ik dat API-sleutels niet in de browser zichtbaar zijn, zodat de applicatie veilig naar productie kan. Acceptatie: externe calls lopen via een backend-endpoint; geen VITE_-sleutel in de client-bundle; sleutels in server-side env.
+- **Prioriteit:** Could-have (voor nu) — bij een productie-uitrol een Must-have
+- **Geschatte tijd:** 3 dagen
+
+### VV-27 — CI-integratie (GitHub Actions)
+- **Bron:** Retrospective / proceswaarneming (4.1)
+- **Probleem:** De tests draaien nu alleen lokaal en handmatig; er is geen automatische controle bij elke push, dus een gebroken test kan ongemerkt op develop komen.
+- **Voorstel:** Een GitHub Actions-workflow die bij elke push en pull request de unit-tests, de E2E-tests en de build draait.
+- **Nieuwe user story:** Als ontwikkelaar wil ik dat tests automatisch draaien bij elke push, zodat een regressie wordt opgevangen voordat code wordt gemerged. Acceptatie: workflow draait unit + E2E + build:check; PR's tonen de status; merge geblokkeerd bij falende tests.
+- **Prioriteit:** Should-have
+- **Geschatte tijd:** 1 dag
 
 ## 4.4 Nieuwe user stories op product backlog
 
-*[Beschrijf de nieuwe user stories die zijn toegevoegd aan het GitHub Projects scrumboard.]*
+De zeven verbetervoorstellen uit 4.3 zijn als user stories op de product backlog (GitHub Projects) gezet, zodat ze als concrete vervolgstappen vastliggen. De volledige user story en acceptatiecriteria per voorstel staan in 4.3; onderstaande tabel vat samen wat er op de backlog is gezet, met de prioriteit en de bijbehorende VV.
 
-*[Screenshot: Product backlog met nieuwe user stories]*
+| VV | User story (kort) | Categorie | Prioriteit | Geschatte tijd |
+|----|-------------------|-----------|------------|----------------|
+| VV-21 | Dagelijkse scrumboard-screenshots als vaste routine | Proces | Could-have | 0,5 dag |
+| VV-22 | Mobile-first wireframes bij een volgend project | Functioneel/ontwerp | Should-have | 1 dag |
+| VV-23 | Responsive layout voor telefoon (<600px) | Functioneel/technisch | Should-have | 2 dagen |
+| VV-24 | Snel-wisselen-scenario (T4.3) automatiseren | Technisch | Could-have | 0,5 dag |
+| VV-25 | Unit- en E2E-coverage samenvoegen tot één meting | Technisch | Could-have | 1 dag |
+| VV-26 | API-sleutels via een backend-proxy | Technisch/security | Could-have (nu) / Must-have (productie) | 3 dagen |
+| VV-27 | CI-integratie met GitHub Actions | Proces/technisch | Should-have | 1 dag |
+
+Onderstaande screenshot toont de zeven nieuwe user stories op het GitHub Projects board.
+
+![Product backlog met de zeven nieuwe user stories (VV-21 t/m VV-27) op het GitHub Projects board](vault/Screenshots/scrumboard/product_backlog_vvs.png)
 
 # 5. Overleg (B1-K2-W1)
 

@@ -70,11 +70,11 @@ const DashboardPage = () => {
       )}
 
       {isLoading && (
-        <Spinner message="Warmtepompdata ophalen via Hupie API..." />
+        <Spinner message="Warmtepompdata ophalen via Hupie API..." data-testid="loading-spinner" />
       )}
 
       {!isLoading && error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3 }} data-testid="error-alert">
           {error}
         </Alert>
       )}
@@ -83,6 +83,7 @@ const DashboardPage = () => {
         <EmptyState
           message="Geen warmtepompen gevonden"
           subMessage="Controleer de Hupie API verbinding en probeer opnieuw."
+          data-testid="empty-state"
         />
       )}
 
@@ -112,9 +113,9 @@ const DashboardPage = () => {
                     if (val) handleKruisProfielChange(val, currentAanvoer);
                   }}
                 >
-                  <ToggleButton value="A">A — Goed</ToggleButton>
-                  <ToggleButton value="B">B — Matig</ToggleButton>
-                  <ToggleButton value="C">C — Slecht</ToggleButton>
+                  <ToggleButton value="A" data-testid="kruisprofiel-isolatie-a">A — Goed</ToggleButton>
+                  <ToggleButton value="B" data-testid="kruisprofiel-isolatie-b">B — Matig</ToggleButton>
+                  <ToggleButton value="C" data-testid="kruisprofiel-isolatie-c">C — Slecht</ToggleButton>
                 </ToggleButtonGroup>
               </Box>
 
@@ -132,9 +133,9 @@ const DashboardPage = () => {
                     if (val) handleKruisProfielChange(currentIsolatie, val);
                   }}
                 >
-                  <ToggleButton value="1">Vloer (≤ 30°C)</ToggleButton>
-                  <ToggleButton value="2">Radiator (30–55°C)</ToggleButton>
-                  <ToggleButton value="3">Hete lucht (≥ 55°C)</ToggleButton>
+                  <ToggleButton value="1" data-testid="kruisprofiel-afgifte-vloer">Vloer (≤ 30°C)</ToggleButton>
+                  <ToggleButton value="2" data-testid="kruisprofiel-afgifte-radiator">Radiator (30–55°C)</ToggleButton>
+                  <ToggleButton value="3" data-testid="kruisprofiel-afgifte-hetelucht">Hete lucht (≥ 55°C)</ToggleButton>
                 </ToggleButtonGroup>
               </Box>
 
@@ -153,7 +154,7 @@ const DashboardPage = () => {
           {selectedContingent && (
             <>
               {/* Two-column section: KPIs + Installatieadvies | COP gauge + fleet list */}
-              <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, alignItems: { xs: 'stretch', md: 'flex-start' } }}>
 
                 {/* Left column */}
                 <Box sx={{ flex: 2, minWidth: 0 }}>
@@ -165,11 +166,11 @@ const DashboardPage = () => {
                 </Box>
 
                 {/* Right column */}
-                <Box sx={{ flex: 1, minWidth: 280 }}>
+                <Box sx={{ flex: 1, minWidth: { xs: 'auto', md: 280 } }}>
                   <CopGauge kpis={kpis} minCop={minCop} />
 
                   {/* Fleet status list */}
-                  <Box sx={{ mt: 2 }}>
+                  <Box sx={{ mt: 2 }} data-testid="pump-status-list">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
                       <Typography variant="caption" fontWeight={700}
                         sx={{ textTransform: 'uppercase', letterSpacing: 2,
@@ -181,6 +182,7 @@ const DashboardPage = () => {
 
                     {selectedContingent.heatPumps.map((pump) => (
                       <Box key={pump.id}
+                        data-testid="pump-status-row"
                         sx={{ display: 'flex', alignItems: 'center',
                               justifyContent: 'space-between', py: 0.75,
                               borderBottom: '1px solid', borderColor: 'divider' }}>
@@ -203,6 +205,7 @@ const DashboardPage = () => {
 
                     <Button
                       size="small"
+                      data-testid="contingent-detail-link"
                       onClick={() => navigate(`/contingent/${selectedContingent.id}`)}
                       sx={{ mt: 1, fontSize: '0.75rem', color: 'primary.main',
                             textTransform: 'none', p: 0, minWidth: 0 }}
