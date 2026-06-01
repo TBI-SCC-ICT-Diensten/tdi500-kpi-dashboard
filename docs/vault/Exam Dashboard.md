@@ -80,14 +80,14 @@ Data flow:
 
 ## Exam Verslag Sections
 
-> Check off each section as you write it. ALL must be done by Vr 27 mrt.
+> I will Check off each section as i write it. ALL must be done by Vr 27 mrt.
 
 ### Opdracht 1 — Planning & Ontwerp (W1 + W2)
-- [ ] Eisen, wensen en technische uitgangspunten
-- [ ] User stories met acceptatiecriteria
-- [ ] Definition of Done
-- [ ] Screenshot sprint backlog (begin sprint)
-- [ ] Screenshots scrumboard (dagelijks)
+- [x] Eisen, wensen en technische uitgangspunten
+- [x] User stories met acceptatiecriteria
+- [x] Definition of Done
+- [x] Screenshot sprint backlog (begin sprint)
+- [x] Screenshots scrumboard (dagelijks)
 - [ ] Wireframes desktop + mobiel (alle routes: /, /contingent/:id, /about)
 - [ ] Sitemap / routing structure
 - [ ] Componentendiagram (React architectuur incl. Router, ErrorBoundary, Context, Hook)
