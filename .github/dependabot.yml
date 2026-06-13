@@ -1,0 +1,35 @@
+# Dependabot configuration — opens automated dependency-update PRs.
+# Dependabot reads this from the repository's DEFAULT branch (main).
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+version: 2
+updates:
+  # JavaScript / TypeScript dependencies (root package.json + package-lock.json)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    groups:
+      # Bundle all minor + patch bumps into ONE weekly PR to keep review
+      # noise low. Major bumps still arrive as separate PRs so potential
+      # breaking changes stay visible.
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+
+  # When a CI workflow is added (see verbetervoorstel VV-27), enable
+  # GitHub Actions updates too by uncommenting the block below:
+  # - package-ecosystem: "github-actions"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "weekly"
