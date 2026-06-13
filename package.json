@@ -48,7 +48,7 @@
     "@mui/icons-material": "^5.18.0",
     "@mui/material": "^5.18.0",
     "apexcharts": "^5.10.4",
-    "axios": "^1.13.6",
+    "axios": "^1.16.0",
     "react": "^18.3.1",
     "react-apexcharts": "^2.1.0",
     "react-dom": "^18.3.1",
