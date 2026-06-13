@@ -56,6 +56,12 @@ export interface ErrorCode {
   code: string;
   message: string;
   severity: 'low' | 'warning' | 'high' | 'critical' | 'error' | string;
+  /**
+   * ISO date string of when the storing was first detected.
+   * Optional — the Hupie API does not currently expose detection
+   * timestamps. Used to derive the resolve-by horizon (oplostermijn).
+   */
+  detectedAt?: string;
 }
 
 export type ConnectionState = 'connected' | 'disconnected' | 'unknown';
