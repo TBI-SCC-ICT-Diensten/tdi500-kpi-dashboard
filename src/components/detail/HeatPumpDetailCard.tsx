@@ -16,6 +16,15 @@ import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
 import { PROPERTY_LABEL_MAP } from '../../types/units';
 import type { HeatPumpSystem, SupplyTemperatureClass } from '../../types/heatpump';
 import { estimateExpectedCop } from '../../services/weatherService';
+import { bepaalOplostermijn, type Oplostermijn } from '../../utils/oplostermijn';
+
+/**
+ * Kleur voor het oplostermijn-label: 'open' is neutraal/amber, terwijl
+ * 'direct' en 'overschreden' urgent (rood) zijn — consistent met de
+ * ernst-badges hierboven.
+ */
+const oplostermijnKleur = (status: Oplostermijn['status']): string =>
+  status === 'open' ? '#D97706' : '#DC2626';
 
 type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
 
@@ -304,6 +313,8 @@ const HeatPumpDetailCard = ({
         <Box sx={{ mt: 1, mb: 0.5 }}>
           {heatPump.errorCodes.map((ec) => {
             const sev = getSeveritySx(ec.severity, isDark);
+            const termijn = bepaalOplostermijn(ec.severity, ec.detectedAt);
+            const termijnKleur = oplostermijnKleur(termijn.status);
             return (
               <Box key={ec.code}
                 data-testid="pump-error-code"
@@ -327,6 +338,15 @@ const HeatPumpDetailCard = ({
                       {ec.message}
                     </Typography>
                   )}
+                  <Chip
+                    data-testid="pump-oplostermijn"
+                    label={termijn.label}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      mt: 0.5, height: 18, fontSize: '0.6rem', fontWeight: 600,
+                      borderColor: termijnKleur, color: termijnKleur,
+                    }} />
                 </Box>
                 <Tooltip title={`Ernst: ${ec.severity}`} placement="top">
                   <Chip label={ec.severity} size="small"
@@ -338,6 +358,10 @@ const HeatPumpDetailCard = ({
               </Box>
             );
           })}
+          <Typography variant="caption" color="text.disabled"
+            sx={{ display: 'block', mt: 0.25, fontSize: '0.66rem' }}>
+            Oplostermijn op basis van de ernst van de storing.
+          </Typography>
         </Box>
       )}
 

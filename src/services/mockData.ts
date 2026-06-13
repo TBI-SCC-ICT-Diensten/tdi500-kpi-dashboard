@@ -19,6 +19,15 @@
 
 import type { HeatPumpSystem } from '../types/heatpump';
 
+/**
+ * Mock detectiedatums voor de storingen, relatief aan "nu" berekend bij
+ * het laden van de module zodat de demo altijd verse, zinnige
+ * oplostermijnen toont, ongeacht wanneer hij wordt opgenomen.
+ * Dit zijn MOCK-detectiedatums — geen echte meetdata.
+ */
+const dagenGeleden = (n: number): string =>
+  new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString();
+
 export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
   {
     id: 'mock-pump-01',
@@ -73,6 +82,7 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
         code: 'W042',
         message: 'Aanvoertemperatuur onder setpoint',
         severity: 'warning',
+        detectedAt: dagenGeleden(10), // mock: ~10 dagen geleden → termijn ~20 dagen vooruit
       },
     ],
     heatingCurve: {
@@ -111,11 +121,13 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
         code: 'F101',
         message: 'Waterdruk kritisch laag',
         severity: 'high',
+        detectedAt: dagenGeleden(5), // mock: ~5 dagen geleden → termijn ~2 dagen vooruit (nog open)
       },
       {
         code: 'F042',
         message: 'Temperatuursensor onbetrouwbaar',
         severity: 'critical',
+        detectedAt: dagenGeleden(2), // mock: ~2 dagen geleden → critical = direct te verhelpen
       },
     ],
     heatingCurve: {
