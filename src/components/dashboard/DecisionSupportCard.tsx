@@ -1,4 +1,3 @@
-import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -10,7 +9,6 @@ import Button from '@mui/material/Button';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AssistantIcon from '@mui/icons-material/Assistant';
 import type { KeyPerformanceIndicator, KruisProfielCode } from '../../types/heatpump';
 import type { OverallScore, DecisionScore } from '../../types/decision';
@@ -23,33 +21,11 @@ interface DecisionSupportCardProps {
 
 }
 
-const scoreColor: Record<OverallScore, string> = {
-  good: '#3b6d11',
-  acceptable: '#ba7517',
-  poor: '#a32d2d',
-  'insufficient-data': '#595959',
-};
-
-const scoreBg: Record<OverallScore, string> = {
-  good: '#eaf3de',
-  acceptable: '#faeeda',
-  poor: '#fcebeb',
-  'insufficient-data': '#f2f2f2',
-};
-
 const scoreLabel: Record<OverallScore, string> = {
   good: 'Goed',
   acceptable: 'Acceptabel',
   poor: 'Onvoldoende',
   'insufficient-data': 'Onvoldoende data',
-};
-
-const OverallIcon = ({ score }: { score: OverallScore }) => {
-  const sx = { fontSize: 32, color: scoreColor[score] };
-  if (score === 'good') return <CheckCircleOutlineIcon sx={sx} />;
-  if (score === 'acceptable') return <WarningAmberIcon sx={sx} />;
-  if (score === 'poor') return <ErrorOutlineIcon sx={sx} />;
-  return <HelpOutlineIcon sx={sx} />;
 };
 
 const FactorIcon = ({ score }: { score: DecisionScore['score'] }) => {
