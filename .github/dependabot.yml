@@ -6,6 +6,9 @@ updates:
   # JavaScript / TypeScript dependencies (root package.json + package-lock.json)
   - package-ecosystem: "npm"
     directory: "/"
+    # Open version-update PRs against develop (not the default branch main),
+    # so routine dependency bumps follow the develop -> main release flow.
+    target-branch: "develop"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -26,6 +29,29 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    # Suppress ROUTINE major-version bumps of the core stack — we do these as
+    # deliberate, separate migrations (one library at a time), not weekly bulk.
+    # Security updates are NOT affected by version-update ignores, so real
+    # vulnerability PRs still surface.
+    ignore:
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@mui/material"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@mui/icons-material"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitejs/plugin-react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-router-dom"
+        update-types: ["version-update:semver-major"]
 
   # When a CI workflow is added (see verbetervoorstel VV-27), enable
   # GitHub Actions updates too by uncommenting the block below:
