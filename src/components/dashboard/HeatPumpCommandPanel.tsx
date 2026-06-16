@@ -9,6 +9,7 @@
  * Disabled when heat pump is offline.
  */
 import { useState, useEffect } from 'react';
+import { getErrorMessage } from '../../utils/getErrorMessage';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -111,11 +112,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           'Knop wordt automatisch opnieuw ingeschakeld.'
         );
       } else {
-        setSetpointError(
-          err instanceof Error
-            ? err.message
-            : 'Onbekende fout bij versturen commando.'
-        );
+        setSetpointError(getErrorMessage(err));
       }
     }
   };
@@ -159,11 +156,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           'Knop wordt automatisch opnieuw ingeschakeld.'
         );
       } else {
-        setCurveError(
-          err instanceof Error
-            ? err.message
-            : 'Onbekende fout bij versturen commando.'
-        );
+        setCurveError(getErrorMessage(err));
       }
     }
   };
