@@ -1,5 +1,6 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import { getErrorMessage } from '../../utils/getErrorMessage';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -41,7 +42,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             Er is iets misgegaan
           </Typography>
           <Typography color="text.secondary" sx={{ mb: 2 }}>
-            {this.state.error?.message || 'Onbekende fout'}
+            {getErrorMessage(this.state.error)}
           </Typography>
           <Button
             variant="contained"

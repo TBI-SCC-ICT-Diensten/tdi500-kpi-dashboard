@@ -38,5 +38,3 @@ export const DashboardProvider = ({ children }: DashboardProviderProps) => {
     </DashboardContext.Provider>
   );
 };
-
-export default DashboardProvider;
