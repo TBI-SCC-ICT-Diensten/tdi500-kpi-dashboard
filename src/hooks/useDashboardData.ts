@@ -7,6 +7,7 @@ import { createContingent } from '../services/contingentService';
 import { aggregateKpisForContingent } from '../services/kpiAggregator';
 import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
 import { useDashboardContext } from '../context/DashboardContext';
+import { getErrorMessage } from '../utils/getErrorMessage';
 
 export interface DashboardData {
   heatPumps: HeatPumpSystem[];
@@ -65,7 +66,7 @@ const useDashboardData = (): DashboardData => {
       }
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
-      const message = err instanceof Error ? err.message : String(err);
+      const message = getErrorMessage(err);
       console.error('[useDashboardData] Failed to load heat pump data:', message);
       setError(`Kon warmtepompdata niet ophalen: ${message}`);
       setIsLoading(false);
