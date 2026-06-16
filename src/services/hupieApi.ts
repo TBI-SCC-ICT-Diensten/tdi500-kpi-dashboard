@@ -111,12 +111,21 @@ const hupieUpdateAxios = axios.create({
 
 const handleApiError = (error: unknown, endpoint: string): ApiError => {
   if (axios.isAxiosError(error)) {
+    // Surface the server's real message — the proxy returns { error: "..." } —
+    // instead of the generic "Request failed with status code 500".
+    const data: unknown = error.response?.data;
+    const serverMessage =
+      data && typeof data === 'object' && typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : typeof data === 'string' && data.trim().length > 0
+          ? data
+          : null;
     const apiError: ApiError = {
-      message: error.message,
+      message: serverMessage ?? error.message,
       statusCode: error.response?.status,
       endpoint,
     };
-    console.error(`[TDI500 API Error] ${endpoint} (${apiError.statusCode || 'Network/Timeout'}):`, error.message);
+    console.error(`[TDI500 API Error] ${endpoint} (${apiError.statusCode || 'Network/Timeout'}):`, apiError.message);
     return apiError;
   }
   

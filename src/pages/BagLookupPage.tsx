@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react';
+import { getErrorMessage } from '../utils/getErrorMessage';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -101,7 +102,7 @@ const BagLookupPage = () => {
       );
       setBagResult(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Onbekende fout bij ophalen BAG-data.');
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
       setProgress(null);
