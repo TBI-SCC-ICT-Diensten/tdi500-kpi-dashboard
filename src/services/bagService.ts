@@ -4,7 +4,7 @@
  * Three-step automated lookup:
  *   1. PDOK Locatieserver → address validation + nummeraanduiding_id
  *   2. BAG Individuele Bevragingen API → bouwjaar, oppervlakte, gebruiksdoelen
- *      (requires VITE_BAG_API_KEY; CORS header is * so no Vite proxy needed)
+ *      (via the server-side /api/bag proxy, which holds the BAG_API_KEY)
  *   3. EP-online API → energielabel (via Vite proxy to avoid CORS)
  *
  * [BAG-LOOKUP] To remove this feature: delete this file,
@@ -54,7 +54,6 @@ function logApiError(
 }
 
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
-const BAG_API_BASE = 'https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2';
 
 // NOTE: This proxy path only works in Vite dev mode.
 // In production, /ep-online requests will 404 unless a
@@ -89,18 +88,15 @@ export interface LookupProgress {
 }
 
 /**
- * Fetches bouwjaar and oppervlakte from the BAG Individuele Bevragingen API.
+ * Fetches bouwjaar and oppervlakte from the BAG Individuele Bevragingen API
+ * via the server-side proxy (api/bag.ts), which holds the BAG_API_KEY.
  * Uses /adressenuitgebreid which returns all needed fields in a single call.
- *
- * Requires VITE_BAG_API_KEY environment variable.
- * CORS header is * so no Vite proxy is needed.
  *
  * @param postcode - Dutch postcode without spaces (e.g. "3012KN")
  * @param huisnummer - House number as string (e.g. "180")
  * @returns bouwjaar, oppervlakte, gebruiksdoelen or null if not found
  *
- * Source: BAG Individuele Bevragingen API v2
- * https://api.bag.kadaster.nl/lvbag/individuelebevragingen/v2/adressenuitgebreid
+ * Source: BAG Individuele Bevragingen API v2 (adressenuitgebreid)
  */
 export async function fetchBagApiData(postcode: string, huisnummer: string): Promise<{
   bouwjaar: number | null;
@@ -108,22 +104,11 @@ export async function fetchBagApiData(postcode: string, huisnummer: string): Pro
   gebruiksdoelen: string[];
   rdCoordinates: [number, number] | null;
 } | null> {
-  const apiKey = import.meta.env['VITE_BAG_API_KEY'] as string | undefined;
-  if (!apiKey) {
-    console.warn('[bagService] VITE_BAG_API_KEY not set — BAG lookup skipped');
-    return null;
-  }
-
   const postcodeClean = postcode.replace(/\s+/g, '').toUpperCase();
-  const url = `${BAG_API_BASE}/adressenuitgebreid?postcode=${postcodeClean}&huisnummer=${encodeURIComponent(huisnummer)}&exacteMatch=true`;
+  // Calls the server-side proxy (api/bag.ts), which attaches the BAG X-Api-Key.
+  const url = `/api/bag?postcode=${postcodeClean}&huisnummer=${encodeURIComponent(huisnummer)}&exacteMatch=true`;
 
-  const response = await axios.get(url, {
-    headers: {
-      'X-Api-Key': apiKey,
-      'Accept': 'application/hal+json',
-      'Accept-Crs': 'epsg:28992',
-    },
-  });
+  const response = await axios.get(url);
 
   const adressen = response.data?._embedded?.adressen;
   if (!adressen || adressen.length === 0) {
