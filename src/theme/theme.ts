@@ -62,5 +62,3 @@ export const createAppTheme = (mode: PaletteMode) =>
       },
     },
   });
-
-export default createAppTheme('light');
