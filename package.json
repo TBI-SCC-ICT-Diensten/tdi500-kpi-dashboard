@@ -32,7 +32,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^25.9.3",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vercel/node": "^5.8.17",
     "@vitejs/plugin-react": "^4.7.0",
@@ -49,7 +49,7 @@
     "@mui/material": "^5.18.0",
     "apexcharts": "^5.15.0",
     "axios": "^1.18.0",
-    "react": "^18.3.1",
+    "react": "^19.2.7",
     "react-apexcharts": "^2.1.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.3"
