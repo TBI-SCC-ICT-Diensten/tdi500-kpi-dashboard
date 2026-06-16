@@ -10,12 +10,12 @@ type HupieHandlers = {
 };
 
 /**
- * Installs interception for all Hupie /hupie/query/ requests.
+ * Installs interception for all Hupie proxy (/api/hupie) requests.
  * Branches list vs detail on the SPARQL body (detail has 'VALUES ?id').
  * Call BEFORE page.goto so the app's first request is intercepted.
  */
 export async function interceptHupie(page: Page, handlers: HupieHandlers): Promise<void> {
-  await page.route('**/hupie/query/**', async (route: Route) => {
+  await page.route('**/api/hupie**', async (route: Route) => {
     if (handlers.failWith?.abort) {
       await route.abort('failed');
       return;
