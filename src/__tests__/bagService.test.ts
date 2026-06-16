@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import axios from 'axios';
 import {
   mapBouwjaarToInsulation,
@@ -121,12 +121,7 @@ describe('fetchBagApiData', () => {
     },
   };
 
-  beforeEach(() => {
-    vi.stubEnv('VITE_BAG_API_KEY', 'test-api-key');
-  });
-
   afterEach(() => {
-    vi.unstubAllEnvs();
     vi.resetAllMocks();
   });
 
@@ -153,11 +148,12 @@ describe('fetchBagApiData', () => {
     expect(result).toBeNull();
   });
 
-  it('returns null and skips API call when VITE_BAG_API_KEY is not set', async () => {
-    vi.stubEnv('VITE_BAG_API_KEY', '');
-    const result = await fetchBagApiData('1234AB', '1');
-    expect(result).toBeNull();
-    expect(axios.get).not.toHaveBeenCalled();
+  it('calls the /api/bag proxy (key is now attached server-side)', async () => {
+    vi.mocked(axios.get).mockResolvedValueOnce(mockBagApiResponse);
+    await fetchBagApiData('1234AB', '1');
+    expect(vi.mocked(axios.get)).toHaveBeenCalledWith(
+      expect.stringContaining('/api/bag'),
+    );
   });
 
   it('handles non-array oorspronkelijkBouwjaar gracefully', async () => {
@@ -182,7 +178,6 @@ describe('fetchBagApiData', () => {
     await fetchBagApiData('1234 AB', '1');
     expect(vi.mocked(axios.get)).toHaveBeenCalledWith(
       expect.stringContaining('postcode=1234AB'),
-      expect.any(Object),
     );
   });
 
@@ -191,7 +186,6 @@ describe('fetchBagApiData', () => {
     await fetchBagApiData('1234AB', '1');
     expect(vi.mocked(axios.get)).toHaveBeenCalledWith(
       expect.stringContaining('exacteMatch=true'),
-      expect.any(Object),
     );
   });
 });

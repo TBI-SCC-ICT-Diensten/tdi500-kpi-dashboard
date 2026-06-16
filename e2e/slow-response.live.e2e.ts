@@ -5,7 +5,7 @@ test.describe('Slow response (live, intercepted)', () => {
   test('T5.4 — loading spinner shows while response is delayed', async ({ page }) => {
     await seedBeheerderRole(page);
     // Delay the list response by 3s so the loading state is observable
-    await page.route('**/hupie/query/**', async (route) => {
+    await page.route('**/api/hupie**', async (route) => {
       await new Promise((r) => setTimeout(r, 3000));
       await route.fulfill({
         status: 200,

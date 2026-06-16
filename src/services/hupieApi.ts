@@ -78,15 +78,11 @@ const hupieAxios = axios.create({
     'Content-Type': 'application/sparql-query',
     'Accept': 'application/json',
   },
-  params: {
-    token: config.api.apiKey,
-  }
 });
 
 /**
- * Separate Axios instance for per-pump detail queries.
- * Uses a shorter timeout (30s) than the default so that unresponsive
- * pumps fail fast instead of blocking for 100s.
+ * Separate Axios instance for per-pump detail queries (60s timeout, same as
+ * the list client). The /api/hupie proxy holds the token server-side.
  */
 const hupieDetailAxios = axios.create({
   baseURL: config.api.baseUrl,
@@ -95,28 +91,21 @@ const hupieDetailAxios = axios.create({
     'Content-Type': 'application/sparql-query',
     'Accept': 'application/json',
   },
-  params: {
-    token: config.api.apiKey,
-  },
 });
 
 /**
  * Separate Axios instance for SPARQL UPDATE queries.
- * SPARQL UPDATE requires Content-Type: application/sparql-update,
- * which is different from the SELECT client (application/sparql-query).
- * These cannot share an instance because Axios does not support
- * per-request Content-Type overrides cleanly with interceptors.
+ * SPARQL UPDATE requires Content-Type: application/sparql-update, which is
+ * different from the SELECT client (application/sparql-query). The /api/hupie
+ * proxy reads this Content-Type and forwards to the Hupie /update/ endpoint
+ * (reads go to /query/); the token is attached server-side.
  */
 const hupieUpdateAxios = axios.create({
-  // Strip /query or /query/ and explicitly append /update/ with the trailing slash
-  baseURL: config.api.baseUrl.replace(/\/query\/?$/, '/update/').replace(/\/sparql\/?$/, '/update/'),
+  baseURL: config.api.baseUrl,
   timeout: 60000,
   headers: {
     'Content-Type': 'application/sparql-update',
     'Accept': 'application/json',
-  },
-  params: {
-    token: config.api.apiKey,
   },
 });
 

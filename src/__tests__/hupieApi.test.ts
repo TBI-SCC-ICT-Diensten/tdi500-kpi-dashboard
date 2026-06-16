@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 import * as hupieApi from '../services/hupieApi';
 import { config } from '../config';
 
@@ -19,8 +19,9 @@ describe('Hupie API Config', () => {
   it('should export an expected config shape', () => {
     expect(config).toHaveProperty('api');
     expect(config.api).toHaveProperty('baseUrl');
-    expect(config.api).toHaveProperty('apiKey');
     expect(config.api).toHaveProperty('timeout');
+    // VV-26: the client-side API key is gone — the server-side proxy holds it.
+    expect(config.api).not.toHaveProperty('apiKey');
   });
 });
 
