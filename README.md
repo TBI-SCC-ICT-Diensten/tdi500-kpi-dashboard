@@ -1,4 +1,4 @@
-# TDI 500 - Contingency KPI Dashboard (Activity 3.4)
+# TDI 500 - Contingency KPI Dashboard
 
 ## Project Overview
 This repository contains the frontend application for Activity 3.4 of the TDI 500 project.The overarching goal of the TDI 500 consortium is to accelerate the installation of (hybrid) heat pumps to 500 per day. 
@@ -22,6 +22,8 @@ Specifically, Activity 3.4 focuses on optimizing the "contingentenaanpak" (conti
 * **Ontology:** Heatpump Common Ontology (HCO) & ETSI SAREF core extensions
 * **Testing:** Vitest (automated unit tests) + manual functional tests
 * **Error Handling:** React ErrorBoundary with fallback UI
+
+Architecture diagrams (component, sequence, routing, and UML class) are available in [`docs/diagrams/`](docs/diagrams/).
 
 ## Project Structure
 ```
@@ -55,19 +57,20 @@ Ensure you have [Node.js](https://nodejs.org/) installed on your local machine.
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/TBI-SCC-ICT-Diensten/tdi500-kpi-dashboard]
+   git clone https://github.com/TBI-SCC-ICT-Diensten/tdi500-kpi-dashboard.git
+   ```
 2. Navigate to the project directory:
-```bash
+   ```bash
    cd tdi500-kpi-dashboard
-```
+   ```
 3. Install the dependencies:
-```bash
+   ```bash
    npm install
-```
+   ```
 4. Configure your environment variables:
-```bash
+   ```bash
    cp .env.example .env
-```
+   ```
    Then fill in your Hupie API credentials in the `.env` file.
 
 ### Running the Application
@@ -82,35 +85,3 @@ Run the automated unit tests:
 ```bash
 npm run test
 ```
-
-## For Assessors
-
-This project is part of a BPV exam (Proeve van Bekwaamheid) for Software Developer niveau 4.
-
-| Resource | Location |
-|----------|----------|
-| Scrum Board | [GitHub Projects](https://github.com/TBI-SCC-ICT-Diensten/tdi500-kpi-dashboard/projects) |
-| Definition of Done | GitHub Issues (pinned) |
-| User Stories | GitHub Issues #1–#11 with acceptance criteria |
-| Exam Verslag | `/docs/` folder in this repository |
-| Wireframes | `/docs/wireframes/` and Figma |
-
-| | |
-|---|---|
-| **Kandidaat** | Destiny Tiyjudy (redacted) |
-| **Klas** | PALVSOD3B |
-| **Examencode** | SD_SD20_PvB1_B1-K1-2_3v1 |
-| **BPV Bedrijf** | TBI SSC ICT |
-| **Praktijkbegeleider** | Jeroen Pat |
-| **Sprint** | 16 maart – 27 maart 2026 |
-
-| Werkproces | Evidence |
-|-----------|----------|
-| B1-K1-W1: Planning & voortgang | Scrum board, sprint backlog screenshots, daily stand-ups |
-| B1-K1-W2: Ontwerp | Wireframes, component diagram, dataflow diagram, class diagram, justifications |
-| B1-K1-W3: Realiseren | Code, branches, PRs, commit history |
-| B1-K1-W4: Testen | Test plan, Vitest results, manual test screenshots |
-| B1-K1-W5: Verbetervoorstellen | Analysis, proposals, new user stories on backlog |
-| B1-K2-W1: Overleg | Scrum board screenshots, meeting notes |
-| B1-K2-W2: Presentatie | Sprint review / live demo |
-| B1-K2-W3: Reflectie | Retrospective in exam verslag |
