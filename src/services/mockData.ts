@@ -92,8 +92,8 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       slopeUnit: '°C/°C',
     },
     deviceSpecs: {
-      manufacturer: 'Bosch',
-      model: 'Compress 7400i AW',
+      manufacturer: 'Daikin',
+      model: 'Altherma 3 R',
       serialNumber: 'BSH-2020-117834',
       firmwareVersion: '2.8.0',
       yearOfManufacture: 2020,
@@ -138,7 +138,7 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
     },
     deviceSpecs: {
       manufacturer: 'Intergas',
-      model: 'HReco 200',
+      model: 'Xtend',
       serialNumber: 'ITG-2019-003291',
       firmwareVersion: '1.4.7',
       yearOfManufacture: 2019,
@@ -169,8 +169,8 @@ export const MOCK_HEAT_PUMPS: HeatPumpSystem[] = [
       slopeUnit: '°C/°C',
     },
     deviceSpecs: {
-      manufacturer: 'Alklima',
-      model: 'ERST20D-VM2E',
+      manufacturer: 'Triple Solar',
+      model: 'PVT-warmtepomp 3.5',
       serialNumber: 'ALK-2023-209156',
       firmwareVersion: '4.0.1',
       yearOfManufacture: 2023,
