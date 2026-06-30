@@ -12,7 +12,9 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:live": "playwright test --project=chromium-live",
-    "build:check": "tsc --noEmit && npm run build"
+    "build:check": "tsc --noEmit && npm run build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -21,13 +23,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/TBI-SCC-ICT-Diensten/tdi500-kpi-dashboard/issues"
   },
   "homepage": "https://github.com/TBI-SCC-ICT-Diensten/tdi500-kpi-dashboard#readme",
   "devDependencies": {
     "@emotion/babel-plugin": "^11.13.5",
+    "@eslint/js": "9.39.4",
     "@playwright/test": "^1.61.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -37,8 +40,14 @@
     "@vercel/node": "^5.8.22",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "9.39.4",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.3",
+    "globals": "17.7.0",
     "jsdom": "^29.1.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "8.62.1",
     "vite": "^6.4.3",
     "vitest": "^4.1.0"
   },
