@@ -41,6 +41,7 @@ import type {
   HeatPumpSystem,
   CommandStatus,
 } from '../../types/heatpump';
+import { COMMAND_RANGES } from '../../config/commandRanges';
 
 interface Props {
   heatPump: HeatPumpSystem;
@@ -138,7 +139,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       setSetpointError('Voer een geldig getal in.');
       return;
     }
-    if (parsed < 10 || parsed > 30) {
+    if (parsed < COMMAND_RANGES.setpoint.min || parsed > COMMAND_RANGES.setpoint.max) {
       setSetpointError('Setpoint moet tussen 10°C en 30°C liggen.');
       return;
     }
@@ -200,11 +201,11 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       setCurveError('Voer een geldige hellingswaarde in.');
       return;
     }
-    if (base < 20 || base > 60) {
+    if (base < COMMAND_RANGES.curveBase.min || base > COMMAND_RANGES.curveBase.max) {
       setCurveError('Basiswaarde moet tussen 20°C en 60°C liggen (aanvoertemperatuur).');
       return;
     }
-    if (slope < -4.0 || slope > -0.1) {
+    if (slope < COMMAND_RANGES.curveSlope.min || slope > COMMAND_RANGES.curveSlope.max) {
       setCurveError('Hellingswaarde moet tussen −4,0 en −0,1 liggen (Hupie-conventie).');
       return;
     }
@@ -281,7 +282,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               sx={{ width: 130 }}
               disabled={isOffline || setpointStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.5' }}
-              helperText="10–30°C"
+              helperText={`${COMMAND_RANGES.setpoint.min}–${COMMAND_RANGES.setpoint.max}°C`}
             />
             <Button
               variant="contained"
@@ -341,7 +342,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               sx={{ width: 110 }}
               disabled={isOffline || curveStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.5' }}
-              helperText="bijv. 40°C (20–60)"
+              helperText={`bijv. 40°C (${COMMAND_RANGES.curveBase.min}–${COMMAND_RANGES.curveBase.max})`}
             />
             <TextField
               label="Helling"

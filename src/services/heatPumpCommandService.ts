@@ -4,6 +4,7 @@ import {
   SPARQL_SET_TEMPERATURE_SETPOINT,
 } from './sparqlQueries';
 import type { HeatingCurveCommand, TemperatureSetpointCommand } from '../types/heatpump';
+import { COMMAND_RANGES } from '../config/commandRanges';
 
 /**
  * Validates that a heat pump ID is a non-empty string.
@@ -59,8 +60,8 @@ export const setHeatingCurve = async (command: HeatingCurveCommand): Promise<voi
   validateId(command.heatPumpId);
   validateNumeric(command.baseValue, 'baseValue');
   validateNumeric(command.slopeValue, 'slopeValue');
-  validateRange(command.baseValue, 20, 60, 'baseValue');
-  validateRange(command.slopeValue, -4.0, -0.1, 'slopeValue');
+  validateRange(command.baseValue, COMMAND_RANGES.curveBase.min, COMMAND_RANGES.curveBase.max, 'baseValue');
+  validateRange(command.slopeValue, COMMAND_RANGES.curveSlope.min, COMMAND_RANGES.curveSlope.max, 'slopeValue');
 
   const query = SPARQL_SET_HEATING_CURVE(
     command.heatPumpId,
@@ -86,7 +87,7 @@ export const setTemperatureSetpoint = async (
 ): Promise<void> => {
   validateId(command.heatPumpId);
   validateNumeric(command.value, 'value');
-  validateRange(command.value, 10, 30, 'value');
+  validateRange(command.value, COMMAND_RANGES.setpoint.min, COMMAND_RANGES.setpoint.max, 'value');
 
   const query = SPARQL_SET_TEMPERATURE_SETPOINT(command.heatPumpId, command.value);
 

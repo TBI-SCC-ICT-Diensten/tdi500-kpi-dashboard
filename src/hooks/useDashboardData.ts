@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { HeatPumpSystem, Contingent, KeyPerformanceIndicator, KruisProfielCode } from '../types/heatpump';
-import { isValidKruisProfielCode } from '../types/heatpump';
+import { isValidKruisProfielCode, DEFAULT_KRUISPROFIEL_CODE, buildContingentId } from '../types/heatpump';
 import { fetchAllHeatPumpData, subscribeToDataSource } from '../services/hupieApi';
 import { createContingent } from '../services/contingentService';
 import { aggregateKpisForContingent } from '../services/kpiAggregator';
@@ -100,8 +100,8 @@ const useDashboardData = (): DashboardData => {
     const candidateCode = `${isolatieniveau}${aanvoertemp}`;
     const kruisProfielCode: KruisProfielCode = isValidKruisProfielCode(candidateCode)
       ? candidateCode
-      : 'B2'; // fallback to default profiel if URL params are invalid
-    const contingentId = `contingent-${kruisProfielCode}`;
+      : DEFAULT_KRUISPROFIEL_CODE; // fallback to default profiel if URL params are invalid
+    const contingentId = buildContingentId(kruisProfielCode);
 
     // Filter heat pumps properly under this specific Kruisprofiel code.
     // Pumps without an assigned code are included (API hasn't mapped yet).
