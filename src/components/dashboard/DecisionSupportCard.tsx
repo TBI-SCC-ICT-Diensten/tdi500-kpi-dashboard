@@ -10,7 +10,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import AssistantIcon from '@mui/icons-material/Assistant';
-import type { KeyPerformanceIndicator, KruisProfielCode } from '../../types/heatpump';
+import { DEFAULT_KRUISPROFIEL_CODE, type KeyPerformanceIndicator, type KruisProfielCode } from '../../types/heatpump';
 import type { OverallScore, DecisionScore } from '../../types/decision';
 import { evaluateContingent } from '../../services/decisionEngine';
 import { useDashboardContext } from '../../context/DashboardContext';
@@ -44,7 +44,7 @@ const factorScoreLabel: Record<DecisionScore['score'], string> = {
 
 const DecisionSupportCard = ({
   kpis = [],
-  kruisProfielCode = 'B2',
+  kruisProfielCode = DEFAULT_KRUISPROFIEL_CODE,
 
 }: DecisionSupportCardProps) => {
   const { state } = useDashboardContext();

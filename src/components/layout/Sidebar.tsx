@@ -15,6 +15,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDashboardContext } from '../../context/DashboardContext';
 import { useRole } from '../../context/RoleContext';
 import type { Role } from '../../context/RoleContext';
+import { DEFAULT_KRUISPROFIEL_CODE, buildContingentId } from '../../types/heatpump';
 import type React from 'react';
 
 interface SidebarProps {
@@ -70,7 +71,7 @@ const Sidebar = ({ width, mobileOpen, onClose }: SidebarProps) => {
   const { role } = useRole();
   const primary = theme.palette.primary.main;
 
-  const contingentId = state.selectedContingentId || 'contingent-B2';
+  const contingentId = state.selectedContingentId || buildContingentId(DEFAULT_KRUISPROFIEL_CODE);
 
   const drawerContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
