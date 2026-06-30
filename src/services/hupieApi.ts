@@ -233,6 +233,21 @@ export const fetchAllHeatPumpData = async (
  * Returns Promise<void>.
  */
 export const executeSparqlUpdate = async (query: string): Promise<void> => {
+  // Mock-mode guard — mirrors the read-path short-circuit in fetchAllHeatPumpData.
+  // A SET/UPDATE has no manufacturer mock to write to, so in mock mode we SIMULATE:
+  // log the would-be SPARQL UPDATE (the parsed values are embedded in it) and
+  // return success WITHOUT any network call. Enforced here, at the lowest write
+  // chokepoint, so no caller can reach a real pump while the dashboard is in mock
+  // mode (the read path guards the same way at fetchAllHeatPumpData).
+  if (currentDataSource === 'mock') {
+    console.info(
+      '[hupieApi] Mock-modus — gesimuleerde schrijfactie, GEEN netwerkverzoek verzonden.\n' +
+      'Onderstaande SPARQL UPDATE zou naar de Hupie API zijn verstuurd:\n' +
+      query
+    );
+    return; // simulated success — same return shape (void) as a real write
+  }
+
   let response;
   try {
     response = await hupieUpdateAxios.post('', query);
