@@ -55,11 +55,10 @@ function logApiError(
 
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
 
-// NOTE: This proxy path only works in Vite dev mode.
-// In production, /ep-online requests will 404 unless a
-// server-side proxy is configured (e.g. nginx, Vercel rewrites).
-// For production deployment, move EP-online calls to a
-// backend API route that holds the API key server-side.
+// EP-online is reached via the same-origin `/ep-online/*` path. In production
+// vercel.json rewrites it to the api/ep-online.ts serverless function (which
+// holds EP_ONLINE_API_KEY); in Vite dev the server.proxy in vite.config.ts
+// forwards it with the dev VITE_EP_ONLINE_API_KEY.
 const EP_PROXY = '/ep-online/api/v5';
 
 export interface BagResult {

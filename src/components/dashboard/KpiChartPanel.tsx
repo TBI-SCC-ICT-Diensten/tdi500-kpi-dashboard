@@ -1,16 +1,13 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import type { KeyPerformanceIndicator, HeatPumpSystem } from '../../types/heatpump';
+import type { HeatPumpSystem } from '../../types/heatpump';
 import TemperatureTrend from '../charts/TemperatureTrend';
 import EnergyComparison from '../charts/EnergyComparison';
-import type { KruisProfielCode } from '../../types/heatpump';
 import EmptyState from '../common/EmptyState';
 
 interface KpiChartPanelProps {
-  kpis?: KeyPerformanceIndicator[];
   heatPumps?: HeatPumpSystem[];
-  kruisProfielCode?: KruisProfielCode;
 }
 
 const KpiChartPanel = ({
