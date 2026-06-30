@@ -219,9 +219,7 @@ const DashboardPage = () => {
               {/* Charts — full width below the two-column section */}
               <Box sx={{ mt: 3 }}>
                 <KpiChartPanel
-                  kpis={kpis}
                   heatPumps={selectedContingent.heatPumps}
-                  kruisProfielCode={selectedContingent.kruisProfiel.code}
                 />
               </Box>
             </>
