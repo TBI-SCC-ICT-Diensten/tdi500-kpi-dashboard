@@ -178,6 +178,8 @@ export const fetchBagData = async (
       },
       timeout: 10000,
     });
+    // TODO(PR-7 / TYPE-1): type the PDOK response so this boundary isn't `any`.
+    // Until then this suppresses the now-active rule on the untyped axios JSON.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     docs = (pdokResponse.data?.response?.docs ?? []) as Record<string, unknown>[];
   } catch (err) {
