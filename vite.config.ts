@@ -13,11 +13,6 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
-    define: {
-      ...Object.fromEntries(
-        Object.entries(env).map(([k, v]) => [`process.env.${k}`, JSON.stringify(v)])
-      ),
-    },
     server: {
       proxy: {
         // Dev only — production uses api/ep-online.ts serverless function

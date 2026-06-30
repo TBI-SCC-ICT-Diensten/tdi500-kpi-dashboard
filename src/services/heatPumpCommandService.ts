@@ -28,6 +28,26 @@ const validateNumeric = (value: number, fieldName: string): void => {
 };
 
 /**
+ * Validates that a numeric value lies within an inclusive [min, max] range.
+ * Range enforcement lives here (not only in the UI) so the executor receives
+ * an authoritative, validated value — no caller can push an unsafe value to a
+ * live heat pump by bypassing the form. Mirrors the UI ranges in
+ * HeatPumpCommandPanel (defense in depth).
+ */
+const validateRange = (
+  value: number,
+  min: number,
+  max: number,
+  fieldName: string
+): void => {
+  if (value < min || value > max) {
+    throw new Error(
+      `[heatPumpCommandService] ${fieldName} must be between ${min} and ${max}, got: ${value}`
+    );
+  }
+};
+
+/**
  * Sets the heating curve of a specific heat pump via SPARQL UPDATE.
  *
  * @param command - HeatingCurveCommand with heatPumpId, baseValue, slopeValue
@@ -39,6 +59,8 @@ export const setHeatingCurve = async (command: HeatingCurveCommand): Promise<voi
   validateId(command.heatPumpId);
   validateNumeric(command.baseValue, 'baseValue');
   validateNumeric(command.slopeValue, 'slopeValue');
+  validateRange(command.baseValue, 20, 60, 'baseValue');
+  validateRange(command.slopeValue, -4.0, -0.1, 'slopeValue');
 
   const query = SPARQL_SET_HEATING_CURVE(
     command.heatPumpId,
@@ -64,6 +86,7 @@ export const setTemperatureSetpoint = async (
 ): Promise<void> => {
   validateId(command.heatPumpId);
   validateNumeric(command.value, 'value');
+  validateRange(command.value, 10, 30, 'value');
 
   const query = SPARQL_SET_TEMPERATURE_SETPOINT(command.heatPumpId, command.value);
 

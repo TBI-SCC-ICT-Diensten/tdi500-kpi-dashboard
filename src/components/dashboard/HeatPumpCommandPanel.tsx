@@ -19,6 +19,11 @@ import Divider from '@mui/material/Divider';
 import CircularProgress from '@mui/material/CircularProgress';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -26,7 +31,12 @@ import {
   setHeatingCurve,
   setTemperatureSetpoint,
 } from '../../services/heatPumpCommandService';
-import { RateLimitError } from '../../services/hupieApi';
+import {
+  RateLimitError,
+  getDataSource,
+  subscribeToDataSource,
+  type DataSource,
+} from '../../services/hupieApi';
 import type {
   HeatPumpSystem,
   CommandStatus,
@@ -40,6 +50,18 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
   const isOffline = heatPump.status === 'offline';
   const [expanded, setExpanded] = useState(false);
 
+  // Reactive data-source mode — the SAME mechanism the read path uses.
+  // In mock mode the executor SIMULATES writes (no network); we use this to
+  // skip the live confirmation and to surface a clear "no real write" signal.
+  const [dataSource, setDataSourceState] = useState<DataSource>(getDataSource());
+  useEffect(() => subscribeToDataSource(setDataSourceState), []);
+  const isMock = dataSource === 'mock';
+
+  // Shared confirmation dialog for live writes (names pump + value + unit).
+  const [confirm, setConfirm] = useState<
+    null | { title: string; message: string; onConfirm: () => void }
+  >(null);
+
   // ── Temperature setpoint state ───────────────────────────────────
   const currentSetpoint = heatPump.measurements.find(
     (m) => m.property === 'temperatureSetpoint'
@@ -49,6 +71,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
   );
   const [setpointStatus, setSetpointStatus] = useState<CommandStatus>('idle');
   const [setpointError, setSetpointError] = useState<string | null>(null);
+  const [setpointMock, setSetpointMock] = useState(false);
 
   // ── Heating curve state ──────────────────────────────────────────
   const currentCurve = heatPump.heatingCurve;
@@ -60,6 +83,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
   );
   const [curveStatus, setCurveStatus] = useState<CommandStatus>('idle');
   const [curveError, setCurveError] = useState<string | null>(null);
+  const [curveMock, setCurveMock] = useState(false);
 
   // ── Rate-limit cooldown ──────────────────────────────────────────
   // Cooldown after rate limit hit — seconds remaining, shared
@@ -87,21 +111,12 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
   }, [heatPump, currentSetpoint, currentCurve]);
 
   // ── Handlers ─────────────────────────────────────────────────────
-  const handleSetpointSubmit = async () => {
-    const parsed = parseFloat(setpointValue);
-    if (!Number.isFinite(parsed)) {
-      setSetpointError('Voer een geldig getal in.');
-      return;
-    }
-    if (parsed < 10 || parsed > 30) {
-      setSetpointError('Setpoint moet tussen 10°C en 30°C liggen.');
-      return;
-    }
-
+  const submitSetpoint = async (value: number, mock: boolean) => {
     setSetpointStatus('pending');
     setSetpointError(null);
     try {
-      await setTemperatureSetpoint({ heatPumpId: heatPump.id, value: parsed });
+      await setTemperatureSetpoint({ heatPumpId: heatPump.id, value });
+      setSetpointMock(mock);
       setSetpointStatus('success');
     } catch (err) {
       setSetpointStatus('error');
@@ -117,7 +132,63 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
     }
   };
 
-  const handleCurveSubmit = async () => {
+  const handleSetpointSubmit = () => {
+    const parsed = parseFloat(setpointValue);
+    if (!Number.isFinite(parsed)) {
+      setSetpointError('Voer een geldig getal in.');
+      return;
+    }
+    if (parsed < 10 || parsed > 30) {
+      setSetpointError('Setpoint moet tussen 10°C en 30°C liggen.');
+      return;
+    }
+    setSetpointError(null);
+
+    // Mock mode: simulate immediately — the executor blocks the network.
+    if (isMock) {
+      void submitSetpoint(parsed, true);
+      return;
+    }
+    // Live mode: confirm the exact pump + value before sending.
+    setConfirm({
+      title: 'Setpoint instellen',
+      message:
+        `Je staat op het punt om warmtepomp ${heatPump.id} in te stellen op ` +
+        `${parsed} °C. Deze wijziging wordt direct actief op de warmtepomp. ` +
+        `Weet je het zeker?`,
+      onConfirm: () => {
+        setConfirm(null);
+        void submitSetpoint(parsed, false);
+      },
+    });
+  };
+
+  const submitCurve = async (base: number, slope: number, mock: boolean) => {
+    setCurveStatus('pending');
+    setCurveError(null);
+    try {
+      await setHeatingCurve({
+        heatPumpId: heatPump.id,
+        baseValue: base,
+        slopeValue: slope,
+      });
+      setCurveMock(mock);
+      setCurveStatus('success');
+    } catch (err) {
+      setCurveStatus('error');
+      if (err instanceof RateLimitError) {
+        setRateLimitCooldown(30);
+        setCurveError(
+          'Rate limit bereikt — Triple Solar server is tijdelijk bezet. ' +
+          'Knop wordt automatisch opnieuw ingeschakeld.'
+        );
+      } else {
+        setCurveError(getErrorMessage(err));
+      }
+    }
+  };
+
+  const handleCurveSubmit = () => {
     const base = parseFloat(curveBase);
     const slope = parseFloat(curveSlope);
 
@@ -137,28 +208,25 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       setCurveError('Hellingswaarde moet tussen −4,0 en −0,1 liggen (Hupie-conventie).');
       return;
     }
-
-    setCurveStatus('pending');
     setCurveError(null);
-    try {
-      await setHeatingCurve({
-        heatPumpId: heatPump.id,
-        baseValue: base,
-        slopeValue: slope,
-      });
-      setCurveStatus('success');
-    } catch (err) {
-      setCurveStatus('error');
-      if (err instanceof RateLimitError) {
-        setRateLimitCooldown(30);
-        setCurveError(
-          'Rate limit bereikt — Triple Solar server is tijdelijk bezet. ' +
-          'Knop wordt automatisch opnieuw ingeschakeld.'
-        );
-      } else {
-        setCurveError(getErrorMessage(err));
-      }
+
+    // Mock mode: simulate immediately — the executor blocks the network.
+    if (isMock) {
+      void submitCurve(base, slope, true);
+      return;
     }
+    // Live mode: confirm the exact pump + values before sending.
+    setConfirm({
+      title: 'Stooklijn instellen',
+      message:
+        `Je staat op het punt om de stooklijn van warmtepomp ${heatPump.id} in te ` +
+        `stellen op basiswaarde ${base} °C en helling ${slope}. Deze wijziging wordt ` +
+        `direct actief op de warmtepomp. Weet je het zeker?`,
+      onConfirm: () => {
+        setConfirm(null);
+        void submitCurve(base, slope, false);
+      },
+    });
   };
 
   return (
@@ -236,8 +304,10 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           </Box>
 
           {setpointStatus === 'success' && (
-            <Alert severity="success" sx={{ mb: 1, py: 0.25, fontSize: '0.72rem' }}>
-              Setpoint succesvol ingesteld.
+            <Alert severity={setpointMock ? 'info' : 'success'} sx={{ mb: 1, py: 0.25, fontSize: '0.72rem' }}>
+              {setpointMock
+                ? 'Mock-modus — geen echte schrijfactie verzonden (gesimuleerd).'
+                : 'Setpoint succesvol ingesteld.'}
             </Alert>
           )}
           {setpointError && (
@@ -309,8 +379,10 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           </Box>
 
           {curveStatus === 'success' && (
-            <Alert severity="success" sx={{ mt: 0.5, py: 0.25, fontSize: '0.72rem' }}>
-              Stooklijn succesvol ingesteld.
+            <Alert severity={curveMock ? 'info' : 'success'} sx={{ mt: 0.5, py: 0.25, fontSize: '0.72rem' }}>
+              {curveMock
+                ? 'Mock-modus — geen echte schrijfactie verzonden (gesimuleerd).'
+                : 'Stooklijn succesvol ingesteld.'}
             </Alert>
           )}
           {curveError && (
@@ -343,12 +415,26 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             </Box>
           )}
 
-          <Alert severity="info" sx={{ mt: 1.5, py: 0.5, fontSize: '0.72rem' }}>
-            Commando's worden direct via SPARQL UPDATE naar de Hupie API verstuurd.
-            Wijzigingen zijn direct actief op de warmtepomp.
+          <Alert severity={isMock ? 'warning' : 'info'} sx={{ mt: 1.5, py: 0.5, fontSize: '0.72rem' }}>
+            {isMock
+              ? "Mock-modus actief — commando's worden gesimuleerd en niet naar de warmtepomp verstuurd."
+              : "Commando's worden direct via SPARQL UPDATE naar de Hupie API verstuurd. Wijzigingen zijn direct actief op de warmtepomp."}
           </Alert>
         </Box>
       </Collapse>
+
+      <Dialog open={confirm !== null} onClose={() => setConfirm(null)}>
+        <DialogTitle>{confirm?.title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{confirm?.message}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirm(null)}>Annuleren</Button>
+          <Button variant="contained" onClick={() => confirm?.onConfirm()}>
+            Bevestigen
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

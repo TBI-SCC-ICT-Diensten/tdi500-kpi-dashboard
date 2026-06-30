@@ -41,6 +41,20 @@ describe('setHeatingCurve', () => {
     ).rejects.toThrow('slopeValue must be a finite number');
     expect(mockExecuteSparqlUpdate).not.toHaveBeenCalled();
   });
+
+  it('throws and does not call executeSparqlUpdate when baseValue is out of range', async () => {
+    await expect(
+      setHeatingCurve({ heatPumpId: 'abc123', baseValue: 10, slopeValue: -0.5 })
+    ).rejects.toThrow('baseValue must be between 20 and 60');
+    expect(mockExecuteSparqlUpdate).not.toHaveBeenCalled();
+  });
+
+  it('throws and does not call executeSparqlUpdate when slopeValue is out of range', async () => {
+    await expect(
+      setHeatingCurve({ heatPumpId: 'abc123', baseValue: 40, slopeValue: -5 })
+    ).rejects.toThrow('slopeValue must be between -4 and -0.1');
+    expect(mockExecuteSparqlUpdate).not.toHaveBeenCalled();
+  });
 });
 
 describe('setTemperatureSetpoint', () => {
@@ -63,6 +77,13 @@ describe('setTemperatureSetpoint', () => {
     await expect(
       setTemperatureSetpoint({ heatPumpId: 'abc123', value: NaN })
     ).rejects.toThrow('value must be a finite number');
+    expect(mockExecuteSparqlUpdate).not.toHaveBeenCalled();
+  });
+
+  it('throws and does not call executeSparqlUpdate when value is out of range', async () => {
+    await expect(
+      setTemperatureSetpoint({ heatPumpId: 'abc123', value: 40 })
+    ).rejects.toThrow('value must be between 10 and 30');
     expect(mockExecuteSparqlUpdate).not.toHaveBeenCalled();
   });
 });
