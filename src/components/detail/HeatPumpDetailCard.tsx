@@ -17,6 +17,7 @@ import { PROPERTY_LABEL_MAP } from '../../types/units';
 import type { HeatPumpSystem, SupplyTemperatureClass } from '../../types/heatpump';
 import type { Oplostermijn } from '../../utils/oplostermijn';
 import { useHeatPumpDetail } from '../../hooks/useHeatPumpDetail';
+import { STATUS_COLORS } from '../../theme/statusColors';
 
 /**
  * Kleur voor het oplostermijn-label: 'open' is neutraal/amber, terwijl
@@ -24,16 +25,16 @@ import { useHeatPumpDetail } from '../../hooks/useHeatPumpDetail';
  * ernst-badges hierboven.
  */
 const oplostermijnKleur = (status: Oplostermijn['status']): string =>
-  status === 'open' ? '#D97706' : '#DC2626';
+  status === 'open' ? STATUS_COLORS.warning : STATUS_COLORS.danger;
 
 type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
 
 const statusDotColor: Record<PumpStatus, string> = {
-  active: '#16A34A',
-  warning: '#D97706',
-  error: '#DC2626',
-  offline: '#6B7280',
-  unknown: '#6B7280',
+  active: STATUS_COLORS.healthy,
+  warning: STATUS_COLORS.warning,
+  error: STATUS_COLORS.danger,
+  offline: STATUS_COLORS.offline,
+  unknown: STATUS_COLORS.offline,
 };
 
 const statusLabel: Record<PumpStatus, string> = {
@@ -50,14 +51,14 @@ const getSeveritySx = (severity: string, isDark: boolean) => {
     return {
       bg:     isDark ? 'rgba(220,38,38,0.15)'  : '#FEE2E2',
       text:   isDark ? '#FCA5A5'               : '#991B1B',
-      border: '#DC2626',
+      border: STATUS_COLORS.danger,
     };
   }
   if (s === 'warning') {
     return {
       bg:     isDark ? 'rgba(217,119,6,0.15)'  : '#FEF3C7',
       text:   isDark ? '#FCD34D'               : '#92400E',
-      border: '#D97706',
+      border: STATUS_COLORS.warning,
     };
   }
   return {
@@ -89,9 +90,9 @@ const HeatPumpDetailCard = ({
     useHeatPumpDetail(heatPump, outdoorTempCelsius, supplyTemperatureClass);
 
   const copStatusColor: Record<'good' | 'warning' | 'critical', string> = {
-    good:     '#16A34A',
-    warning:  '#D97706',
-    critical: '#DC2626',
+    good:     STATUS_COLORS.healthy,
+    warning:  STATUS_COLORS.warning,
+    critical: STATUS_COLORS.danger,
   };
 
   return (
