@@ -384,3 +384,31 @@ export const deriveKruisProfielCode = (
   const cls = mapAfgifteToClass(afgiftesysteem);
   return `${insulationLevel}${cls}` as KruisProfielCode;
 };
+
+export type InsulationEstimate = ReturnType<typeof mapBouwjaarToInsulation>;
+
+/**
+ * Insulation-estimate precedence (Y-axis of the kruisprofiel):
+ *   1. energielabel (most accurate)  2. BAG bouwjaar  3. manual bouwjaar  4. none.
+ * Extracted verbatim from BagLookupPage's in-render IIFE (PR-10).
+ */
+export const deriveInsulation = (
+  bagResult: BagResult | null,
+  manualBouwjaar: string
+): InsulationEstimate | null => {
+  if (bagResult?.energielabel) {
+    const level = mapEnergielabelToInsulation(bagResult.energielabel);
+    return {
+      level,
+      reason: `Energielabel ${bagResult.energielabel} → isolatieklasse ${level} (nauwkeuriger dan bouwjaar-schatting)`,
+      confidence: 'hoog',
+    };
+  }
+  if (bagResult?.bouwjaar != null) {
+    return mapBouwjaarToInsulation(bagResult.bouwjaar);
+  }
+  if (manualBouwjaar !== '' && !isNaN(Number(manualBouwjaar))) {
+    return mapBouwjaarToInsulation(Number(manualBouwjaar));
+  }
+  return null;
+};

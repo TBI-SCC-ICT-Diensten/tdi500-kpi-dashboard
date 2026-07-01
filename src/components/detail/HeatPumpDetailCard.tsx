@@ -15,8 +15,8 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
 import { PROPERTY_LABEL_MAP } from '../../types/units';
 import type { HeatPumpSystem, SupplyTemperatureClass } from '../../types/heatpump';
-import { estimateExpectedCop } from '../../services/weatherService';
-import { bepaalOplostermijn, type Oplostermijn } from '../../utils/oplostermijn';
+import type { Oplostermijn } from '../../utils/oplostermijn';
+import { useHeatPumpDetail } from '../../hooks/useHeatPumpDetail';
 
 /**
  * Kleur voor het oplostermijn-label: 'open' is neutraal/amber, terwijl
@@ -85,32 +85,8 @@ const HeatPumpDetailCard = ({
   const hasSpecs = specs && Object.values(specs).some(Boolean);
   const status = heatPump.status as PumpStatus;
 
-  // Expected COP based on outdoor temp + supply class
-  // Only calculated when we have outdoor temperature context
-  const copMeasurement = heatPump.measurements.find(
-    (m) => m.property === 'cop'
-  );
-  const actualCop = copMeasurement?.value ?? null;
-
-  const expectedCop =
-    outdoorTempCelsius !== undefined && supplyTemperatureClass
-      ? estimateExpectedCop(outdoorTempCelsius, supplyTemperatureClass)
-      : null;
-
-  // COP status: how does actual compare to expected?
-  const copDelta =
-    actualCop !== null && expectedCop !== null
-      ? actualCop - expectedCop
-      : null;
-
-  const copStatus: 'good' | 'warning' | 'critical' | null =
-    copDelta === null
-      ? null
-      : copDelta >= -0.3
-      ? 'good'       // within 0.3 of expected or above
-      : copDelta >= -0.8
-      ? 'warning'    // 0.3–0.8 below expected
-      : 'critical';  // more than 0.8 below expected
+  const { expectedCop, copDelta, copStatus, errorCodes } =
+    useHeatPumpDetail(heatPump, outdoorTempCelsius, supplyTemperatureClass);
 
   const copStatusColor: Record<'good' | 'warning' | 'critical', string> = {
     good:     '#16A34A',
@@ -309,11 +285,10 @@ const HeatPumpDetailCard = ({
       )}
 
       {/* ── Error codes ───────────────────────────────────────────── */}
-      {heatPump.errorCodes.length > 0 && (
+      {errorCodes.length > 0 && (
         <Box sx={{ mt: 1, mb: 0.5 }}>
-          {heatPump.errorCodes.map((ec) => {
+          {errorCodes.map(({ errorCode: ec, termijn }) => {
             const sev = getSeveritySx(ec.severity, isDark);
-            const termijn = bepaalOplostermijn(ec.severity, ec.detectedAt);
             const termijnKleur = oplostermijnKleur(termijn.status);
             return (
               <Box key={ec.code}
