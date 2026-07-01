@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 import type { PaletteMode } from '@mui/material';
+import { STATUS_COLORS } from './statusColors';
 
 export const createAppTheme = (mode: PaletteMode) =>
   createTheme({
@@ -18,17 +19,17 @@ export const createAppTheme = (mode: PaletteMode) =>
         contrastText: '#ffffff',
       },
       error: {
-        main:  '#DC2626',
+        main:  STATUS_COLORS.danger,
         light: '#FEE2E2',
         dark:  '#991B1B',
       },
       warning: {
-        main:  '#D97706',
+        main:  STATUS_COLORS.warning,
         light: '#FEF3C7',
         dark:  '#92400E',
       },
       success: {
-        main:  '#16A34A',
+        main:  STATUS_COLORS.healthy,
         light: '#DCFCE7',
         dark:  '#14532D',
       },

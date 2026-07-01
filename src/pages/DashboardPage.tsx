@@ -14,11 +14,15 @@ import CopGauge from '../components/charts/CopGauge';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
 import { useRole } from '../context/RoleContext';
+import { STATUS_COLORS } from '../theme/statusColors';
 
 const STATUS_DOT: Record<string, string> = {
-  active:  '#16A34A',
-  warning: '#D97706',
-  error:   '#DC2626',
+  active:  STATUS_COLORS.healthy,
+  warning: STATUS_COLORS.warning,
+  error:   STATUS_COLORS.danger,
+  // Off-palette grijs (#4B5563 = grijs-600) — wijkt af van de canonieke
+  // STATUS_COLORS.offline (#6B7280). Bewust NIET geunificeerd: dat zou de
+  // gerenderde kleur wijzigen (deze PR is een no-op). Zie PR-notitie.
   offline: '#4B5563',
   unknown: '#4B5563',
 };
