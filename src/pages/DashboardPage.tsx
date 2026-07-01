@@ -13,7 +13,6 @@ import DecisionSupportCard from '../components/dashboard/DecisionSupportCard';
 import CopGauge from '../components/charts/CopGauge';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
-import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
 import { useRole } from '../context/RoleContext';
 
 const STATUS_DOT: Record<string, string> = {
@@ -32,13 +31,10 @@ const DashboardPage = () => {
     contingents,
     selectedContingent,
     kpis,
+    minCop,
     isLoading,
     error,
   } = useDashboardData();
-
-  const minCop = selectedContingent
-    ? SCORING_THRESHOLDS_BY_PROFIEL[selectedContingent.kruisProfiel.code].minCop
-    : 2.5;
 
   const currentIsolatie = searchParams.get('isolatie') ?? 'B';
   const currentAanvoer = searchParams.get('aanvoer') ?? '2';

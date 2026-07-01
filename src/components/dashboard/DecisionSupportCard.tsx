@@ -12,8 +12,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import AssistantIcon from '@mui/icons-material/Assistant';
 import { DEFAULT_KRUISPROFIEL_CODE, type KeyPerformanceIndicator, type KruisProfielCode } from '../../types/heatpump';
 import type { OverallScore, DecisionScore } from '../../types/decision';
-import { evaluateContingent } from '../../services/decisionEngine';
-import { useDashboardContext } from '../../context/DashboardContext';
+import { useDecisionSupport } from '../../hooks/useDecisionSupport';
 
 interface DecisionSupportCardProps {
   kpis?: KeyPerformanceIndicator[];
@@ -47,11 +46,8 @@ const DecisionSupportCard = ({
   kruisProfielCode = DEFAULT_KRUISPROFIEL_CODE,
 
 }: DecisionSupportCardProps) => {
-  const { state } = useDashboardContext();
-  const recommendation = evaluateContingent(kpis, kruisProfielCode);
-  const { overallScore, summary, details, suggestedAction } = recommendation;
-  
-  const profileCode = state.selectedContingentId ? state.selectedContingentId.replace('contingent-', '') : null;
+  const { overallScore, summary, details, suggestedAction, profileCode } =
+    useDecisionSupport(kpis, kruisProfielCode);
 
   return (
     <Paper data-testid="decision-card" variant="outlined" sx={{ p: 2 }}>
