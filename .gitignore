@@ -11,6 +11,9 @@ Claude.md
 .vite
 coverage
 
+# Azure Functions local settings (never commit secrets)
+local.settings.json
+
 # Obsidian per-machine state
 docs/vault/.obsidian/workspace.json
 docs/vault/.obsidian/workspace-mobile.json

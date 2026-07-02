@@ -55,11 +55,15 @@ function logApiError(
 
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
 
-// EP-online is reached via the same-origin `/ep-online/*` path. In production
-// vercel.json rewrites it to the api/ep-online.ts serverless function (which
-// holds EP_ONLINE_API_KEY); in Vite dev the server.proxy in vite.config.ts
-// forwards it with the dev VITE_EP_ONLINE_API_KEY.
-const EP_PROXY = '/ep-online/api/v5';
+// EP-online is reached via the server-side proxy (which holds EP_ONLINE_API_KEY).
+// Production build: call the function directly as `/api/ep-online?subpath=api/v5/...`
+// (passing the subpath as a query param). This works on Vercel today AND on Azure
+// Static Web Apps + BYOF, with no host rewrite needed. Vite dev: the server.proxy in
+// vite.config.ts forwards `/ep-online/*` with the dev VITE_EP_ONLINE_API_KEY, so keep
+// that path locally. Static `import.meta.env.DEV` access (no whole-env inlining — #138).
+const EP_PROXY = import.meta.env.DEV
+  ? '/ep-online/api/v5'
+  : '/api/ep-online?subpath=api/v5';
 
 export interface BagResult {
   // From PDOK
