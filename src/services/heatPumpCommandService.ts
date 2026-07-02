@@ -1,8 +1,4 @@
-import { executeSparqlUpdate } from './hupieApi';
-import {
-  SPARQL_SET_HEATING_CURVE,
-  SPARQL_SET_TEMPERATURE_SETPOINT,
-} from './sparqlQueries';
+import { executeCommand } from './hupieApi';
 import type { HeatingCurveCommand, TemperatureSetpointCommand } from '../types/heatpump';
 import { COMMAND_RANGES } from '../config/commandRanges';
 
@@ -63,14 +59,13 @@ export const setHeatingCurve = async (command: HeatingCurveCommand): Promise<voi
   validateRange(command.baseValue, COMMAND_RANGES.curveBase.min, COMMAND_RANGES.curveBase.max, 'baseValue');
   validateRange(command.slopeValue, COMMAND_RANGES.curveSlope.min, COMMAND_RANGES.curveSlope.max, 'slopeValue');
 
-  const query = SPARQL_SET_HEATING_CURVE(
-    command.heatPumpId,
-    command.baseValue,
-    command.slopeValue
-  );
-
   console.log(`[TDI500] setHeatingCurve: sending command for heat pump ${command.heatPumpId}`);
-  await executeSparqlUpdate(query);
+  await executeCommand({
+    command: 'heating-curve',
+    id: command.heatPumpId,
+    base: command.baseValue,
+    slope: command.slopeValue,
+  });
   console.log(`[TDI500] setHeatingCurve: success for heat pump ${command.heatPumpId}`);
 };
 
@@ -89,12 +84,10 @@ export const setTemperatureSetpoint = async (
   validateNumeric(command.value, 'value');
   validateRange(command.value, COMMAND_RANGES.setpoint.min, COMMAND_RANGES.setpoint.max, 'value');
 
-  const query = SPARQL_SET_TEMPERATURE_SETPOINT(command.heatPumpId, command.value);
-
   console.log(
     `[TDI500] setTemperatureSetpoint: sending command for heat pump ${command.heatPumpId}`
   );
-  await executeSparqlUpdate(query);
+  await executeCommand({ command: 'setpoint', id: command.heatPumpId, value: command.value });
   console.log(
     `[TDI500] setTemperatureSetpoint: success for heat pump ${command.heatPumpId}`
   );
