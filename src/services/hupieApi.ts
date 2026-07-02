@@ -94,17 +94,17 @@ const hupieDetailAxios = axios.create({
 });
 
 /**
- * Separate Axios instance for SPARQL UPDATE queries.
- * SPARQL UPDATE requires Content-Type: application/sparql-update, which is
- * different from the SELECT client (application/sparql-query). The /api/hupie
- * proxy reads this Content-Type and forwards to the Hupie /update/ endpoint
- * (reads go to /query/); the token is attached server-side.
+ * Separate Axios instance for structured WRITE commands (RSEC-1). Writes are sent
+ * as application/json ({command, id, value | base, slope}); the /api/hupie proxy
+ * validates + builds the SPARQL UPDATE server-side and forwards it to /update/. A
+ * raw SPARQL UPDATE string is no longer sent by the client (and is rejected by the
+ * proxy). The token is attached server-side.
  */
-const hupieUpdateAxios = axios.create({
+const hupieCommandAxios = axios.create({
   baseURL: config.api.baseUrl,
   timeout: 60000,
   headers: {
-    'Content-Type': 'application/sparql-update',
+    'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
 });
@@ -226,18 +226,42 @@ export const fetchAllHeatPumpData = async (
 };
 
 /**
- * Executes a SPARQL UPDATE query against the Hupie endpoint.
+ * The structured write commands the proxy accepts. The client never sends raw
+ * SPARQL; the server validates these params and builds the allow-listed SPARQL
+ * UPDATE server-side (RSEC-1), so an arbitrary UPDATE is unrepresentable here.
+ */
+export type HupieWriteCommand =
+  | { command: 'setpoint'; id: string; value: number }
+  | { command: 'heating-curve'; id: string; base: number; slope: number };
+
+/**
+ * Sends a structured inregel command to the Hupie write proxy.
  * Used for write operations: SET heating curve, SET temperature setpoint.
  *
- * SPARQL UPDATE returns no result body on success (HTTP 200/204).
- * Returns Promise<void>.
+ * Mock-mode guard (#138) — mirrors the read-path short-circuit in
+ * fetchAllHeatPumpData. In mock mode we SIMULATE: log the intended command and
+ * return success WITHOUT any network call, so no caller can reach a real pump while
+ * the dashboard is in mock mode.
+ *
+ * On a live write the proxy forwards the upstream response; Hupie signals a
+ * rate-limit / manufacturer-server condition as HTTP 200 with an error string in
+ * the body, so we parse it and surface RateLimitError / ManufacturerServerError.
  */
-export const executeSparqlUpdate = async (query: string): Promise<void> => {
+export const executeCommand = async (command: HupieWriteCommand): Promise<void> => {
+  if (currentDataSource === 'mock') {
+    console.info(
+      '[hupieApi] Mock-modus — gesimuleerde schrijfactie, GEEN netwerkverzoek verzonden.\n' +
+      'Onderstaand commando zou naar de Hupie API zijn verstuurd:\n' +
+      JSON.stringify(command)
+    );
+    return; // simulated success — same return shape (void) as a real write
+  }
+
   let response;
   try {
-    response = await hupieUpdateAxios.post('', query);
+    response = await hupieCommandAxios.post('', command);
   } catch (error) {
-    throw handleApiError(error, 'POST sparql-update');
+    throw handleApiError(error, 'POST hupie-command');
   }
 
   // Hupie returns HTTP 200 even when the manufacturer's server

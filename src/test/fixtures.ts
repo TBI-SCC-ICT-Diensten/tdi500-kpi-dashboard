@@ -8,7 +8,6 @@
 
 import type {
   HeatPumpSystem,
-  Measurement,
   KeyPerformanceIndicator,
   KpiStatus,
 } from '../types/heatpump';
@@ -54,19 +53,6 @@ export function makeHeatPump(
     },
     ...overrides,
   };
-}
-
-/**
- * Builds a single Measurement with the given property/value/unit.
- * rawUnit defaults to the unit string if not provided.
- */
-export function makeMeasurement(
-  property: Measurement['property'],
-  value: number,
-  unit: string,
-  rawUnit?: string
-): Measurement {
-  return { property, value, unit, rawUnit: rawUnit ?? unit };
 }
 
 /**
@@ -119,24 +105,6 @@ export function makeKpis(overrides: {
       status: overrides.inregelStatus ?? 'good',
       description: 'Placeholder',
     },
-  ];
-}
-
-/**
- * Builds a mixed set of pumps (active/warning/error/offline)
- * suitable for exercising contingent rollup logic.
- */
-export function makeMixedContingentPumps(): HeatPumpSystem[] {
-  return [
-    makeHeatPump({ id: 'pump-1', status: 'active' }),
-    makeHeatPump({ id: 'pump-2', status: 'active' }),
-    makeHeatPump({ id: 'pump-3', status: 'warning' }),
-    makeHeatPump({ id: 'pump-4', status: 'error' }),
-    makeHeatPump({
-      id: 'pump-5',
-      status: 'offline',
-      internetConnection: 'disconnected',
-    }),
   ];
 }
 

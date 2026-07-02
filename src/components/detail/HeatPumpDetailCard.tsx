@@ -15,8 +15,9 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
 import { PROPERTY_LABEL_MAP } from '../../types/units';
 import type { HeatPumpSystem, SupplyTemperatureClass } from '../../types/heatpump';
-import { estimateExpectedCop } from '../../services/weatherService';
-import { bepaalOplostermijn, type Oplostermijn } from '../../utils/oplostermijn';
+import type { Oplostermijn } from '../../utils/oplostermijn';
+import { useHeatPumpDetail } from '../../hooks/useHeatPumpDetail';
+import { STATUS_COLORS } from '../../theme/statusColors';
 
 /**
  * Kleur voor het oplostermijn-label: 'open' is neutraal/amber, terwijl
@@ -24,16 +25,16 @@ import { bepaalOplostermijn, type Oplostermijn } from '../../utils/oplostermijn'
  * ernst-badges hierboven.
  */
 const oplostermijnKleur = (status: Oplostermijn['status']): string =>
-  status === 'open' ? '#D97706' : '#DC2626';
+  status === 'open' ? STATUS_COLORS.warning : STATUS_COLORS.danger;
 
 type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
 
 const statusDotColor: Record<PumpStatus, string> = {
-  active: '#16A34A',
-  warning: '#D97706',
-  error: '#DC2626',
-  offline: '#6B7280',
-  unknown: '#6B7280',
+  active: STATUS_COLORS.healthy,
+  warning: STATUS_COLORS.warning,
+  error: STATUS_COLORS.danger,
+  offline: STATUS_COLORS.offline,
+  unknown: STATUS_COLORS.offline,
 };
 
 const statusLabel: Record<PumpStatus, string> = {
@@ -50,14 +51,14 @@ const getSeveritySx = (severity: string, isDark: boolean) => {
     return {
       bg:     isDark ? 'rgba(220,38,38,0.15)'  : '#FEE2E2',
       text:   isDark ? '#FCA5A5'               : '#991B1B',
-      border: '#DC2626',
+      border: STATUS_COLORS.danger,
     };
   }
   if (s === 'warning') {
     return {
       bg:     isDark ? 'rgba(217,119,6,0.15)'  : '#FEF3C7',
       text:   isDark ? '#FCD34D'               : '#92400E',
-      border: '#D97706',
+      border: STATUS_COLORS.warning,
     };
   }
   return {
@@ -85,37 +86,13 @@ const HeatPumpDetailCard = ({
   const hasSpecs = specs && Object.values(specs).some(Boolean);
   const status = heatPump.status as PumpStatus;
 
-  // Expected COP based on outdoor temp + supply class
-  // Only calculated when we have outdoor temperature context
-  const copMeasurement = heatPump.measurements.find(
-    (m) => m.property === 'cop'
-  );
-  const actualCop = copMeasurement?.value ?? null;
-
-  const expectedCop =
-    outdoorTempCelsius !== undefined && supplyTemperatureClass
-      ? estimateExpectedCop(outdoorTempCelsius, supplyTemperatureClass)
-      : null;
-
-  // COP status: how does actual compare to expected?
-  const copDelta =
-    actualCop !== null && expectedCop !== null
-      ? actualCop - expectedCop
-      : null;
-
-  const copStatus: 'good' | 'warning' | 'critical' | null =
-    copDelta === null
-      ? null
-      : copDelta >= -0.3
-      ? 'good'       // within 0.3 of expected or above
-      : copDelta >= -0.8
-      ? 'warning'    // 0.3–0.8 below expected
-      : 'critical';  // more than 0.8 below expected
+  const { expectedCop, copDelta, copStatus, errorCodes } =
+    useHeatPumpDetail(heatPump, outdoorTempCelsius, supplyTemperatureClass);
 
   const copStatusColor: Record<'good' | 'warning' | 'critical', string> = {
-    good:     '#16A34A',
-    warning:  '#D97706',
-    critical: '#DC2626',
+    good:     STATUS_COLORS.healthy,
+    warning:  STATUS_COLORS.warning,
+    critical: STATUS_COLORS.danger,
   };
 
   return (
@@ -309,11 +286,10 @@ const HeatPumpDetailCard = ({
       )}
 
       {/* ── Error codes ───────────────────────────────────────────── */}
-      {heatPump.errorCodes.length > 0 && (
+      {errorCodes.length > 0 && (
         <Box sx={{ mt: 1, mb: 0.5 }}>
-          {heatPump.errorCodes.map((ec) => {
+          {errorCodes.map(({ errorCode: ec, termijn }) => {
             const sev = getSeveritySx(ec.severity, isDark);
-            const termijn = bepaalOplostermijn(ec.severity, ec.detectedAt);
             const termijnKleur = oplostermijnKleur(termijn.status);
             return (
               <Box key={ec.code}

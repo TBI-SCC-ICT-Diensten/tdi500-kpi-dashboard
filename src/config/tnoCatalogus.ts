@@ -576,6 +576,3 @@ export function getAvailableFabrikanten(code: KruisProfielCode): Fabrikant[] {
     hasAnyValue(profiel[f])
   );
 }
-
-// Re-export FabrikantInstellingen for convenience (imported from types)
-export type { FabrikantInstellingen } from '../types/heatpump';

@@ -1,5 +1,3 @@
-import type { MeasurementProperty } from './heatpump';
-
 export const UNIT_MAP: Record<string, string> = {
   'http://www.ontology-of-units-of-measure.org/resource/om-2/degreeCelsius': '°C',
   'http://www.ontology-of-units-of-measure.org/resource/om-2/kelvin': 'K',
@@ -15,14 +13,6 @@ export const UNIT_MAP: Record<string, string> = {
   'http://www.ontology-of-units-of-measure.org/resource/om-2/pascal': 'Pa',
 
   'http://www.ontology-of-units-of-measure.org/resource/om-2/one': '',
-};
-
-export const PROPERTY_MAP: Record<string, MeasurementProperty> = {
-  'https://www.tno.nl/building/ontology/heatpump-common-ontology#CurrentTemperature': 'roomTemperature',
-  'https://www.tno.nl/building/ontology/heatpump-common-ontology#TemperatureSetpoint': 'temperatureSetpoint',
-  'https://www.tno.nl/building/ontology/heatpump-common-ontology#COP': 'cop',
-  'https://www.tno.nl/building/ontology/heatpump-common-ontology#ElectricityUse': 'energyUsage',
-  'https://saref.etsi.org/saref4watr/FlowPressure': 'waterPressure',
 };
 
 export const PROPERTY_LABEL_MAP: Record<string, string> = {

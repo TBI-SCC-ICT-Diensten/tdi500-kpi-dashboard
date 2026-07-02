@@ -8,8 +8,7 @@
  * Calls heatPumpCommandService which sends SPARQL UPDATE to Hupie API.
  * Disabled when heat pump is offline.
  */
-import { useState, useEffect } from 'react';
-import { getErrorMessage } from '../../utils/getErrorMessage';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -19,18 +18,17 @@ import Divider from '@mui/material/Divider';
 import CircularProgress from '@mui/material/CircularProgress';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import TuneIcon from '@mui/icons-material/Tune';
-import {
-  setHeatingCurve,
-  setTemperatureSetpoint,
-} from '../../services/heatPumpCommandService';
-import { RateLimitError } from '../../services/hupieApi';
-import type {
-  HeatPumpSystem,
-  CommandStatus,
-} from '../../types/heatpump';
+import { useHeatPumpCommand } from '../../hooks/useHeatPumpCommand';
+import type { HeatPumpSystem } from '../../types/heatpump';
+import { COMMAND_RANGES } from '../../config/commandRanges';
 
 interface Props {
   heatPump: HeatPumpSystem;
@@ -40,126 +38,27 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
   const isOffline = heatPump.status === 'offline';
   const [expanded, setExpanded] = useState(false);
 
-  // ── Temperature setpoint state ───────────────────────────────────
-  const currentSetpoint = heatPump.measurements.find(
-    (m) => m.property === 'temperatureSetpoint'
-  );
-  const [setpointValue, setSetpointValue] = useState(
-    currentSetpoint ? String(currentSetpoint.value) : ''
-  );
-  const [setpointStatus, setSetpointStatus] = useState<CommandStatus>('idle');
-  const [setpointError, setSetpointError] = useState<string | null>(null);
+  const {
+    isMock,
+    confirm,
+    setConfirm,
+    setpointValue,
+    handleSetpointChange,
+    setpointStatus,
+    setpointError,
+    setpointMock,
+    handleSetpointSubmit,
+    curveBase,
+    handleCurveBaseChange,
+    curveSlope,
+    handleCurveSlopeChange,
+    curveStatus,
+    curveError,
+    curveMock,
+    handleCurveSubmit,
+    rateLimitCooldown,
+  } = useHeatPumpCommand(heatPump);
 
-  // ── Heating curve state ──────────────────────────────────────────
-  const currentCurve = heatPump.heatingCurve;
-  const [curveBase, setCurveBase] = useState(
-    currentCurve ? String(currentCurve.baseValue) : ''
-  );
-  const [curveSlope, setCurveSlope] = useState(
-    currentCurve ? String(currentCurve.slopeValue) : ''
-  );
-  const [curveStatus, setCurveStatus] = useState<CommandStatus>('idle');
-  const [curveError, setCurveError] = useState<string | null>(null);
-
-  // ── Rate-limit cooldown ──────────────────────────────────────────
-  // Cooldown after rate limit hit — seconds remaining, shared
-  // across both forms because the rate limit is per-pump, not per-command
-  const [rateLimitCooldown, setRateLimitCooldown] = useState(0);
-
-  useEffect(() => {
-    if (rateLimitCooldown <= 0) return;
-    const timer = setTimeout(
-      () => setRateLimitCooldown((s) => s - 1),
-      1000
-    );
-    return () => clearTimeout(timer);
-  }, [rateLimitCooldown]);
-
-  // ── Sync incoming props ──────────────────────────────────────────
-  useEffect(() => {
-    if (currentSetpoint) {
-      setSetpointValue(String(currentSetpoint.value));
-    }
-    if (currentCurve) {
-      setCurveBase(String(currentCurve.baseValue));
-      setCurveSlope(String(currentCurve.slopeValue));
-    }
-  }, [heatPump, currentSetpoint, currentCurve]);
-
-  // ── Handlers ─────────────────────────────────────────────────────
-  const handleSetpointSubmit = async () => {
-    const parsed = parseFloat(setpointValue);
-    if (!Number.isFinite(parsed)) {
-      setSetpointError('Voer een geldig getal in.');
-      return;
-    }
-    if (parsed < 10 || parsed > 30) {
-      setSetpointError('Setpoint moet tussen 10°C en 30°C liggen.');
-      return;
-    }
-
-    setSetpointStatus('pending');
-    setSetpointError(null);
-    try {
-      await setTemperatureSetpoint({ heatPumpId: heatPump.id, value: parsed });
-      setSetpointStatus('success');
-    } catch (err) {
-      setSetpointStatus('error');
-      if (err instanceof RateLimitError) {
-        setRateLimitCooldown(30);
-        setSetpointError(
-          'Rate limit bereikt — Triple Solar server is tijdelijk bezet. ' +
-          'Knop wordt automatisch opnieuw ingeschakeld.'
-        );
-      } else {
-        setSetpointError(getErrorMessage(err));
-      }
-    }
-  };
-
-  const handleCurveSubmit = async () => {
-    const base = parseFloat(curveBase);
-    const slope = parseFloat(curveSlope);
-
-    if (!Number.isFinite(base)) {
-      setCurveError('Voer een geldige basiswaarde in.');
-      return;
-    }
-    if (!Number.isFinite(slope)) {
-      setCurveError('Voer een geldige hellingswaarde in.');
-      return;
-    }
-    if (base < 20 || base > 60) {
-      setCurveError('Basiswaarde moet tussen 20°C en 60°C liggen (aanvoertemperatuur).');
-      return;
-    }
-    if (slope < -4.0 || slope > -0.1) {
-      setCurveError('Hellingswaarde moet tussen −4,0 en −0,1 liggen (Hupie-conventie).');
-      return;
-    }
-
-    setCurveStatus('pending');
-    setCurveError(null);
-    try {
-      await setHeatingCurve({
-        heatPumpId: heatPump.id,
-        baseValue: base,
-        slopeValue: slope,
-      });
-      setCurveStatus('success');
-    } catch (err) {
-      setCurveStatus('error');
-      if (err instanceof RateLimitError) {
-        setRateLimitCooldown(30);
-        setCurveError(
-          'Rate limit bereikt — Triple Solar server is tijdelijk bezet. ' +
-          'Knop wordt automatisch opnieuw ingeschakeld.'
-        );
-      } else {
-        setCurveError(getErrorMessage(err));
-      }
-    }
-  };
 
   return (
     <Box sx={{ mt: 1.5 }}>
@@ -204,16 +103,12 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             <TextField
               label="Setpoint (°C)"
               value={setpointValue}
-              onChange={(e) => {
-                setSetpointValue(e.target.value);
-                setSetpointStatus('idle');
-                setSetpointError(null);
-              }}
+              onChange={(e) => handleSetpointChange(e.target.value)}
               size="small"
               sx={{ width: 130 }}
               disabled={isOffline || setpointStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.5' }}
-              helperText="10–30°C"
+              helperText={`${COMMAND_RANGES.setpoint.min}–${COMMAND_RANGES.setpoint.max}°C`}
             />
             <Button
               variant="contained"
@@ -236,8 +131,10 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           </Box>
 
           {setpointStatus === 'success' && (
-            <Alert severity="success" sx={{ mb: 1, py: 0.25, fontSize: '0.72rem' }}>
-              Setpoint succesvol ingesteld.
+            <Alert severity={setpointMock ? 'info' : 'success'} sx={{ mb: 1, py: 0.25, fontSize: '0.72rem' }}>
+              {setpointMock
+                ? 'Mock-modus — geen echte schrijfactie verzonden (gesimuleerd).'
+                : 'Setpoint succesvol ingesteld.'}
             </Alert>
           )}
           {setpointError && (
@@ -262,25 +159,17 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             <TextField
               label="Basiswaarde (°C)"
               value={curveBase}
-              onChange={(e) => {
-                setCurveBase(e.target.value);
-                setCurveStatus('idle');
-                setCurveError(null);
-              }}
+              onChange={(e) => handleCurveBaseChange(e.target.value)}
               size="small"
               sx={{ width: 110 }}
               disabled={isOffline || curveStatus === 'pending'}
               inputProps={{ inputMode: 'decimal', step: '0.5' }}
-              helperText="bijv. 40°C (20–60)"
+              helperText={`bijv. 40°C (${COMMAND_RANGES.curveBase.min}–${COMMAND_RANGES.curveBase.max})`}
             />
             <TextField
               label="Helling"
               value={curveSlope}
-              onChange={(e) => {
-                setCurveSlope(e.target.value);
-                setCurveStatus('idle');
-                setCurveError(null);
-              }}
+              onChange={(e) => handleCurveSlopeChange(e.target.value)}
               size="small"
               sx={{ width: 110 }}
               disabled={isOffline || curveStatus === 'pending'}
@@ -309,8 +198,10 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           </Box>
 
           {curveStatus === 'success' && (
-            <Alert severity="success" sx={{ mt: 0.5, py: 0.25, fontSize: '0.72rem' }}>
-              Stooklijn succesvol ingesteld.
+            <Alert severity={curveMock ? 'info' : 'success'} sx={{ mt: 0.5, py: 0.25, fontSize: '0.72rem' }}>
+              {curveMock
+                ? 'Mock-modus — geen echte schrijfactie verzonden (gesimuleerd).'
+                : 'Stooklijn succesvol ingesteld.'}
             </Alert>
           )}
           {curveError && (
@@ -343,12 +234,26 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             </Box>
           )}
 
-          <Alert severity="info" sx={{ mt: 1.5, py: 0.5, fontSize: '0.72rem' }}>
-            Commando's worden direct via SPARQL UPDATE naar de Hupie API verstuurd.
-            Wijzigingen zijn direct actief op de warmtepomp.
+          <Alert severity={isMock ? 'warning' : 'info'} sx={{ mt: 1.5, py: 0.5, fontSize: '0.72rem' }}>
+            {isMock
+              ? "Mock-modus actief — commando's worden gesimuleerd en niet naar de warmtepomp verstuurd."
+              : "Commando's worden direct via SPARQL UPDATE naar de Hupie API verstuurd. Wijzigingen zijn direct actief op de warmtepomp."}
           </Alert>
         </Box>
       </Collapse>
+
+      <Dialog open={confirm !== null} onClose={() => setConfirm(null)}>
+        <DialogTitle>{confirm?.title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{confirm?.message}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirm(null)}>Annuleren</Button>
+          <Button variant="contained" onClick={() => confirm?.onConfirm()}>
+            Bevestigen
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

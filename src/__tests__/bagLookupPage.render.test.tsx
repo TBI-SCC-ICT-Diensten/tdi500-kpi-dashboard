@@ -81,6 +81,16 @@ describe('BagLookupPage', () => {
     expect(screen.getByText(/70 m²/)).toBeInTheDocument();
   });
 
+  it('derives insulation from the energielabel (wins over bouwjaar)', async () => {
+    // mock returns energielabel 'B' (→ class A) AND bouwjaar 1921 (→ class C):
+    // the energielabel must win. CHARACTERIZATION of the precedence.
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/postcode/i),  { target: { value: '3027SN' } });
+    fireEvent.change(screen.getByLabelText(/huisnummer/i), { target: { value: '100' } });
+    fireEvent.click(screen.getByRole('button', { name: /ophalen/i }));
+    expect(await screen.findByText(/Energielabel B → isolatieklasse A/)).toBeInTheDocument();
+  });
+
   it('shows all three afgiftesysteem options after BAG result loads', async () => {
     renderPage();
     fireEvent.change(screen.getByLabelText(/postcode/i),  { target: { value: '3027SN' } });

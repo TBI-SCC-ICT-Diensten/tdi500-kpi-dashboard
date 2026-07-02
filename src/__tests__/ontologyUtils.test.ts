@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   resolveUnit,
-  resolveProperty,
   parseNumericValue,
   parseTimestamp,
   extractIdFromUri,
@@ -24,16 +23,6 @@ describe('resolveUnit', () => {
 
   it('returns "unknown unit" for empty string', () => {
     expect(resolveUnit('')).toBe('unknown unit');
-  });
-});
-
-describe('resolveProperty', () => {
-  it('returns roomTemperature for CurrentTemperature URI', () => {
-    expect(resolveProperty('https://www.tno.nl/building/ontology/heatpump-common-ontology#CurrentTemperature')).toBe('roomTemperature');
-  });
-
-  it('returns "unknown" for unrecognized URI', () => {
-    expect(resolveProperty('http://example.org/unknown')).toBe('unknown');
   });
 });
 

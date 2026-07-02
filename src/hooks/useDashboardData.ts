@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { HeatPumpSystem, Contingent, KeyPerformanceIndicator, KruisProfielCode } from '../types/heatpump';
-import { isValidKruisProfielCode } from '../types/heatpump';
+import { isValidKruisProfielCode, DEFAULT_KRUISPROFIEL_CODE, buildContingentId } from '../types/heatpump';
 import { fetchAllHeatPumpData, subscribeToDataSource } from '../services/hupieApi';
 import { createContingent } from '../services/contingentService';
 import { aggregateKpisForContingent } from '../services/kpiAggregator';
@@ -14,6 +14,7 @@ export interface DashboardData {
   contingents: Contingent[];
   selectedContingent: Contingent | null;
   kpis: KeyPerformanceIndicator[];
+  minCop: number;
   isLoading: boolean;
   error: string | null;
   refetch: () => void;
@@ -100,8 +101,8 @@ const useDashboardData = (): DashboardData => {
     const candidateCode = `${isolatieniveau}${aanvoertemp}`;
     const kruisProfielCode: KruisProfielCode = isValidKruisProfielCode(candidateCode)
       ? candidateCode
-      : 'B2'; // fallback to default profiel if URL params are invalid
-    const contingentId = `contingent-${kruisProfielCode}`;
+      : DEFAULT_KRUISPROFIEL_CODE; // fallback to default profiel if URL params are invalid
+    const contingentId = buildContingentId(kruisProfielCode);
 
     // Filter heat pumps properly under this specific Kruisprofiel code.
     // Pumps without an assigned code are included (API hasn't mapped yet).
@@ -143,11 +144,18 @@ const useDashboardData = (): DashboardData => {
     return aggregateKpisForContingent(selectedContingent.heatPumps, thresholds);
   }, [selectedContingent]);
 
+  // Profile min-COP for the gauge; view-ready so DashboardPage needn't reach into
+  // the scoring config. Fallback 2.5 preserved verbatim from the page.
+  const minCop = selectedContingent
+    ? SCORING_THRESHOLDS_BY_PROFIEL[selectedContingent.kruisProfiel.code].minCop
+    : 2.5;
+
   return {
     heatPumps,
     contingents,
     selectedContingent,
     kpis,
+    minCop,
     isLoading,
     error,
     refetch: load,

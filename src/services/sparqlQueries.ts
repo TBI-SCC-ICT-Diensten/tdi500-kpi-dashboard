@@ -1,3 +1,8 @@
+// ⚠ BUNDLED SERVER-SIDE: api/hupie.ts imports SPARQL_SET_TEMPERATURE_SETPOINT and
+// SPARQL_SET_HEATING_CURVE and the Vercel serverless function bundles this module
+// (RSEC-1: the server builds the two allow-listed UPDATE queries). Keep this module
+// DEPENDENCY-FREE — no browser-only imports (import.meta.env, MUI, DOM), or the
+// function build breaks.
 export const SPARQL_LIST_HEATPUMPS = `
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX hco: <https://www.tno.nl/building/ontology/heatpump-common-ontology#>
