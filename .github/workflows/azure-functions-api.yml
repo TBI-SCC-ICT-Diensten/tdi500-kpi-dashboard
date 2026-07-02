@@ -1,0 +1,64 @@
+name: Deploy Azure Functions API (BYOF)
+
+# Deploys the standalone Function App backend (azure-api/) that the Static Web App is
+# linked to as its /api backend. This is SEPARATE from the SWA frontend workflow — the
+# SWA workflow keeps api_location EMPTY so it never routes through SWA managed functions
+# (that would defeat the BYOF + Key Vault design).
+#
+# Auth: OIDC (federated credential) — publish-profile/basic-auth is disabled on the app
+# and does not work on Flex Consumption (no Kudu/SCM). The three AZURE_* secrets below
+# must be wired manually (see azure-api/README.md).
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'azure-api/**'
+      - '.github/workflows/azure-functions-api.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write # required for azure/login OIDC
+  contents: read
+
+env:
+  AZURE_FUNCTIONAPP_NAME: func-tdi500-dashboard-d-weu
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: azure-api
+  NODE_VERSION: '20'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install, typecheck, test, build
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: |
+          npm ci
+          npm run typecheck
+          npm run test
+          npm run build
+
+      - name: Prune to production dependencies
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        # Keeps dist/ (already built) but strips devDeps so the deployed node_modules is
+        # just @azure/functions.
+        run: npm ci --omit=dev
+
+      - name: Azure login (OIDC — no stored credential)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
