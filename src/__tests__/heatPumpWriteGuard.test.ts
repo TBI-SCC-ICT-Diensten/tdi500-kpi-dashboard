@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 /**
  * Write-guard integration tests — the SET path end to end:
- *   service (range validation) → executeSparqlUpdate (mock guard) → axios.
+ *   service (range validation) → executeCommand (mock guard) → axios.
  *
  * axios is mocked at the instance level (same harness as hupieApiErrors.test.ts)
  * so we can assert exactly whether a network POST happens. The service and the
@@ -56,34 +56,26 @@ describe('write guard — mock mode simulates with ZERO network', () => {
   });
 });
 
-describe('write guard — live mode validates, then emits the verbatim SPARQL UPDATE', () => {
+describe('write guard — live mode validates, then posts the structured command', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockPost.mockResolvedValue({ status: 200, data: '' });
     setDataSource('live');
   });
 
-  it('in-range setpoint POSTs the correct SPARQL UPDATE (predicates/units unchanged)', async () => {
+  it('in-range setpoint POSTs the structured command (no client-side SPARQL)', async () => {
     await setTemperatureSetpoint({ heatPumpId: 'abc123', value: 20.5 });
     expect(mockPost).toHaveBeenCalledTimes(1);
-    const body = mockPost.mock.calls[0]?.[1] as string;
-    expect(body).toContain('saref:hasCommandKind hco:ControlTemperatureSetpoint');
-    expect(body).toContain('saref:hasPropertyKind hco:TemperatureSetpoint');
-    expect(body).toMatch(/"20\.5"\^\^xsd:double/);
-    expect(body).toContain('om:degreeCelsius');
-    expect(body).toContain('VALUES ?id { "abc123" }');
+    const [url, payload] = mockPost.mock.calls[0] as [string, unknown];
+    expect(url).toBe(''); // baseURL is '/api/hupie'
+    expect(payload).toEqual({ command: 'setpoint', id: 'abc123', value: 20.5 });
   });
 
-  it('in-range heating curve POSTs the correct SPARQL UPDATE (predicates/units unchanged)', async () => {
+  it('in-range heating curve POSTs the structured command (no client-side SPARQL)', async () => {
     await setHeatingCurve({ heatPumpId: 'abc123', baseValue: 40, slopeValue: -0.6 });
     expect(mockPost).toHaveBeenCalledTimes(1);
-    const body = mockPost.mock.calls[0]?.[1] as string;
-    expect(body).toContain('saref:hasCommandKind hco:ControlHeatingCurve');
-    expect(body).toContain('saref:isValueOfProperty hco:HeatingCurveBase');
-    expect(body).toMatch(/"40"\^\^xsd:double/);
-    expect(body).toContain('saref:isValueOfProperty hco:HeatingCurveSlope');
-    expect(body).toMatch(/"-0\.6"\^\^xsd:double/);
-    expect(body).toContain('hco:DegreeCelsiusPerDegreeCelsius');
+    const [, payload] = mockPost.mock.calls[0] as [string, unknown];
+    expect(payload).toEqual({ command: 'heating-curve', id: 'abc123', base: 40, slope: -0.6 });
   });
 
   it('out-of-range setpoint is rejected BEFORE any network call', async () => {
