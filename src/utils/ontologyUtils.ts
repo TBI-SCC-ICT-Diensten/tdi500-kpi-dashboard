@@ -1,13 +1,9 @@
-import { UNIT_MAP, PROPERTY_MAP } from '../types/units';
+import { UNIT_MAP } from '../types/units';
 import type { SparqlValue } from '../types/api';
-import type { MeasurementProperty, ConnectionState } from '../types/heatpump';
+import type { ConnectionState } from '../types/heatpump';
 
 export const resolveUnit = (unitUri: string): string => {
   return UNIT_MAP[unitUri] ?? 'unknown unit';
-};
-
-export const resolveProperty = (propertyUri: string): MeasurementProperty => {
-  return PROPERTY_MAP[propertyUri] ?? 'unknown';
 };
 
 export const parseNumericValue = (sparqlValue?: SparqlValue): number => {

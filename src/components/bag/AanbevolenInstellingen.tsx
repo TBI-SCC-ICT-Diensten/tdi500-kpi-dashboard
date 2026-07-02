@@ -1,4 +1,3 @@
-import { useState, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -10,10 +9,7 @@ import Alert from '@mui/material/Alert';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import UploadIcon from '@mui/icons-material/Upload';
 
-import {
-  getCatalogusProfiel,
-  getAvailableFabrikanten,
-} from '../../config/tnoCatalogus';
+import { useAanbevolenInstellingen } from '../../hooks/useAanbevolenInstellingen';
 import {
   ALL_FABRIKANTEN,
 } from '../../types/heatpump';
@@ -94,24 +90,8 @@ const ValueDisplay = ({ value }: { value: CatalogusValue }) => {
  * de fabrikanten-documentatie.
  */
 const AanbevolenInstellingen = ({ kruisProfielCode }: Props) => {
-  const profiel = useMemo(
-    () => getCatalogusProfiel(kruisProfielCode),
-    [kruisProfielCode]
-  );
-  const available = useMemo(
-    () => getAvailableFabrikanten(kruisProfielCode),
-    [kruisProfielCode]
-  );
-
-  // Default to first available fabrikant. Fall back to first in
-  // canonical order if somehow all are hidden. ALL_FABRIKANTEN is
-  // statically defined with 4 elements so the non-null assertion
-  // is safe — it only exists to satisfy noUncheckedIndexedAccess.
-  const [selected, setSelected] = useState<Fabrikant>(
-    available[0] ?? ALL_FABRIKANTEN[0]!
-  );
-
-  const settings = profiel[selected];
+  const { available, selected, setSelected, settings } =
+    useAanbevolenInstellingen(kruisProfielCode);
 
   return (
     <Box>

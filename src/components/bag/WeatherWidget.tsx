@@ -6,7 +6,6 @@
  *
  * Data source: Open-Meteo (KNMI + ECMWF model data for Netherlands)
  */
-import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -16,9 +15,7 @@ import AirIcon from '@mui/icons-material/Air';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { fetchWeather, estimateExpectedCop, type WeatherObservation }
-  from '../../services/weatherService';
-import { rdToWgs84 } from '../../utils/rdToWgs84';
+import { useWeather } from '../../hooks/useWeather';
 import type { SupplyTemperatureClass } from '../../types/heatpump';
 
 interface Props {
@@ -32,35 +29,8 @@ function windDirectionLabel(deg: number): string {
 }
 
 const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
-  const [obs,     setObs]     = useState<WeatherObservation | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    const [lat, lon] = rdToWgs84(rdCoordinates[0], rdCoordinates[1]);
-
-    fetchWeather(lat, lon)
-      .then((result) => {
-        if (cancelled) return;
-        if (result?.isValid) {
-          setObs(result);
-        } else {
-          setError('Weerdata tijdelijk niet beschikbaar');
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setError('Verbindingsfout met Open-Meteo');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => { cancelled = true; };
-  }, [rdCoordinates[0], rdCoordinates[1]]);
+  const { obs, loading, error, expectedCop, copContext } =
+    useWeather(rdCoordinates, supplyTemperatureClass);
 
   if (loading) {
     return (
@@ -81,21 +51,9 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
     );
   }
 
-  const expectedCop = obs.temperatureCelsius !== null
-    ? estimateExpectedCop(obs.temperatureCelsius, supplyTemperatureClass)
-    : null;
-
   const time = new Date(obs.observationTime).toLocaleTimeString('nl-NL', {
     hour: '2-digit', minute: '2-digit',
   });
-
-  const copContext = obs.temperatureCelsius !== null
-    ? obs.temperatureCelsius < 0
-      ? 'Koude dag — hogere aanvoertemperatuur en lager rendement verwacht.'
-      : obs.temperatureCelsius > 10
-      ? 'Mild weer — gunstige omstandigheden voor de warmtepomp.'
-      : 'Normale stookomstandigheden.'
-    : null;
 
   return (
     <Box>

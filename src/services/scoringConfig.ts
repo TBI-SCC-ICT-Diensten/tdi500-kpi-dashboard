@@ -27,3 +27,20 @@ export const SCORING_THRESHOLDS_BY_PROFIEL: Record<KruisProfielCode, ScoringThre
   C2: { minCop: 2.0, maxSupplyTemperatureCelsius: 55, maxWaterPressureBar: 2.5, maxHighSeverityErrors: 0 },
   C3: { minCop: 1.8, maxSupplyTemperatureCelsius: 80, maxWaterPressureBar: 2.5, maxHighSeverityErrors: 0 },
 };
+
+/**
+ * Global KPI scoring bands — the threshold VALUES shared between kpiAggregator
+ * (which applies them as real comparisons: >=, ===, <=) and decisionEngine
+ * (which renders them in its Dutch threshold strings with > / ≥ / ≤). The literal
+ * lives once here; each call site keeps its own comparison operator unchanged.
+ */
+export const KPI_BANDS = {
+  /** COP "acceptabel" band lower edge as a fraction of minCop (averageCop >= minCop * factor). */
+  copWarningFactor: 0.85,
+  /** Storingen: count <= this is acceptabel; above is slecht. */
+  storingenAcceptableMax: 2,
+  /** Connectivity: === this percentage is goed. */
+  connectivityGoodPct: 100,
+  /** Connectivity: >= this percentage is acceptabel. */
+  connectivityAcceptablePct: 80,
+} as const;

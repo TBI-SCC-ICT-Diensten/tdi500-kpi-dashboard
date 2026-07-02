@@ -4,6 +4,7 @@ import Paper from '@mui/material/Paper';
 import ReactApexChart from 'react-apexcharts';
 import { useTheme } from '@mui/material/styles';
 import type { KeyPerformanceIndicator } from '../../types/heatpump';
+import { STATUS_COLORS } from '../../theme/statusColors';
 
 interface CopGaugeProps {
   kpis: KeyPerformanceIndicator[];
@@ -67,7 +68,7 @@ const CopGauge = ({ kpis, minCop = 2.5 }: CopGaugeProps) => {
   };
 
   return (
-    <Paper data-testid="cop-gauge" variant="outlined" sx={{ p: 2, height: '100%', borderLeft: '3px solid #16A34A' }}>
+    <Paper data-testid="cop-gauge" variant="outlined" sx={{ p: 2, height: '100%', borderLeft: `3px solid ${STATUS_COLORS.healthy}` }}>
       <Typography variant="overline" color="text.secondary"
         sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
         COP Gauge

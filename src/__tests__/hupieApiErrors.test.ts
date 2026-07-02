@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock axios at the instance level — executeSparqlUpdate calls
-// hupieUpdateAxios.post() on a custom instance, so we intercept there.
+// Mock axios at the instance level — executeCommand calls
+// hupieCommandAxios.post() on a custom instance, so we intercept there.
 const mockPost = vi.hoisted(() => vi.fn());
 
 vi.mock('axios', async (importOriginal) => {
@@ -21,13 +21,13 @@ vi.mock('axios', async (importOriginal) => {
 });
 
 import {
-  executeSparqlUpdate,
+  executeCommand,
   RateLimitError,
   ManufacturerServerError,
   setDataSource,
 } from '../services/hupieApi';
 
-describe('executeSparqlUpdate — manufacturer server error detection', () => {
+describe('executeCommand — manufacturer server error detection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setDataSource('live');
@@ -39,7 +39,7 @@ describe('executeSparqlUpdate — manufacturer server error detection', () => {
       data: 'No response from manufacturer server',
     });
 
-    await expect(executeSparqlUpdate('INSERT { } WHERE { }'))
+    await expect(executeCommand({ command: 'setpoint', id: 'abc123', value: 20 }))
       .rejects.toThrow(RateLimitError);
   });
 
@@ -56,7 +56,7 @@ describe('executeSparqlUpdate — manufacturer server error detection', () => {
       data: 'manufacturer server timeout',
     });
 
-    await expect(executeSparqlUpdate('INSERT { } WHERE { }'))
+    await expect(executeCommand({ command: 'setpoint', id: 'abc123', value: 20 }))
       .rejects.toThrow(ManufacturerServerError);
   });
 
@@ -66,7 +66,7 @@ describe('executeSparqlUpdate — manufacturer server error detection', () => {
       data: '',
     });
 
-    await expect(executeSparqlUpdate('INSERT { } WHERE { }'))
+    await expect(executeCommand({ command: 'setpoint', id: 'abc123', value: 20 }))
       .resolves.not.toThrow();
   });
 

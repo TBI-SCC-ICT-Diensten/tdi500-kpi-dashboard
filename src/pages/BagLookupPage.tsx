@@ -5,8 +5,6 @@
  * sidebar entry tagged [BAG-LOOKUP] in App.tsx and Sidebar.tsx.
  */
 
-import { useState } from 'react';
-import { getErrorMessage } from '../utils/getErrorMessage';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -25,21 +23,8 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Spinner from '../components/common/Spinner';
 import WeatherWidget from '../components/bag/WeatherWidget';
 import AanbevolenInstellingen from '../components/bag/AanbevolenInstellingen';
-import {
-  fetchBagData,
-  mapBouwjaarToInsulation,
-  mapEnergielabelToInsulation,
-  mapAfgifteToClass,
-  deriveKruisProfielCode,
-  type BagResult,
-  type LookupProgress,
-} from '../services/bagService';
-import { getKruisProfiel } from '../config/kruisProfielen';
-import { SCORING_THRESHOLDS_BY_PROFIEL } from '../services/scoringConfig';
-import type { KruisProfielCode } from '../types/heatpump';
+import { useBagLookup, type Afgiftesysteem } from '../hooks/useBagLookup';
 import { useRole } from '../context/RoleContext';
-
-type Afgiftesysteem = 'vloerverwarming' | 'radiator' | 'hete lucht';
 
 const afgifteLabels: Record<Afgiftesysteem, string> = {
   vloerverwarming: 'Vloerverwarming (≤ 30°C)',
@@ -57,74 +42,15 @@ const BagLookupPage = () => {
   const theme = useTheme();
   const cellBg = theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'grey.50';
   const { role } = useRole();
-  const [postcode, setPostcode] = useState('');
-  const [huisnummer, setHuisnummer] = useState('');
-  const [afgiftesysteem, setAfgiftesysteem] = useState<Afgiftesysteem | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [bagResult, setBagResult] = useState<BagResult | null>(null);
-  const [kruisProfielCode, setKruisProfielCode] = useState<KruisProfielCode | null>(null);
-  const [manualBouwjaar, setManualBouwjaar] = useState<string>('');
-  const [progress, setProgress] = useState<LookupProgress | null>(null);
-
-  const insulation = (() => {
-    if (bagResult?.energielabel) {
-      const level = mapEnergielabelToInsulation(bagResult.energielabel);
-      return {
-        level,
-        reason: `Energielabel ${bagResult.energielabel} → isolatieklasse ${level} (nauwkeuriger dan bouwjaar-schatting)`,
-        confidence: 'hoog' as const,
-      };
-    }
-    if (bagResult?.bouwjaar != null) {
-      return mapBouwjaarToInsulation(bagResult.bouwjaar);
-    }
-    if (manualBouwjaar !== '' && !isNaN(Number(manualBouwjaar))) {
-      return mapBouwjaarToInsulation(Number(manualBouwjaar));
-    }
-    return null;
-  })();
-
-  const handleSearch = async () => {
-    if (!postcode.trim() || !huisnummer.trim()) return;
-    setLoading(true);
-    setError(null);
-    setBagResult(null);
-    setKruisProfielCode(null);
-    setAfgiftesysteem(null);
-    setManualBouwjaar('');
-
-    try {
-      const result = await fetchBagData(
-        postcode.trim(),
-        huisnummer.trim(),
-        setProgress
-      );
-      setBagResult(result);
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setLoading(false);
-      setProgress(null);
-    }
-  };
-
-  const handleAfgifteChange = (
-    _: React.MouseEvent<HTMLElement>,
-    value: Afgiftesysteem | null
-  ) => {
-    setAfgiftesysteem(value);
-    if (value && insulation) {
-      setKruisProfielCode(deriveKruisProfielCode(insulation.level, value));
-    } else {
-      setKruisProfielCode(null);
-    }
-  };
-
-  const profiel = kruisProfielCode ? getKruisProfiel(kruisProfielCode) : null;
-  const thresholds = kruisProfielCode
-    ? SCORING_THRESHOLDS_BY_PROFIEL[kruisProfielCode]
-    : null;
+  const {
+    postcode, setPostcode,
+    huisnummer, setHuisnummer,
+    afgiftesysteem, handleAfgifteChange,
+    manualBouwjaar, handleManualBouwjaarChange,
+    loading, error, bagResult, kruisProfielCode, progress,
+    insulation, supplyTemperatureClass, profiel, thresholds,
+    handleSearch,
+  } = useBagLookup();
 
   return (
     <Box>
@@ -330,11 +256,7 @@ const BagLookupPage = () => {
                   label="Bouwjaar (handmatig)"
                   placeholder="bijv. 1921"
                   value={manualBouwjaar}
-                  onChange={(e) => {
-                    setManualBouwjaar(e.target.value);
-                    setKruisProfielCode(null);
-                    setAfgiftesysteem(null);
-                  }}
+                  onChange={(e) => handleManualBouwjaarChange(e.target.value)}
                   size="small"
                   sx={{ width: 180 }}
                   inputProps={{ maxLength: 4 }}
@@ -407,7 +329,7 @@ const BagLookupPage = () => {
             </Typography>
             <WeatherWidget
               rdCoordinates={bagResult.rdCoordinates}
-              supplyTemperatureClass={afgiftesysteem ? mapAfgifteToClass(afgiftesysteem) : undefined}
+              supplyTemperatureClass={supplyTemperatureClass}
             />
           </Paper>
         </Box>

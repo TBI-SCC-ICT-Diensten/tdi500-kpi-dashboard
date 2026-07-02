@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -12,7 +11,7 @@ import useDashboardData from '../hooks/useDashboardData';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
 import HeatPumpDetailCard from '../components/detail/HeatPumpDetailCard';
-import { fetchWeather } from '../services/weatherService';
+import { useOutdoorTemperature } from '../hooks/useOutdoorTemperature';
 
 const ContingentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,26 +20,7 @@ const ContingentDetailPage = () => {
 
   const contingent = contingents.find((c) => c.id === id);
 
-  const [outdoorTempCelsius, setOutdoorTempCelsius] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!contingent) return;
-
-    // Use first pump that has coordinates for weather lookup
-    const pumpWithCoords = contingent.heatPumps.find((p) => p.wgs84);
-    if (!pumpWithCoords?.wgs84) return;
-
-    const { lat, lon } = pumpWithCoords.wgs84;
-    fetchWeather(lat, lon)
-      .then((obs) => {
-        if (obs?.isValid && obs.temperatureCelsius !== null) {
-          setOutdoorTempCelsius(obs.temperatureCelsius);
-        }
-      })
-      .catch(() => {
-        // Non-fatal — weather context is enhancement only
-      });
-  }, [contingent?.id]);
+  const outdoorTempCelsius = useOutdoorTemperature(contingent);
 
   if (isLoading) {
     return <Spinner message="Contingentdata ophalen..." />;

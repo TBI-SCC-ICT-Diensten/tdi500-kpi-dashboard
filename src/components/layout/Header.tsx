@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -15,12 +14,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import BuildIcon from '@mui/icons-material/Build';
 import InsightsIcon from '@mui/icons-material/Insights';
-import {
-  getDataSource,
-  setDataSource,
-  subscribeToDataSource,
-  type DataSource,
-} from '../../services/hupieApi';
+import { useDataSource } from '../../hooks/useDataSource';
 import { useColorMode } from '../../context/ColorModeContext';
 import { useRole } from '../../context/RoleContext';
 
@@ -30,19 +24,11 @@ interface HeaderProps {
 }
 
 const Header = ({ onMenuClick }: HeaderProps) => {
-  const [source, setSource] = useState<DataSource>(getDataSource());
+  // The data-source read/toggle now lives in useDataSource (no direct service
+  // import). Toggling triggers a refetch via useDashboardData's own subscription.
+  const { dataSource: source, toggle: handleToggle } = useDataSource();
   const { mode, toggleColorMode } = useColorMode();
   const { role, setRole } = useRole();
-
-  // Keep the chip in sync if the data source changes elsewhere.
-  useEffect(() => subscribeToDataSource(setSource), []);
-
-  const handleToggle = () => {
-    const next: DataSource = source === 'live' ? 'mock' : 'live';
-    setDataSource(next);
-    // No need to call refetch here — useDashboardData subscribes to
-    // data source changes and auto-refetches.
-  };
 
   return (
     <AppBar

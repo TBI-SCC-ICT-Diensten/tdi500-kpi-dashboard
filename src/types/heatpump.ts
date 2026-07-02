@@ -168,6 +168,12 @@ export function isValidKruisProfielCode(code: string): code is KruisProfielCode 
   return VALID_KRUISPROFIEL_CODES.includes(code as KruisProfielCode);
 }
 
+/** Default kruisprofiel — shown when none is selected or URL params are invalid. */
+export const DEFAULT_KRUISPROFIEL_CODE: KruisProfielCode = 'B2';
+
+/** Canonical contingent id for a kruisprofiel code (e.g. 'B2' -> 'contingent-B2'). */
+export const buildContingentId = (code: KruisProfielCode): string => `contingent-${code}`;
+
 // ── TNO Catalogus (Activiteit 2.1) ──────────────────────────────────────────
 
 /**

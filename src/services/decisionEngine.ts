@@ -1,6 +1,6 @@
 import type { KeyPerformanceIndicator, KruisProfielCode } from '../types/heatpump';
 import type { DecisionScore, Recommendation, OverallScore } from '../types/decision';
-import { SCORING_THRESHOLDS_BY_PROFIEL } from './scoringConfig';
+import { SCORING_THRESHOLDS_BY_PROFIEL, KPI_BANDS } from './scoringConfig';
 
 /**
  * Derives an overall score from an array of individual factor scores.
@@ -106,7 +106,7 @@ export const evaluateContingent = (
         score,
         value: copKpi.value,
         unit: '',
-        threshold: `> ${thresholds.minCop} = goed, > ${(thresholds.minCop * 0.85).toFixed(1)} = acceptabel`,
+        threshold: `> ${thresholds.minCop} = goed, > ${(thresholds.minCop * KPI_BANDS.copWarningFactor).toFixed(1)} = acceptabel`,
         explanation:
           score === 'good'
             ? `COP van ${copKpi.value.toFixed(2)} voldoet aan de profieldrempel (min. ${thresholds.minCop}).`
@@ -129,7 +129,7 @@ export const evaluateContingent = (
       score,
       value: connectivityKpi.value,
       unit: '%',
-      threshold: '100% = goed, ≥ 80% = acceptabel, < 80% = slecht',
+      threshold: `${KPI_BANDS.connectivityGoodPct}% = goed, ≥ ${KPI_BANDS.connectivityAcceptablePct}% = acceptabel, < ${KPI_BANDS.connectivityAcceptablePct}% = slecht`,
       explanation:
         score === 'good'
           ? `Alle warmtepompen (${connectivityKpi.value}%) zijn online en rapporteren data.`
@@ -153,7 +153,7 @@ export const evaluateContingent = (
       score,
       value: storingenKpi.value,
       unit: 'meldingen',
-      threshold: `${thresholds.maxHighSeverityErrors} = goed, ≤ 2 = acceptabel, > 2 = slecht`,
+      threshold: `${thresholds.maxHighSeverityErrors} = goed, ≤ ${KPI_BANDS.storingenAcceptableMax} = acceptabel, > ${KPI_BANDS.storingenAcceptableMax} = slecht`,
       explanation:
         score === 'good'
           ? 'Geen actieve storingen met hoge prioriteit. Inregelinstellingen functioneren correct.'

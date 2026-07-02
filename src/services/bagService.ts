@@ -55,11 +55,10 @@ function logApiError(
 
 const PDOK_BASE = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1';
 
-// NOTE: This proxy path only works in Vite dev mode.
-// In production, /ep-online requests will 404 unless a
-// server-side proxy is configured (e.g. nginx, Vercel rewrites).
-// For production deployment, move EP-online calls to a
-// backend API route that holds the API key server-side.
+// EP-online is reached via the same-origin `/ep-online/*` path. In production
+// vercel.json rewrites it to the api/ep-online.ts serverless function (which
+// holds EP_ONLINE_API_KEY); in Vite dev the server.proxy in vite.config.ts
+// forwards it with the dev VITE_EP_ONLINE_API_KEY.
 const EP_PROXY = '/ep-online/api/v5';
 
 export interface BagResult {
@@ -178,6 +177,8 @@ export const fetchBagData = async (
       },
       timeout: 10000,
     });
+    // TODO(PR-7 / TYPE-1): type the PDOK response so this boundary isn't `any`.
+    // Until then this suppresses the now-active rule on the untyped axios JSON.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     docs = (pdokResponse.data?.response?.docs ?? []) as Record<string, unknown>[];
   } catch (err) {
@@ -382,4 +383,32 @@ export const deriveKruisProfielCode = (
 ): KruisProfielCode => {
   const cls = mapAfgifteToClass(afgiftesysteem);
   return `${insulationLevel}${cls}` as KruisProfielCode;
+};
+
+export type InsulationEstimate = ReturnType<typeof mapBouwjaarToInsulation>;
+
+/**
+ * Insulation-estimate precedence (Y-axis of the kruisprofiel):
+ *   1. energielabel (most accurate)  2. BAG bouwjaar  3. manual bouwjaar  4. none.
+ * Extracted verbatim from BagLookupPage's in-render IIFE (PR-10).
+ */
+export const deriveInsulation = (
+  bagResult: BagResult | null,
+  manualBouwjaar: string
+): InsulationEstimate | null => {
+  if (bagResult?.energielabel) {
+    const level = mapEnergielabelToInsulation(bagResult.energielabel);
+    return {
+      level,
+      reason: `Energielabel ${bagResult.energielabel} → isolatieklasse ${level} (nauwkeuriger dan bouwjaar-schatting)`,
+      confidence: 'hoog',
+    };
+  }
+  if (bagResult?.bouwjaar != null) {
+    return mapBouwjaarToInsulation(bagResult.bouwjaar);
+  }
+  if (manualBouwjaar !== '' && !isNaN(Number(manualBouwjaar))) {
+    return mapBouwjaarToInsulation(Number(manualBouwjaar));
+  }
+  return null;
 };

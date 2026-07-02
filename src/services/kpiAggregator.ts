@@ -1,5 +1,5 @@
 import type { HeatPumpSystem, KeyPerformanceIndicator, KpiStatus } from '../types/heatpump';
-import type { ScoringThresholds } from './scoringConfig';
+import { KPI_BANDS, type ScoringThresholds } from './scoringConfig';
 
 /**
  * Calculates the average COP across all heat pumps in a contingent.
@@ -23,7 +23,7 @@ export const calculateCopKpi = (
   const status: KpiStatus =
     averageCop === 0              ? 'warning'  :
     averageCop >= thresholds.minCop ? 'good'    :
-    averageCop >= thresholds.minCop * 0.85 ? 'warning' :
+    averageCop >= thresholds.minCop * KPI_BANDS.copWarningFactor ? 'warning' :
                                     'critical';
 
   return {
@@ -60,8 +60,8 @@ export const calculateConnectivityKpi = (
   const percentage = Math.round((online / heatPumps.length) * 100);
 
   const status: KpiStatus =
-    percentage === 100 ? 'good'     :
-    percentage >= 80   ? 'warning'  :
+    percentage === KPI_BANDS.connectivityGoodPct ? 'good'     :
+    percentage >= KPI_BANDS.connectivityAcceptablePct   ? 'warning'  :
                          'critical';
 
   return {
@@ -93,7 +93,7 @@ export const calculateStoringenKpi = (
 
   const status: KpiStatus =
     count === 0 ? 'good'     :
-    count <= 2  ? 'warning'  :
+    count <= KPI_BANDS.storingenAcceptableMax  ? 'warning'  :
                   'critical';
 
   return {

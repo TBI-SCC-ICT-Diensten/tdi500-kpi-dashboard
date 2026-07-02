@@ -8,15 +8,16 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import type { KeyPerformanceIndicator, KpiStatus } from '../../types/heatpump';
+import { STATUS_COLORS } from '../../theme/statusColors';
 
 interface KpiOverviewPanelProps {
   kpis: KeyPerformanceIndicator[];
 }
 
 const statusBorderColor: Record<KpiStatus, string> = {
-  good:     '#16A34A',
-  warning:  '#D97706',
-  critical: '#DC2626',
+  good:     STATUS_COLORS.healthy,
+  warning:  STATUS_COLORS.warning,
+  critical: STATUS_COLORS.danger,
 };
 
 const statusColor: Record<KpiStatus, string> = {
