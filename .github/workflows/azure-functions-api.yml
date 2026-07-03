@@ -6,12 +6,13 @@ name: Deploy Azure Functions API (BYOF)
 # (that would defeat the BYOF + Key Vault design).
 #
 # Auth: OIDC (federated credential) — publish-profile/basic-auth is disabled on the app
-# and does not work on Flex Consumption (no Kudu/SCM). The three AZURE_* secrets below
-# must be wired manually (see azure-api/README.md).
+# and does not work on Flex Consumption (no Kudu/SCM). The three AZURE_* secret NAMES in
+# the login step resolve per GitHub Environment (func-dev / func-prod) — each holds its
+# own identity + subscription (see azure-api/README.md).
 
 on:
   push:
-    branches: [develop]
+    branches: [develop, main]
     paths:
       - 'azure-api/**'
       - '.github/workflows/azure-functions-api.yml'
@@ -22,13 +23,19 @@ permissions:
   contents: read
 
 env:
-  AZURE_FUNCTIONAPP_NAME: func-tdi500-dashboard-d-weu
   AZURE_FUNCTIONAPP_PACKAGE_PATH: azure-api
   NODE_VERSION: '20'
 
 jobs:
+  # develop → func-dev → func-tdi500-dashboard-d-weu ; main → func-prod → func-tdi500-dashboard-p-weu
   build-and-deploy:
     runs-on: ubuntu-latest
+    # environment: on the job is what makes the plain secret NAMES in the login step
+    # resolve to that environment's VALUES (dev identity+sub vs prod identity+sub). The
+    # federated credentials fail closed — dev identity trusts only develop, prod only main.
+    environment: ${{ github.ref_name == 'main' && 'func-prod' || 'func-dev' }}
+    env:
+      AZURE_FUNCTIONAPP_NAME: ${{ github.ref_name == 'main' && 'func-tdi500-dashboard-p-weu' || 'func-tdi500-dashboard-d-weu' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,3 +69,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          sku: flexconsumption
