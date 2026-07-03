@@ -1,6 +1,6 @@
 // Flat ESLint config — the project's quality gate (CFG-1).
 //
-// Scope: src/ and api/ only. Type-aware (typescript-eslint projectService).
+// Scope: src/ only. Type-aware (typescript-eslint projectService).
 // NOT wired into the build/CI yet — runnable via `npm run lint`. The findings
 // this surfaces are baseline technical debt; they are fixed in later PRs
 // (PR-3 dead code, PR-7 types, …), not here.
@@ -14,11 +14,10 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
 export default tseslint.config(
-  // Only src/ and api/ are linted; everything else is ignored.
+  // Only src/ is linted; everything else is ignored.
   {
     ignores: [
       'dist/**',
-      'dist-api/**',
       'coverage/**',
       'node_modules/**',
       'playwright-report/**',
@@ -28,9 +27,9 @@ export default tseslint.config(
     ],
   },
 
-  // Type-aware base for all application TS/TSX in src/ and api/.
+  // Type-aware base for all application TS/TSX in src/.
   {
-    files: ['src/**/*.{ts,tsx}', 'api/**/*.ts'],
+    files: ['src/**/*.{ts,tsx}'],
     extends: [js.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
@@ -55,12 +54,6 @@ export default tseslint.config(
       'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
-  },
-
-  // Server (Vercel serverless functions): Node globals.
-  {
-    files: ['api/**/*.ts'],
-    languageOptions: { globals: { ...globals.node } },
   },
 
   // Tests + test helpers: Node/vitest globals; type-aware rules relaxed
