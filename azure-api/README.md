@@ -1,9 +1,8 @@
 # azure-api — Azure Functions v4 backend (BYOF)
 
 The standalone **Azure Functions (Node v4)** app that the Static Web App
-(`stapp-tdi500-dashboard-d-weu-01`) is linked to as its `/api` backend. It ports the
-three Vercel proxies (`../api/*.ts`) — Hupie / BAG / EP-online — with **identical
-behaviour**, including the RSEC-1 write-guard.
+(`stapp-tdi500-dashboard-d-weu-01`) is linked to as its `/api` backend. It serves the
+three `/api` proxies — Hupie / BAG / EP-online — including the RSEC-1 write-guard.
 
 ## Why a separate project + deploy
 

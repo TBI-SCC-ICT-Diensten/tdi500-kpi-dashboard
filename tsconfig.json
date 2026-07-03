@@ -19,5 +19,5 @@
     "sourceMap": true,
     "noEmit": true
   },
-  "include": ["src", "api"]
+  "include": ["src"]
 }
