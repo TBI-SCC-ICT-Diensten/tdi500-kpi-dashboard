@@ -1,0 +1,27 @@
+{
+  "name": "tdi500-azure-api",
+  "version": "1.0.0",
+  "description": "Azure Functions v4 API for the TDI 500 dashboard — BYOF backend linked to the SWA. Ports the Vercel api/*.ts proxies (Hupie/BAG/EP-online); the RSEC-1 write-guard is imported from ../src/services/hupieWriteGuard (one source of truth).",
+  "private": true,
+  "main": "dist/functions/*.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "node esbuild.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "prestart": "npm run build",
+    "start": "func start"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}

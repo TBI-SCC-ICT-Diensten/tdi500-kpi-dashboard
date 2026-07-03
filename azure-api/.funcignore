@@ -1,0 +1,11 @@
+.git*
+.vscode
+.funcignore
+local.settings.json
+src/
+test/
+*.ts
+tsconfig.json
+vitest.config.mts
+esbuild.mjs
+README.md

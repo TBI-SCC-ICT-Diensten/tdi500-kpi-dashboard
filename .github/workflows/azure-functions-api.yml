@@ -1,0 +1,72 @@
+name: Deploy Azure Functions API (BYOF)
+
+# Deploys the standalone Function App backend (azure-api/) that the Static Web App is
+# linked to as its /api backend. This is SEPARATE from the SWA frontend workflow — the
+# SWA workflow keeps api_location EMPTY so it never routes through SWA managed functions
+# (that would defeat the BYOF + Key Vault design).
+#
+# Auth: OIDC (federated credential) — publish-profile/basic-auth is disabled on the app
+# and does not work on Flex Consumption (no Kudu/SCM). The three AZURE_* secret NAMES in
+# the login step resolve per GitHub Environment (func-dev / func-prod) — each holds its
+# own identity + subscription (see azure-api/README.md).
+
+on:
+  push:
+    branches: [develop, main]
+    paths:
+      - 'azure-api/**'
+      - '.github/workflows/azure-functions-api.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write # required for azure/login OIDC
+  contents: read
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: azure-api
+  NODE_VERSION: '20'
+
+jobs:
+  # develop → func-dev → func-tdi500-dashboard-d-weu ; main → func-prod → func-tdi500-dashboard-p-weu
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    # environment: on the job is what makes the plain secret NAMES in the login step
+    # resolve to that environment's VALUES (dev identity+sub vs prod identity+sub). The
+    # federated credentials fail closed — dev identity trusts only develop, prod only main.
+    environment: ${{ github.ref_name == 'main' && 'func-prod' || 'func-dev' }}
+    env:
+      AZURE_FUNCTIONAPP_NAME: ${{ github.ref_name == 'main' && 'func-tdi500-dashboard-p-weu' || 'func-tdi500-dashboard-d-weu' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install, typecheck, test, build
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: |
+          npm ci
+          npm run typecheck
+          npm run test
+          npm run build
+
+      - name: Prune to production dependencies
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        # Keeps dist/ (already built) but strips devDeps so the deployed node_modules is
+        # just @azure/functions.
+        run: npm ci --omit=dev
+
+      - name: Azure login (OIDC — no stored credential)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          sku: flexconsumption
