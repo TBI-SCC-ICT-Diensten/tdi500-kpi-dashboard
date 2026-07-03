@@ -53,6 +53,36 @@ updates:
       - dependency-name: "react-router-dom"
         update-types: ["version-update:semver-major"]
 
+  # Azure Functions backend (azure-api/package.json + package-lock.json) — the
+  # BYOF production API. Separate entry so its build/runtime deps (esbuild,
+  # typescript, vitest, @azure/functions, @types/node) get routine version-update
+  # PRs, also targeted at develop so they follow the develop -> main release flow.
+  # NOTE: target-branch governs VERSION updates only. Dependabot SECURITY updates
+  # always open against the DEFAULT branch (main) regardless of this setting — that
+  # is why the esbuild security bump #154 landed on main, not develop.
+  - package-ecosystem: "npm"
+    directory: "/azure-api"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    groups:
+      # Same low-noise grouping as the root entry: minor + patch bundled,
+      # majors arrive separately so breaking changes stay visible.
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+
   # When a CI workflow is added (see verbetervoorstel VV-27), enable
   # GitHub Actions updates too by uncommenting the block below:
   # - package-ecosystem: "github-actions"
