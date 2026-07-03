@@ -89,6 +89,14 @@ describe('hupieHandler — read path (unchanged)', () => {
     expect(res.status).toBe(200);
   });
 
+  it('treats a missing Content-Type as a read (default sparql-query), never /update/', async () => {
+    await hupieHandler(makeReq({ body: 'SELECT * WHERE { ?s ?p ?o }' }));
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [url] = mockFetch.mock.calls[0] as [string];
+    expect(url).not.toContain('/update/');
+    expect(url).toContain('/query/');
+  });
+
   it('returns 500 when secrets are not configured', async () => {
     delete process.env.HUPIE_API_KEY;
     const res = await hupieHandler(makeReq({ contentType: 'application/sparql-query', body: 'SELECT * WHERE { ?s ?p ?o }' }));
