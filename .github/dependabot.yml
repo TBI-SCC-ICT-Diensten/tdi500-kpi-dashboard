@@ -82,6 +82,13 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    # @types/node must track the Node 20 runtime (engines >=20, workflow
+    # NODE_VERSION 20, host bundle [4.*,5.0.0)). Block MAJOR bumps (Node 21+
+    # types type-check against APIs absent at the Node 20 runtime and would
+    # crash — see closed PR #160). Minor/patch within 20.x still flow.
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   # When a CI workflow is added (see verbetervoorstel VV-27), enable
   # GitHub Actions updates too by uncommenting the block below:
