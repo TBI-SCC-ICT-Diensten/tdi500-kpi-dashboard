@@ -47,12 +47,15 @@ export type StatusColorKey = keyof typeof STATUS_COLORS;
  * complete literal in de bron ziet — samengestelde namen bestaan runtime
  * stilletjes NIET. Vandaar deze map met volledige strings.
  *
- * Twee vaste patronen (kies bewust, zie tailwind.config.js):
- *   • TINT-PAAR (pills/badges met tintvlak): licht `bg-*-100 text-*-800`,
- *     donker `dark:bg-*-600/15 dark:text-*-300`. Dit is wat hieronder staat.
+ * Vaste patronen (kies bewust, zie tailwind.config.js):
+ *   • TINT-PAAR (pills/badges/rijen met tintvlak): licht `bg-*-100 text-*-800`,
+ *     donker `dark:bg-*-600/15 dark:text-*-300` → STATUS_PILL_CLASSES.
  *   • TEXT-SAFE (kleine status-TEKST op een kaal vlak, ≤0.7rem, zónder tint):
- *     gebruik de `-700`-stap (`text-success-700` / `text-warning-700` /
- *     `text-danger-700`) — de mains halen AA niet op wit bij die grootte.
+ *     de `-700`-stap — de mains halen AA niet op wit bij die grootte
+ *     → STATUS_TEXT_SAFE_CLASSES.
+ *   • ACCENT-RAND (3px linker-rand op een tintvlak) → STATUS_ACCENT_BORDER_CLASSES.
+ *   • SOLIDE CHIP (gevuld vlak in de main-kleur, witte tekst)
+ *     → STATUS_SOLID_CHIP_CLASSES.
  * ════════════════════════════════════════════════════════════════════════ */
 
 /** Semantisch statusvocabulaire — zelfde sleutels als STATUS_COLORS. */
@@ -71,3 +74,39 @@ export const STATUS_PILL_CLASSES: Record<StatusSemantic, string> = {
 /** Getypeerde accessor — het seam-contract voor gemigreerde componenten. */
 export const statusClasses = (semantic: StatusSemantic): string =>
   STATUS_PILL_CLASSES[semantic];
+
+/** TEXT-SAFE: kleine status-tekst op een kaal vlak (≤0.7rem) — de `-700`-stap
+ *  haalt wél AA op wit; donker de `-300`-stap. Eerste consument: de
+ *  oplostermijn-chip in ErrorCodeRow. */
+export const STATUS_TEXT_SAFE_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'text-success-700 dark:text-success-300',
+  warning: 'text-warning-700 dark:text-warning-300',
+  danger:  'text-danger-700 dark:text-danger-300',
+  offline: 'text-slate-600 dark:text-slate-400',
+};
+
+/** ACCENT-RAND: de 3px linker-rand (`border-l-3`) op een tint-rij. */
+export const STATUS_ACCENT_BORDER_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'border-success-600',
+  warning: 'border-warning-600',
+  danger:  'border-danger-600',
+  offline: 'border-slate-400 dark:border-slate-600',
+};
+
+/** SOLIDE CHIP: gevuld vlak in de main-kleur met witte tekst. */
+export const STATUS_SOLID_CHIP_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'bg-success-600 text-white',
+  warning: 'bg-warning-600 text-white',
+  danger:  'bg-danger-600 text-white',
+  offline: 'bg-slate-400 dark:bg-slate-600 text-white',
+};
+
+/** Ernst-bucketing (storingen) → status-semantiek. Ernst is een OPEN
+ *  vocabulaire (types/heatpump.ts) — alles buiten de bekende niveaus valt
+ *  bewust in de neutrale 'offline'-tier, zoals getSeveritySx altijd deed. */
+export const severityToSemantic = (severity: string): StatusSemantic => {
+  const s = severity.toLowerCase();
+  if (s === 'critical' || s === 'high' || s === 'error') return 'danger';
+  if (s === 'warning') return 'warning';
+  return 'offline';
+};
