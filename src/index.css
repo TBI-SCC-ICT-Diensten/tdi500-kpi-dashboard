@@ -1,0 +1,8 @@
+/* Tailwind-lagen (coexistentie-fase). Preflight staat UIT
+   (tailwind.config.js corePlugins.preflight:false) — MUI's CssBaseline levert
+   de reset, dus `@tailwind base` emiteert vrijwel niets. Alle drie de
+   directives staan er voor correctheid; utilities verschijnen pas zodra een
+   component Tailwind-klassen gebruikt. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

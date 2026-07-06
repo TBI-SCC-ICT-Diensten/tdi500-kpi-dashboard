@@ -1,3 +1,6 @@
+// Tailwind-lagen eerst: de statische CSS-laag hoort vóór Emotion's
+// runtime-injectie in de cascade (coexistentie-fase, zie tailwind.config.js).
+import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
