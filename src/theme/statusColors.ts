@@ -33,3 +33,41 @@ export const STATUS_COLORS = {
 } as const;
 
 export type StatusColorKey = keyof typeof STATUS_COLORS;
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * TAILWIND-REPRESENTATIE (MUI→Tailwind-migratie, coexistentie-fase)
+ *
+ * Zelfde bron van waarheid, tweede representatie: STATUS_COLORS (hex, hierboven)
+ * blijft voor de nog-MUI consumenten; gemigreerde Tailwind-componenten consumeren
+ * de class-strings hieronder. Zodra MUI verdwijnt, vervalt de hex-export en
+ * convergeert deze module.
+ *
+ * ⚠️ JIT-VETO — ALTIJD volledige class-LITERALS. Nooit dynamisch samenstellen
+ * (`bg-${naam}-100`): Tailwind's JIT genereert alleen classes die het als
+ * complete literal in de bron ziet — samengestelde namen bestaan runtime
+ * stilletjes NIET. Vandaar deze map met volledige strings.
+ *
+ * Twee vaste patronen (kies bewust, zie tailwind.config.js):
+ *   • TINT-PAAR (pills/badges met tintvlak): licht `bg-*-100 text-*-800`,
+ *     donker `dark:bg-*-600/15 dark:text-*-300`. Dit is wat hieronder staat.
+ *   • TEXT-SAFE (kleine status-TEKST op een kaal vlak, ≤0.7rem, zónder tint):
+ *     gebruik de `-700`-stap (`text-success-700` / `text-warning-700` /
+ *     `text-danger-700`) — de mains halen AA niet op wit bij die grootte.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/** Semantisch statusvocabulaire — zelfde sleutels als STATUS_COLORS. */
+export type StatusSemantic = 'healthy' | 'warning' | 'danger' | 'offline';
+
+/** Tint-paar-classes per semantiek (licht + donker; donker slaapt tot de
+ *  dark-unificatie een `dark`-class op <html> zet). Offline/onbekend volgt de
+ *  neutrale slate/overlay-rolmap uit tailwind.config.js. */
+export const STATUS_PILL_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'bg-success-100 text-success-800 dark:bg-success-600/15 dark:text-success-300',
+  warning: 'bg-warning-100 text-warning-800 dark:bg-warning-600/15 dark:text-warning-300',
+  danger:  'bg-danger-100 text-danger-800 dark:bg-danger-600/15 dark:text-danger-300',
+  offline: 'bg-slate-100 text-slate-600 dark:bg-overlay-10 dark:text-slate-400',
+};
+
+/** Getypeerde accessor — het seam-contract voor gemigreerde componenten. */
+export const statusClasses = (semantic: StatusSemantic): string =>
+  STATUS_PILL_CLASSES[semantic];

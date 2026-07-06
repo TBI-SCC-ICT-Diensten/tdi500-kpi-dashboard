@@ -13,6 +13,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
+import StatusPill, { type PumpStatus } from '../common/StatusPill';
 import { PROPERTY_LABEL_MAP } from '../../types/units';
 import type { HeatPumpSystem, SupplyTemperatureClass } from '../../types/heatpump';
 import type { Oplostermijn } from '../../utils/oplostermijn';
@@ -26,24 +27,6 @@ import { STATUS_COLORS } from '../../theme/statusColors';
  */
 const oplostermijnKleur = (status: Oplostermijn['status']): string =>
   status === 'open' ? STATUS_COLORS.warning : STATUS_COLORS.danger;
-
-type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
-
-const statusDotColor: Record<PumpStatus, string> = {
-  active: STATUS_COLORS.healthy,
-  warning: STATUS_COLORS.warning,
-  error: STATUS_COLORS.danger,
-  offline: STATUS_COLORS.offline,
-  unknown: STATUS_COLORS.offline,
-};
-
-const statusLabel: Record<PumpStatus, string> = {
-  active: 'Actief',
-  warning: 'Waarschuwing',
-  error: 'Fout',
-  offline: 'Offline',
-  unknown: 'Onbekend',
-};
 
 const getSeveritySx = (severity: string, isDark: boolean) => {
   const s = severity.toLowerCase();
@@ -112,15 +95,10 @@ const HeatPumpDetailCard = ({
             {heatPump.id}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25, flexShrink: 0 }}>
-          <Box sx={{
-            width: 8, height: 8, borderRadius: '50%',
-            bgcolor: statusDotColor[status],
-            flexShrink: 0,
-          }} />
-          <Typography variant="caption" color="text.secondary">
-            {statusLabel[status]}
-          </Typography>
+        {/* Puur-Tailwind leaf in een MUI-parent (migratiepatroon: geen adapter
+            nodig — Emotion- en Tailwind-classes bestaan naast elkaar). */}
+        <Box sx={{ mt: 0.25, flexShrink: 0 }}>
+          <StatusPill status={status} />
         </Box>
       </Box>
 
