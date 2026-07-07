@@ -4,9 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import KpiStatusIcon from './KpiStatusIcon';
 import type { KeyPerformanceIndicator, KpiStatus } from '../../types/heatpump';
 import { STATUS_COLORS } from '../../theme/statusColors';
 
@@ -18,25 +16,6 @@ const statusBorderColor: Record<KpiStatus, string> = {
   good:     STATUS_COLORS.healthy,
   warning:  STATUS_COLORS.warning,
   critical: STATUS_COLORS.danger,
-};
-
-const statusColor: Record<KpiStatus, string> = {
-  good:     'success.main',
-  warning:  'warning.main',
-  critical: 'error.main',
-};
-
-const statusBg: Record<KpiStatus, string> = {
-  good:     'success.light',
-  warning:  'warning.light',
-  critical: 'error.light',
-};
-
-const StatusIcon = ({ status }: { status: KpiStatus }) => {
-  const sx = { fontSize: 20, color: statusColor[status] };
-  if (status === 'good') return <CheckCircleOutlineIcon sx={sx} />;
-  if (status === 'warning') return <WarningAmberIcon sx={sx} />;
-  return <ErrorOutlineIcon sx={sx} />;
 };
 
 const categoryLabel: Record<string, string> = {
@@ -81,11 +60,7 @@ const KpiOverviewPanel = ({ kpis }: KpiOverviewPanelProps) => {
                     sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
                     {categoryLabel[kpi.category] ?? kpi.category}
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5,
-                             px: 0.75, py: 0.25, borderRadius: 1,
-                             bgcolor: statusBg[kpi.status] }}>
-                    <StatusIcon status={kpi.status} />
-                  </Box>
+                  <KpiStatusIcon status={kpi.status} />
                 </Box>
 
                 <Typography

@@ -104,6 +104,49 @@ test.describe('Dark-modus — unificatie MUI + Tailwind', () => {
     await expect(icon).toHaveCSS('color', ICON_MAIN[semantic]);
   });
 
+  test('KpiStatusIcon: tint-surface -100 → 15%-alpha dark, icoon canoniek -600 modus-invariant', async ({ page }) => {
+    await seedBeheerderRole(page);
+    await page.goto('/');
+    await expect(page.getByTestId('decision-card')).toBeVisible({ timeout: 15000 });
+
+    // De KPI-status-chip is een tint-SURFACE (bg-only) die het -600-icoon host.
+    // Licht: bg-*-100 = de oude MUI `*.light` EXACT (strikte no-op). Dark: de
+    // nette 15%-alpha main — géén fel modus-blind #DCFCE7-vlak meer. Icoon = de
+    // levendige -600, modus-invariant (net als de dot/factor-icoon). De
+    // KPI-status is een 3-tal (good/warning/critical) → nooit offline.
+    const TINT_LIGHT: Record<string, string> = {
+      healthy: 'rgb(220, 252, 231)', warning: 'rgb(254, 243, 199)', danger: 'rgb(254, 226, 226)',
+    };
+    const ICON_MAIN: Record<string, string> = {
+      healthy: 'rgb(22, 163, 74)', warning: 'rgb(217, 119, 6)', danger: 'rgb(220, 38, 38)',
+    };
+    const TINT_DARK: Record<string, RegExp> = {
+      healthy: /^rgba\(22, 163, 74, 0\.1[45]\d*\)$/,
+      warning: /^rgba\(217, 119, 6, 0\.1[45]\d*\)$/,
+      danger: /^rgba\(220, 38, 38, 0\.1[45]\d*\)$/,
+    };
+
+    // Eerste KPI-kaart; lees de semantiek van de chip en toets ertegen (robuust
+    // voor welke status de mock ook oplevert).
+    const chip = page.locator('[data-testid^="kpi-card-"] [data-semantic]').first();
+    await expect(chip).toBeVisible();
+    const semantic = (await chip.getAttribute('data-semantic')) as 'healthy' | 'warning' | 'danger';
+    expect(['healthy', 'warning', 'danger']).toContain(semantic);
+
+    const icon = chip.locator('svg');
+
+    // Licht: tint-surface bg-*-100 (= de oude *.light exact), icoon -600.
+    await expect(chip).toHaveCSS('background-color', TINT_LIGHT[semantic]);
+    await expect(icon).toHaveCSS('color', ICON_MAIN[semantic]);
+
+    // Toggle → dark: tint = subtiele 15%-alpha main, icoon ONGEWIJZIGD -600.
+    await page.getByTestId('theme-toggle').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    const darkBg = await chip.evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(darkBg).toMatch(TINT_DARK[semantic]);
+    await expect(icon).toHaveCSS('color', ICON_MAIN[semantic]);
+  });
+
   test('dark blijft na reload: class aanwezig bij eerste load (persistentie + first-paint sync)', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('theme-toggle').click();
