@@ -56,6 +56,17 @@ export default tseslint.config(
     },
   },
 
+  // shadcn/ui primitives (ui/*): copied-in library code. They co-export the
+  // component + its cva variants (buttonVariants, …) — the standard shadcn
+  // idiom, so react-refresh's "only export components" rule is off here.
+  // Standing rule for every future shadcn primitive added under ui/.
+  {
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+
   // Tests + test helpers: Node/vitest globals; type-aware rules relaxed
   // (mocks and casts are legitimate in tests).
   {

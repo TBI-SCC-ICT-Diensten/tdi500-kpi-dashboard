@@ -1,5 +1,6 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '../../utils/getErrorMessage';
 
 interface ErrorBoundaryProps {
@@ -45,7 +46,6 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             {getErrorMessage(this.state.error)}
           </Typography>
           <Button
-            variant="contained"
             onClick={() => this.setState({ hasError: false, error: null })}
           >
             Probeer opnieuw

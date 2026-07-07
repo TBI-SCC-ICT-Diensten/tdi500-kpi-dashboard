@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
+import { Button } from '@/components/ui/button';
 import Chip from '@mui/material/Chip';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -191,11 +191,11 @@ const DashboardPage = () => {
                     ))}
 
                     <Button
-                      size="small"
+                      variant="link"
+                      size="sm"
                       data-testid="contingent-detail-link"
                       onClick={() => navigate(`/contingent/${selectedContingent.id}`)}
-                      sx={{ mt: 1, fontSize: '0.75rem', color: 'primary.main',
-                            textTransform: 'none', p: 0, minWidth: 0 }}
+                      className="mt-2 h-auto min-w-0 p-0 text-xs"
                     >
                       Naar detail →
                     </Button>

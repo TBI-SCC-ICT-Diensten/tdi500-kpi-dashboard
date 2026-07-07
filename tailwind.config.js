@@ -44,7 +44,10 @@ module.exports = {
           800: '#0B2674',
           900: '#081C55',
           950: '#051238',
-          DEFAULT: '#123EB7',
+          // shadcn: modus-bewuste DEFAULT (licht #123EB7 / donker #6C8FE8, J3) +
+          // foreground. De steps 50–950 hierboven blijven ONGEMOEID.
+          DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
+          foreground: 'hsl(var(--primary-foreground) / <alpha-value>)',
         },
         /* ── SECONDARY · TNO deep navy — ramp from #002484 (at 800) ────── */
         secondary: {
@@ -59,7 +62,9 @@ module.exports = {
           800: '#002484',   // ★ brand — sidebar/drawer chrome, dark headings
           900: '#001B63',
           950: '#001140',
-          DEFAULT: '#002484',
+          // shadcn semantic DEFAULT + foreground; steps 50–950 ONGEMOEID.
+          DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
+          foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)',
         },
         /* ── ACCENT · TDI 500 green — project identity ONLY (J2).
               Accent borders, project chrome. NEVER semantic/status. ─────── */
@@ -110,6 +115,34 @@ module.exports = {
         },
         /* Offline / geen data — ONE token (§D2, J5) = slate-500 */
         offline: { DEFAULT: '#64748B' },
+
+        /* ── shadcn/ui SEMANTISCHE TOKENS → hsl(var(--x)) uit index.css.
+              NIEUWE namen (botsen niet met de TNO-ramps hierboven). primary/
+              secondary kregen een var-DEFAULT + foreground; `accent` NIET —
+              het TNO-groen blijft chrome-only (J2), shadcn accent-hovers worden
+              in de component ge-slate-d (staande regel). `<alpha-value>` zodat
+              opacity-modifiers (bv. hover:bg-primary/90) werken. */
+        background:  'hsl(var(--background) / <alpha-value>)',
+        foreground:  'hsl(var(--foreground) / <alpha-value>)',
+        border:      'hsl(var(--border) / <alpha-value>)',
+        input:       'hsl(var(--input) / <alpha-value>)',
+        ring:        'hsl(var(--ring) / <alpha-value>)',
+        destructive: {
+          DEFAULT:    'hsl(var(--destructive) / <alpha-value>)',
+          foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)',
+        },
+        muted: {
+          DEFAULT:    'hsl(var(--muted) / <alpha-value>)',
+          foreground: 'hsl(var(--muted-foreground) / <alpha-value>)',
+        },
+        popover: {
+          DEFAULT:    'hsl(var(--popover) / <alpha-value>)',
+          foreground: 'hsl(var(--popover-foreground) / <alpha-value>)',
+        },
+        card: {
+          DEFAULT:    'hsl(var(--card) / <alpha-value>)',
+          foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
+        },
 
         /* ── NEUTRALS — Tailwind slate IS the deliberate ramp; keep stock.
               Role map (replaces the ad-hoc rgba/gray/slate mix):
@@ -184,7 +217,9 @@ module.exports = {
       /* ── RADIUS — settled 4/8 scale (§B, J6) ──────────────────────────── */
       borderRadius: {
         DEFAULT: '4px',
+        md: 'calc(var(--radius) - 2px)',  // shadcn (--radius 0.5rem → 6px)
         lg: '8px',
+        sm: 'calc(var(--radius) - 4px)',  // shadcn (→ 4px)
         full: '9999px',  // status dots
       },
       /* ── BORDERS — flat design: 1px divider standard; 3px accent left-
@@ -196,5 +231,5 @@ module.exports = {
             do NOT introduce an elevation scale in the migration. ─────────── */
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 };
