@@ -101,7 +101,16 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           </ToggleButton>
         </ToggleButtonGroup>
         <Tooltip title={mode === 'dark' ? 'Licht thema' : 'Donker thema'}>
-          <IconButton size="small" onClick={toggleColorMode} sx={{ color: 'text.secondary' }}>
+          {/* aria-label: icoon-knop had geen toegankelijke NAAM (de Tooltip is
+              een beschrijving) — a11y-fix; de testid is de stabiele selector
+              voor de dark-mode e2e. */}
+          <IconButton
+            size="small"
+            onClick={toggleColorMode}
+            aria-label="Thema wisselen"
+            data-testid="theme-toggle"
+            sx={{ color: 'text.secondary' }}
+          >
             {mode === 'dark'
               ? <Brightness7Icon fontSize="small" />
               : <Brightness4Icon fontSize="small" />}
