@@ -180,4 +180,22 @@ test.describe('Dark-modus — unificatie MUI + Tailwind', () => {
     await expect(page.locator('html')).toHaveClass(/dark/);
     await expect(applyBtn).toHaveCSS('background-color', 'rgb(108, 143, 232)');
   });
+
+  test('shadcn Card (surface): bg = MUI background.paper — wit licht / slate-800 dark (NIET de pagina-slate-900)', async ({ page }) => {
+    await seedBeheerderRole(page);
+    await page.goto('/');
+    // decision-card = de gemigreerde Paper→Card (DecisionSupportCard), leest --card.
+    const card = page.getByTestId('decision-card');
+    await expect(card).toBeVisible({ timeout: 15000 });
+
+    // Licht: bg = wit = MUI background.paper (#FFFFFF).
+    await expect(card).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+
+    // Toggle → dark: bg = slate-800 #1E293B = rgb(30,41,59) = MUI background.paper.
+    // NIET slate-900 rgb(15,23,42) (= de pagina): de #178-var-fix die de
+    // dark-elevatie-contrast herstelt (--card was slate-900, nu slate-800).
+    await page.getByTestId('theme-toggle').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(card).toHaveCSS('background-color', 'rgb(30, 41, 59)');
+  });
 });

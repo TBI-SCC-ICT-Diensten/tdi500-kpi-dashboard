@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import ReactApexChart from 'react-apexcharts';
+import { Card } from '@/components/ui/card';
 import { useTheme } from '@mui/material/styles';
 import type { HeatPumpSystem } from '../../types/heatpump';
 import EmptyState from '../common/EmptyState';
@@ -43,7 +43,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
 
   if (!hasData) {
     return (
-      <Paper data-testid="chart-temperature-trend" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #0EA5E9' }}>
+      <Card data-testid="chart-temperature-trend" className="border-l-[3px] border-l-sky-500 p-4">
         <Typography variant="overline" color="text.secondary"
           sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
           Temperatuurtrend
@@ -52,7 +52,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
           message="Geen temperatuurdata beschikbaar"
           subMessage="De warmtepompen retourneren momenteel geen temperatuurmetingen."
         />
-      </Paper>
+      </Card>
     );
   }
 
@@ -93,7 +93,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
   };
 
   return (
-    <Paper data-testid="chart-temperature-trend" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #0EA5E9' }}>
+    <Card data-testid="chart-temperature-trend" className="border-l-[3px] border-l-sky-500 p-4">
       <Typography variant="overline" color="text.secondary"
         sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
         Temperatuurtrend
@@ -108,7 +108,7 @@ const TemperatureTrend = ({ heatPumps }: TemperatureTrendProps) => {
         type="bar"
         height={240}
       />
-    </Paper>
+    </Card>
   );
 };
 

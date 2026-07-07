@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import IconButton from '@mui/material/IconButton';
 import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
@@ -43,7 +43,7 @@ const HeatPumpDetailCard = ({
   };
 
   return (
-    <Paper data-testid="contingent-pump-card" variant="outlined" sx={{ p: 2 }}>
+    <Card data-testid="contingent-pump-card" className="p-4">
 
       {/* ── Header: manufacturer/model (prominent) + status dot ─── */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between',
@@ -74,7 +74,7 @@ const HeatPumpDetailCard = ({
         </Typography>
       )}
 
-      <Divider sx={{ mb: 1.5, mt: heatPump.building || heatPump.room ? 0 : 1 }} />
+      <Separator className={`mb-3${heatPump.building || heatPump.room ? '' : ' mt-2'}`} />
 
       {/* ── Device specs collapsible ─────────────────────────────── */}
       {hasSpecs && (
@@ -134,7 +134,7 @@ const HeatPumpDetailCard = ({
                 ))}
             </Box>
           </Collapse>
-          <Divider sx={{ mt: 1.5 }} />
+          <Separator className="mt-3" />
         </Box>
       )}
 
@@ -246,7 +246,7 @@ const HeatPumpDetailCard = ({
       {/* ── Command panel ─────────────────────────────────────────── */}
       <HeatPumpCommandPanel heatPump={heatPump} />
 
-    </Paper>
+    </Card>
   );
 };
 

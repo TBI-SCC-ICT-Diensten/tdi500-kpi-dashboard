@@ -6,7 +6,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
+import { Separator } from '@/components/ui/separator';
 import { useTheme, alpha } from '@mui/material/styles';
 import { LayoutDashboard, HardHat, MapPin } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -82,7 +82,7 @@ const Sidebar = ({ width, mobileOpen, onClose }: SidebarProps) => {
         </Typography>
       </Box>
 
-      <Divider />
+      <Separator />
 
       <List sx={{ pt: 1, px: 1 }}>
         {NAV_ITEMS

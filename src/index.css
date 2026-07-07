@@ -48,9 +48,9 @@
   .dark {
     --background: 222 47% 11%;           /* slate-900 */
     --foreground: 210 40% 98%;          /* slate-50 */
-    --card: 222 47% 11%;
+    --card: 217 33% 17.5%;              /* slate-800 #1E293B = MUI background.paper (NIET -900 = de pagina; anders geen dark-elevatie). 17.5% => exact rgb(30,41,59) */
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 217 33% 17.5%;           /* slate-800 = MUI background.paper */
     --popover-foreground: 210 40% 98%;
     --primary: 223 73% 66.7%;           /* #6C8FE8 = primary-400 (J3) */
     --primary-foreground: 222 47% 11%;  /* slate-900 (contrastText) */
