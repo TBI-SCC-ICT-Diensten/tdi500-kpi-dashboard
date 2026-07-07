@@ -50,6 +50,11 @@ export type StatusColorKey = keyof typeof STATUS_COLORS;
  * Vaste patronen (kies bewust, zie tailwind.config.js):
  *   • TINT-PAAR (pills/badges/rijen met tintvlak): licht `bg-*-100 text-*-800`,
  *     donker `dark:bg-*-600/15 dark:text-*-300` → STATUS_PILL_CLASSES.
+ *   • TINT-SURFACE (tintvlak dat een GRAPHIC host, géén tekst): enkel de
+ *     achtergrond — `bg-*-100` licht / `dark:bg-*-600/15` donker, zónder
+ *     tekststap → STATUS_TINT_BG_CLASSES. Onderscheiden van het tint-PAAR: de
+ *     host is een icoon met eigen -600 (STATUS_ICON_CLASSES), dus de -800-
+ *     tekststap zou hier dood zijn — één representatie = precies wat ze zegt.
  *   • TEXT-SAFE (kleine status-TEKST op een kaal vlak, ≤0.7rem, zónder tint):
  *     de `-700`-stap — de mains halen AA niet op wit bij die grootte
  *     → STATUS_TEXT_SAFE_CLASSES.
@@ -80,6 +85,22 @@ export const STATUS_PILL_CLASSES: Record<StatusSemantic, string> = {
 /** Getypeerde accessor — het seam-contract voor gemigreerde componenten. */
 export const statusClasses = (semantic: StatusSemantic): string =>
   STATUS_PILL_CLASSES[semantic];
+
+/** TINT-SURFACE: enkel de tint-ACHTERGROND (géén tekststap) voor een vlak dat
+ *  een GRAPHIC host — een status-icoon dat zijn eigen levendige -600 draagt
+ *  (STATUS_ICON_CLASSES). Onderscheid met STATUS_PILL_CLASSES (het tint-PAAR:
+ *  achtergrond + -800-tekst, bedoeld voor TEKST op de tint): hier zou de
+ *  tekststap dood zijn, dus die is er niet — seam-eerlijkheid, elke
+ *  representatie betekent precies wat ze zegt. Licht de -100-tint (= de oude
+ *  MUI `*.light` #DCFCE7/#FEF3C7/#FEE2E2 exact), donker de 15%-alpha main (net
+ *  als het tint-paar). Offline volgt de neutrale slate/overlay-rolmap. Eerste
+ *  (en enige) consument: KpiStatusIcon — de icoon-tintchip. */
+export const STATUS_TINT_BG_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'bg-success-100 dark:bg-success-600/15',
+  warning: 'bg-warning-100 dark:bg-warning-600/15',
+  danger:  'bg-danger-100 dark:bg-danger-600/15',
+  offline: 'bg-slate-100 dark:bg-overlay-10',
+};
 
 /** TEXT-SAFE: kleine status-tekst op een kaal vlak (≤0.7rem) — de `-700`-stap
  *  haalt wél AA op wit; donker de `-300`-stap. Eerste consument: de
@@ -168,5 +189,21 @@ export const decisionScoreToSemantic = (
     case 'good': return 'healthy';
     case 'acceptable': return 'warning';
     default: return 'danger'; // poor
+  }
+};
+
+/** KPI-status → status-semantiek. De KPI-status (types/heatpump.ts) is een
+ *  GESLOTEN drietal (good/warning/critical) — géén offline-tier, net als de
+ *  factorscore en anders dan de pomp-/ernst-bucketers. Geconsumeerd door
+ *  KpiStatusIcon: good→healthy, warning→warning, critical→danger. Sluit de
+ *  status-familie — alle statusweergaven (pil/rij/stip/factor/kpi) lezen nu
+ *  uit deze ene seam. */
+export const kpiStatusToSemantic = (
+  status: 'good' | 'warning' | 'critical'
+): StatusSemantic => {
+  switch (status) {
+    case 'good': return 'healthy';
+    case 'warning': return 'warning';
+    default: return 'danger'; // critical
   }
 };
