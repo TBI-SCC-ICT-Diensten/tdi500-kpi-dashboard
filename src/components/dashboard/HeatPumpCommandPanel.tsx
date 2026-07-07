@@ -23,9 +23,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import TuneIcon from '@mui/icons-material/Tune';
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { useHeatPumpCommand } from '../../hooks/useHeatPumpCommand';
 import type { HeatPumpSystem } from '../../types/heatpump';
 import { COMMAND_RANGES } from '../../config/commandRanges';
@@ -74,14 +72,14 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
         onClick={() => setExpanded((prev) => !prev)}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <TuneIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+          <SlidersHorizontal size={16} className="text-slate-600 dark:text-slate-400" />
           <Typography variant="caption" fontWeight={600} color="text.secondary"
             sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
             Inregelinstellingen
           </Typography>
         </Box>
         <IconButton size="small" disableRipple>
-          {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+          {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </IconButton>
       </Box>
 

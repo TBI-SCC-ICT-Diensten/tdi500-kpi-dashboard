@@ -4,9 +4,8 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import useDashboardData from '../hooks/useDashboardData';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
@@ -98,7 +97,7 @@ const ContingentDetailPage = () => {
                    mb: 2, px: 1.5, py: 1, borderRadius: 1,
                    border: '1px solid', borderColor: 'divider',
                    bgcolor: 'action.hover' }}>
-          <WbSunnyIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+          <Sun size={16} className="text-warning-600" />
           <Typography variant="caption" color="text.secondary">
             Buitentemperatuur:{' '}
             <strong style={{ color: 'inherit' }}>

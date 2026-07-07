@@ -3,7 +3,7 @@ import type { StatusSemantic } from './statusColors';
 /**
  * Status-iconen (Material-paden, 24×24 viewBox) voor gemigreerde
  * Tailwind-componenten — inline SVG's op `currentColor`, zodat componenten
- * MUI-vrij blijven (@mui/icons-material sleept SvgIcon + Emotion mee).
+ * MUI-vrij blijven (het Material-icoonpakket sleept SvgIcon + Emotion mee).
  * Eigen module (geen export vanuit een component-bestand): houdt
  * react-refresh/only-export-components schoon en deelt de paden tussen
  * StatusPill, ErrorCodeRow en toekomstige migraties.
