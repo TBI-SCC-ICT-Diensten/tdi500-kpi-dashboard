@@ -44,6 +44,27 @@ test.describe('Dark-modus — unificatie MUI + Tailwind', () => {
     }
   });
 
+  test('StatusDot: semantische stip modus-invariant, offline-stip lichter in dark', async ({ page }) => {
+    await seedBeheerderRole(page);
+    await page.goto('/');
+    await expect(page.getByTestId('decision-card')).toBeVisible({ timeout: 15000 });
+
+    const activeDot = page.locator('[data-testid="pump-status-row"] [data-status="active"]').first();
+    const offlineDot = page.locator('[data-testid="pump-status-row"] [data-status="offline"]').first();
+    await expect(activeDot).toBeVisible();
+    await expect(offlineDot).toBeVisible();
+
+    // Licht: success-600 + canoniek slate-500 (divergentie-2 geland).
+    await expect(activeDot).toHaveCSS('background-color', 'rgb(22, 163, 74)');
+    await expect(offlineDot).toHaveCSS('background-color', 'rgb(100, 116, 139)');
+
+    // Dark: semantische stip ONGEWIJZIGD (modus-invariant), offline → slate-400.
+    await page.getByTestId('theme-toggle').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(activeDot).toHaveCSS('background-color', 'rgb(22, 163, 74)');
+    await expect(offlineDot).toHaveCSS('background-color', 'rgb(148, 163, 184)');
+  });
+
   test('dark blijft na reload: class aanwezig bij eerste load (persistentie + first-paint sync)', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('theme-toggle').click();
