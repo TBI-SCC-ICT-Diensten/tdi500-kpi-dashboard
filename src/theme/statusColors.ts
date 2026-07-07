@@ -56,6 +56,9 @@ export type StatusColorKey = keyof typeof STATUS_COLORS;
  *   • ACCENT-RAND (3px linker-rand op een tintvlak) → STATUS_ACCENT_BORDER_CLASSES.
  *   • SOLIDE CHIP (gevuld vlak in de main-kleur, witte tekst)
  *     → STATUS_SOLID_CHIP_CLASSES.
+ *   • SOLIDE DOT (kale statusstip, geen tekst) → STATUS_DOT_CLASSES — NIET de
+ *     chip-representatie hergebruiken: die is op wit-tekst-contrast afgestemd
+ *     (offline dónkerder in dark), een stip moet juist lichter in dark.
  * ════════════════════════════════════════════════════════════════════════ */
 
 /** Semantisch statusvocabulaire — zelfde sleutels als STATUS_COLORS. */
@@ -109,4 +112,29 @@ export const severityToSemantic = (severity: string): StatusSemantic => {
   if (s === 'critical' || s === 'high' || s === 'error') return 'danger';
   if (s === 'warning') return 'warning';
   return 'offline';
+};
+
+/** SOLIDE DOT: kale statusstip in de main-kleur. Semantische stippen zijn
+ *  MODUS-INVARIANT (levendig -600 leest op licht én donker); alleen de
+ *  neutrale offline-stip wordt lichter in dark (slate-400) voor zichtbaarheid
+ *  op het donkere vlak. Slate is stock-Tailwind (heeft -400/-500). */
+export const STATUS_DOT_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'bg-success-600',
+  warning: 'bg-warning-600',
+  danger:  'bg-danger-600',
+  offline: 'bg-slate-500 dark:bg-slate-400',
+};
+
+/** Pompstatus → status-semantiek — één bron van waarheid, geconsumeerd door
+ *  StatusPill én StatusDot. De default-tak vangt offline/unknown én eventuele
+ *  onbekende runtime-waarden (het oude `?? '#4B5563'`-fallbackgedrag). */
+export const pumpStatusToSemantic = (
+  status: 'active' | 'warning' | 'error' | 'offline' | 'unknown'
+): StatusSemantic => {
+  switch (status) {
+    case 'active': return 'healthy';
+    case 'warning': return 'warning';
+    case 'error': return 'danger';
+    default: return 'offline';
+  }
 };

@@ -1,4 +1,4 @@
-import { statusClasses, type StatusSemantic } from '../../theme/statusColors';
+import { statusClasses, pumpStatusToSemantic } from '../../theme/statusColors';
 import { ICON_PATHS } from '../../theme/statusIcons';
 
 /**
@@ -18,13 +18,8 @@ import { ICON_PATHS } from '../../theme/statusIcons';
 
 export type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
 
-const SEMANTIC: Record<PumpStatus, StatusSemantic> = {
-  active: 'healthy',
-  warning: 'warning',
-  error: 'danger',
-  offline: 'offline',
-  unknown: 'offline', // eigen label, zelfde neutrale styling als offline
-};
+// Status→semantiek komt uit de seam (pumpStatusToSemantic) — één bron van
+// waarheid, gedeeld met StatusDot. unknown → offline-styling, eigen label.
 
 const LABEL: Record<PumpStatus, string> = {
   active: 'Gezond',
@@ -39,7 +34,7 @@ interface Props {
 }
 
 const StatusPill = ({ status }: Props) => {
-  const semantic = SEMANTIC[status];
+  const semantic = pumpStatusToSemantic(status);
   return (
     <span
       data-status={status}
