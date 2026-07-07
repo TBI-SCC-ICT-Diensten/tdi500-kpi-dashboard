@@ -5,7 +5,7 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
-import AssistantIcon from '@mui/icons-material/Assistant';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DEFAULT_KRUISPROFIEL_CODE, type KeyPerformanceIndicator, type KruisProfielCode } from '../../types/heatpump';
 import type { OverallScore } from '../../types/decision';
@@ -38,7 +38,7 @@ const DecisionSupportCard = ({
 
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-        <AssistantIcon color="primary" />
+        <Sparkles className="text-primary" />
         <Box>
           <Typography variant="subtitle1" fontWeight={600}>
             Installatieadvies

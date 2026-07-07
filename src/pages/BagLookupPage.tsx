@@ -16,10 +16,8 @@ import Grid from '@mui/material/Grid';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useTheme } from '@mui/material/styles';
-import { Search } from 'lucide-react';
+import { Search, Home, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import HomeIcon from '@mui/icons-material/Home';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Spinner from '../components/common/Spinner';
 import WeatherWidget from '../components/bag/WeatherWidget';
 import AanbevolenInstellingen from '../components/bag/AanbevolenInstellingen';
@@ -132,7 +130,7 @@ const BagLookupPage = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-            <HomeIcon color="primary" />
+            <Home className="text-primary" />
             <Box>
               <Typography variant="subtitle1" fontWeight={600}>
                 {bagResult.weergavenaam}
@@ -344,7 +342,7 @@ const BagLookupPage = () => {
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2,
             p: 2, bgcolor: 'primary.main', borderRadius: 1 }}>
-            <CheckCircleOutlineIcon sx={{ color: 'white' }} />
+            <CircleCheck className="text-white" />
             <Box>
               <Typography variant="subtitle1" fontWeight={700} color="white">
                 Kruisprofiel {profiel.code}

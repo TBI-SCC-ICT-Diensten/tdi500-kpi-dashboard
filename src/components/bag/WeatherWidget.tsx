@@ -10,11 +10,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
-import ThermostatIcon from '@mui/icons-material/Thermostat';
-import AirIcon from '@mui/icons-material/Air';
-import WaterDropIcon from '@mui/icons-material/WaterDrop';
-import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Thermometer, Wind, Droplet, Info } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather';
 import type { SupplyTemperatureClass } from '../../types/heatpump';
 
@@ -82,8 +78,7 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
                  gap: 1, mb: 2 }}>
 
         <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
-          <ThermostatIcon sx={{ fontSize: 18, color: 'primary.main',
-                                display: 'block', mx: 'auto', mb: 0.5 }} />
+          <Thermometer size={18} className="mx-auto mb-1 block text-primary" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.temperatureCelsius?.toFixed(1)}°C
           </Typography>
@@ -93,8 +88,7 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
         </Paper>
 
         <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
-          <DeviceThermostatIcon sx={{ fontSize: 18, color: 'text.secondary',
-                                      display: 'block', mx: 'auto', mb: 0.5 }} />
+          <Thermometer size={18} className="mx-auto mb-1 block text-slate-600 dark:text-slate-400" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.feelsLikeCelsius?.toFixed(1)}°C
           </Typography>
@@ -104,8 +98,7 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
         </Paper>
 
         <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
-          <AirIcon sx={{ fontSize: 18, color: 'info.main',
-                         display: 'block', mx: 'auto', mb: 0.5 }} />
+          <Wind size={18} className="mx-auto mb-1 block text-sky-500" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.windSpeedMs?.toFixed(1)} m/s
           </Typography>
@@ -116,8 +109,7 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
         </Paper>
 
         <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
-          <WaterDropIcon sx={{ fontSize: 18, color: 'info.light',
-                               display: 'block', mx: 'auto', mb: 0.5 }} />
+          <Droplet size={18} className="mx-auto mb-1 block text-sky-400" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.precipitationMm?.toFixed(1)} mm
           </Typography>
@@ -133,8 +125,7 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
                    p: 1.5, borderRadius: 1,
                    border: '1px solid', borderColor: 'divider',
                    bgcolor: 'action.hover' }}>
-          <InfoOutlinedIcon sx={{ fontSize: 15, mt: 0.2,
-                                   color: 'text.secondary', flexShrink: 0 }} />
+          <Info size={15} className="mt-0.5 shrink-0 text-slate-600 dark:text-slate-400" />
           <Box>
             <Typography variant="caption" fontWeight={600} display="block">
               COP-verwachting bij {obs.temperatureCelsius?.toFixed(1)}°C

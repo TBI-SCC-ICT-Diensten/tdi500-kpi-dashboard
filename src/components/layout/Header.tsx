@@ -5,15 +5,9 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import MenuIcon from '@mui/icons-material/Menu';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import WifiIcon from '@mui/icons-material/Wifi';
-import ScienceIcon from '@mui/icons-material/Science';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import BuildIcon from '@mui/icons-material/Build';
-import InsightsIcon from '@mui/icons-material/Insights';
+import { Menu, Wifi, FlaskConical, Moon, Sun, Wrench, LineChart } from 'lucide-react';
 import { useDataSource } from '../../hooks/useDataSource';
 import { useColorMode } from '../../context/ColorModeContext';
 import { useRole } from '../../context/RoleContext';
@@ -44,7 +38,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           onClick={onMenuClick}
           sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 1, color: 'text.secondary' }}
         >
-          <MenuIcon />
+          <Menu />
         </IconButton>
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h6" fontWeight={700} color="primary.main" sx={{ lineHeight: 1.2 }}>
@@ -56,7 +50,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
         </Box>
         <Chip
           data-testid="datasource-chip"
-          icon={source === 'live' ? <WifiIcon /> : <ScienceIcon />}
+          icon={source === 'live' ? <Wifi size={18} /> : <FlaskConical size={18} />}
           label={source === 'live' ? 'Hupie API (live)' : 'Mock data'}
           size="small"
           color={source === 'live' ? 'success' : 'warning'}
@@ -92,11 +86,11 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           }}
         >
           <ToggleButton value="installateur" aria-label="Installateur" data-testid="role-installateur">
-            <BuildIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            <Wrench size={14} className="mr-1" />
             Installateur
           </ToggleButton>
           <ToggleButton value="beheerder" aria-label="Beheerder" data-testid="role-beheerder">
-            <InsightsIcon sx={{ fontSize: 14, mr: 0.5 }} />
+            <LineChart size={14} className="mr-1" />
             Beheerder
           </ToggleButton>
         </ToggleButtonGroup>
@@ -112,8 +106,8 @@ const Header = ({ onMenuClick }: HeaderProps) => {
             sx={{ color: 'text.secondary' }}
           >
             {mode === 'dark'
-              ? <Brightness7Icon fontSize="small" />
-              : <Brightness4Icon fontSize="small" />}
+              ? <Sun size={20} />
+              : <Moon size={20} />}
           </IconButton>
         </Tooltip>
       </Toolbar>

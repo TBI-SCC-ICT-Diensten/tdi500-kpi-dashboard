@@ -5,8 +5,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Tooltip from '@mui/material/Tooltip';
 import Alert from '@mui/material/Alert';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Upload } from 'lucide-react';
+import { Info, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { useAanbevolenInstellingen } from '../../hooks/useAanbevolenInstellingen';
@@ -157,7 +156,7 @@ const AanbevolenInstellingen = ({ kruisProfielCode }: Props) => {
 
       <Alert
         severity="info"
-        icon={<InfoOutlinedIcon fontSize="inherit" />}
+        icon={<Info size="1em" />}
         sx={{ mb: 2, fontSize: '0.78rem' }}
       >
         "Niet opgegeven" betekent dat deze fabrikant geen standaardwaarde

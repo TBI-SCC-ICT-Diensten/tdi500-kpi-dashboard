@@ -6,9 +6,7 @@ import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
 import ErrorCodeRow from './ErrorCodeRow';
 import StatusPill, { type PumpStatus } from '../common/StatusPill';
@@ -87,7 +85,7 @@ const HeatPumpDetailCard = ({
             onClick={() => setSpecsExpanded(p => !p)}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <InfoOutlinedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <Info size={14} className="text-slate-600 dark:text-slate-400" />
               <Typography variant="caption" fontWeight={600}
                 color="text.secondary"
                 sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -96,8 +94,8 @@ const HeatPumpDetailCard = ({
             </Box>
             <IconButton size="small" disableRipple>
               {specsExpanded
-                ? <ExpandLessIcon fontSize="small" />
-                : <ExpandMoreIcon fontSize="small" />}
+                ? <ChevronUp size={20} />
+                : <ChevronDown size={20} />}
             </IconButton>
           </Box>
           <Collapse in={specsExpanded}>
