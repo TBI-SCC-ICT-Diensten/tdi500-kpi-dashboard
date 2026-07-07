@@ -8,7 +8,7 @@
  */
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
+import { Card } from '@/components/ui/card';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Thermometer, Wind, Droplet, Info } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather';
@@ -77,7 +77,7 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
                  gridTemplateColumns: 'repeat(4, 1fr)',
                  gap: 1, mb: 2 }}>
 
-        <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
+        <Card className="p-3 text-center">
           <Thermometer size={18} className="mx-auto mb-1 block text-primary" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.temperatureCelsius?.toFixed(1)}°C
@@ -85,9 +85,9 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
           <Typography variant="caption" color="text.secondary" fontSize="0.65rem">
             Buiten
           </Typography>
-        </Paper>
+        </Card>
 
-        <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
+        <Card className="p-3 text-center">
           <Thermometer size={18} className="mx-auto mb-1 block text-slate-600 dark:text-slate-400" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.feelsLikeCelsius?.toFixed(1)}°C
@@ -95,9 +95,9 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
           <Typography variant="caption" color="text.secondary" fontSize="0.65rem">
             Gevoeld
           </Typography>
-        </Paper>
+        </Card>
 
-        <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
+        <Card className="p-3 text-center">
           <Wind size={18} className="mx-auto mb-1 block text-sky-500" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.windSpeedMs?.toFixed(1)} m/s
@@ -106,9 +106,9 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
             Wind {obs.windDirectionDeg !== null
               ? windDirectionLabel(obs.windDirectionDeg) : ''}
           </Typography>
-        </Paper>
+        </Card>
 
-        <Paper variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
+        <Card className="p-3 text-center">
           <Droplet size={18} className="mx-auto mb-1 block text-sky-400" />
           <Typography variant="subtitle2" fontWeight={700} lineHeight={1}>
             {obs.precipitationMm?.toFixed(1)} mm
@@ -116,7 +116,7 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
           <Typography variant="caption" color="text.secondary" fontSize="0.65rem">
             Neerslag
           </Typography>
-        </Paper>
+        </Card>
       </Box>
 
       {/* COP context */}

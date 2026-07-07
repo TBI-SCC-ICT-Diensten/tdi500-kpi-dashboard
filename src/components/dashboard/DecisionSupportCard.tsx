@@ -1,12 +1,12 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { DEFAULT_KRUISPROFIEL_CODE, type KeyPerformanceIndicator, type KruisProfielCode } from '../../types/heatpump';
 import type { OverallScore } from '../../types/decision';
 import { useDecisionSupport } from '../../hooks/useDecisionSupport';
@@ -34,7 +34,7 @@ const DecisionSupportCard = ({
     useDecisionSupport(kpis, kruisProfielCode);
 
   return (
-    <Paper data-testid="decision-card" variant="outlined" sx={{ p: 2 }}>
+    <Card data-testid="decision-card" className="p-4">
 
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
@@ -49,7 +49,7 @@ const DecisionSupportCard = ({
         </Box>
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Separator className="mb-4" />
 
       {/* Overall score banner */}
       <Alert
@@ -143,7 +143,7 @@ const DecisionSupportCard = ({
         ondersteuning, niet als definitief oordeel. De installateur
         blijft verantwoordelijk voor de uiteindelijke beslissing.
       </Alert>
-    </Paper>
+    </Card>
   );
 };
 

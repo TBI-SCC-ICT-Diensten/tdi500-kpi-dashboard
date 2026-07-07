@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { Button } from '@/components/ui/button';
 import Alert from '@mui/material/Alert';
-import Divider from '@mui/material/Divider';
+import { Separator } from '@/components/ui/separator';
 import CircularProgress from '@mui/material/CircularProgress';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -60,7 +60,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
 
   return (
     <Box sx={{ mt: 1.5 }}>
-      <Divider sx={{ mb: 1 }} />
+      <Separator className="mb-2" />
       <Box
         sx={{
           display: 'flex',
@@ -140,7 +140,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             </Alert>
           )}
 
-          <Divider sx={{ my: 1.5 }} />
+          <Separator className="my-3" />
 
           {/* Heating Curve */}
           <Typography variant="caption" color="text.secondary"

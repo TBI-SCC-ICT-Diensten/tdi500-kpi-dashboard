@@ -7,10 +7,8 @@
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
-import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -18,6 +16,8 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useTheme } from '@mui/material/styles';
 import { Search, Home, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import Spinner from '../components/common/Spinner';
 import WeatherWidget from '../components/bag/WeatherWidget';
 import AanbevolenInstellingen from '../components/bag/AanbevolenInstellingen';
@@ -69,10 +69,10 @@ const BagLookupPage = () => {
         </Typography>
       </Box>
 
-      <Divider sx={{ mb: 3 }} />
+      <Separator className="mb-6" />
 
       {/* Step 1: Address input */}
-      <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
+      <Card className="mb-6 p-6">
         <Typography variant="overline" color="text.secondary"
           sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}>
           Stap 1 — Adres invoeren
@@ -111,7 +111,7 @@ const BagLookupPage = () => {
         </Box>
 
 
-      </Paper>
+      </Card>
 
       {loading && (
         <Spinner message={progress?.message ?? 'Gegevens ophalen...'} />
@@ -123,7 +123,7 @@ const BagLookupPage = () => {
 
       {/* Step 2: BAG result */}
       {bagResult && !loading && (
-        <Paper data-testid="bag-result" variant="outlined" sx={{ p: 3, mb: 3 }}>
+        <Card data-testid="bag-result" className="mb-6 p-6">
           <Typography variant="overline" color="text.secondary"
             sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}>
             Stap 2 — BAG-resultaat
@@ -182,15 +182,13 @@ const BagLookupPage = () => {
             )}
             {bagResult.energielabelError && (
               <Grid item xs={12}>
-                <Paper variant="outlined"
-                  sx={{ p: 1.5, borderColor: 'warning.main',
-                        bgcolor: 'warning.light' }}>
+                <Card className="border-warning-600 bg-warning-100 p-3">
                   <Typography variant="caption"
                     sx={{ color: 'warning.dark', fontWeight: 600 }}>
                     ⚠ Energielabel kon niet worden opgehaald:{' '}
                     {bagResult.energielabelError}
                   </Typography>
-                </Paper>
+                </Card>
               </Grid>
             )}
             {bagResult.oppervlakte && (
@@ -262,12 +260,12 @@ const BagLookupPage = () => {
               </Box>
             </Box>
           )}
-        </Paper>
+        </Card>
       )}
 
       {/* Step 3: Afgiftesysteem selection */}
       {bagResult && insulation && !loading && (
-        <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
+        <Card className="mb-6 p-6">
           <Typography variant="overline" color="text.secondary"
             sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}>
             Stap 3 — Afgiftesysteem selecteren (X-as kruisprofiel)
@@ -304,7 +302,7 @@ const BagLookupPage = () => {
               </ToggleButton>
             ))}
           </ToggleButtonGroup>
-        </Paper>
+        </Card>
       )}
 
       {/* Step 4: Current weather */}
@@ -318,7 +316,7 @@ const BagLookupPage = () => {
             </Typography>
             <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
           </Box>
-          <Paper variant="outlined" sx={{ p: 2 }}>
+          <Card className="p-4">
             <Typography variant="caption" color="text.secondary"
               sx={{ display: 'block', mb: 1.5 }}>
               Actuele meting op basis van Open-Meteo (KNMI/ECMWF model).
@@ -328,13 +326,13 @@ const BagLookupPage = () => {
               rdCoordinates={bagResult.rdCoordinates}
               supplyTemperatureClass={supplyTemperatureClass}
             />
-          </Paper>
+          </Card>
         </Box>
       )}
 
       {/* Step 5: Kruisprofiel + Inregelinstellingen result */}
       {profiel && thresholds && (
-        <Paper variant="outlined" sx={{ p: 3 }}>
+        <Card className="p-6">
           <Typography variant="overline" color="text.secondary"
             sx={{ display: 'block', mb: 2, letterSpacing: 1.5 }}>
             Stap 5 — Profielgrenzen
@@ -402,12 +400,12 @@ const BagLookupPage = () => {
               ? `Kruisprofiel bepaald op basis van energielabel ${bagResult.energielabel} — dit is de meest nauwkeurige methode.`
               : 'Dit zijn de standaard inregelinstellingen op basis van het geschatte woningprofiel (bouwjaar). Controleer het energielabel via EP-online voor een definitieve kruisprofiel-toewijzing.'}
           </Alert>
-        </Paper>
+        </Card>
       )}
 
       {/* Step 6: Aanbevolen instellingen per fabrikant */}
       {kruisProfielCode && (
-        <Paper variant="outlined" sx={{ p: 3, mt: 3 }}>
+        <Card className="mt-6 p-6">
           <Typography
             variant="overline"
             color="text.secondary"
@@ -416,7 +414,7 @@ const BagLookupPage = () => {
             Stap 6 — Aanbevolen instellingen per fabrikant
           </Typography>
           <AanbevolenInstellingen kruisProfielCode={kruisProfielCode} />
-        </Paper>
+        </Card>
       )}
     </Box>
   );

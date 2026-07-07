@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
+import { Card } from '@/components/ui/card';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
 import { ArrowLeft, Sun } from 'lucide-react';
@@ -80,14 +80,14 @@ const ContingentDetailPage = () => {
           { label: 'Warmtepompen', value: `${contingent.heatPumps.length} installaties` },
         ].map(({ label, value }) => (
           <Grid item xs={6} sm={3} key={label}>
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Card className="p-4">
               <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
                 {label}
               </Typography>
               <Typography variant="body1" fontWeight={600} sx={{ mt: 0.5 }}>
                 {value}
               </Typography>
-            </Paper>
+            </Card>
           </Grid>
         ))}
       </Grid>

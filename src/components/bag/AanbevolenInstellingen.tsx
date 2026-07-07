@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
+import { Card } from '@/components/ui/card';
 import Typography from '@mui/material/Typography';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -119,7 +119,7 @@ const AanbevolenInstellingen = ({ kruisProfielCode }: Props) => {
         ))}
       </Tabs>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Card className="mb-4 p-4">
         <Box
           sx={{
             display: 'grid',
@@ -152,7 +152,7 @@ const AanbevolenInstellingen = ({ kruisProfielCode }: Props) => {
             </Box>
           ))}
         </Box>
-      </Paper>
+      </Card>
 
       <Alert
         severity="info"
