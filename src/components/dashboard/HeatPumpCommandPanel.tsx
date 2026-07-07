@@ -12,7 +12,7 @@ import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import { Button } from '@/components/ui/button';
 import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -111,8 +111,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               helperText={`${COMMAND_RANGES.setpoint.min}–${COMMAND_RANGES.setpoint.max}°C`}
             />
             <Button
-              variant="contained"
-              size="small"
+              size="sm"
               onClick={handleSetpointSubmit}
               disabled={
                 isOffline ||
@@ -120,7 +119,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
                 !setpointValue.trim() ||
                 rateLimitCooldown > 0
               }
-              sx={{ height: 40, minWidth: 80 }}
+              className="h-10 min-w-20"
             >
               {setpointStatus === 'pending'
                 ? <CircularProgress size={16} color="inherit" />
@@ -177,8 +176,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               helperText="bijv. −0,6"
             />
             <Button
-              variant="contained"
-              size="small"
+              size="sm"
               onClick={handleCurveSubmit}
               disabled={
                 isOffline ||
@@ -187,7 +185,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
                 !curveSlope.trim() ||
                 rateLimitCooldown > 0
               }
-              sx={{ height: 40, minWidth: 80 }}
+              className="h-10 min-w-20"
             >
               {curveStatus === 'pending'
                 ? <CircularProgress size={16} color="inherit" />
@@ -248,8 +246,8 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           <DialogContentText>{confirm?.message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirm(null)}>Annuleren</Button>
-          <Button variant="contained" onClick={() => confirm?.onConfirm()}>
+          <Button variant="ghost" onClick={() => setConfirm(null)}>Annuleren</Button>
+          <Button onClick={() => confirm?.onConfirm()}>
             Bevestigen
           </Button>
         </DialogActions>

@@ -3,11 +3,11 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Alert from '@mui/material/Alert';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import UploadIcon from '@mui/icons-material/Upload';
+import { Upload } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 import { useAanbevolenInstellingen } from '../../hooks/useAanbevolenInstellingen';
 import {
@@ -168,11 +168,8 @@ const AanbevolenInstellingen = ({ kruisProfielCode }: Props) => {
 
       <Tooltip title="In ontwikkeling — toepassen op warmtepomp volgt in een volgende iteratie.">
         <span>
-          <Button
-            variant="contained"
-            disabled
-            startIcon={<UploadIcon />}
-          >
+          <Button disabled>
+            <Upload />
             Toepassen op warmtepomp
           </Button>
         </span>

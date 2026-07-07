@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import useDashboardData from '../hooks/useDashboardData';
 import Spinner from '../components/common/Spinner';
@@ -30,10 +30,11 @@ const ContingentDetailPage = () => {
     return (
       <Box>
         <Button
-          startIcon={<ArrowBackIcon />}
+          variant="ghost"
           onClick={() => navigate('/')}
-          sx={{ mb: 2 }}
+          className="mb-4"
         >
+          <ArrowLeft />
           Terug naar dashboard
         </Button>
         <EmptyState
@@ -47,10 +48,11 @@ const ContingentDetailPage = () => {
   return (
     <Box>
       <Button
-        startIcon={<ArrowBackIcon />}
+        variant="ghost"
         onClick={() => navigate('/')}
-        sx={{ mb: 2 }}
+        className="mb-4"
       >
+        <ArrowLeft />
         Terug naar dashboard
       </Button>
 

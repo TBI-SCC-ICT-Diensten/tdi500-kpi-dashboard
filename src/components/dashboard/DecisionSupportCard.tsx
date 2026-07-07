@@ -5,8 +5,8 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
-import Button from '@mui/material/Button';
 import AssistantIcon from '@mui/icons-material/Assistant';
+import { Button } from '@/components/ui/button';
 import { DEFAULT_KRUISPROFIEL_CODE, type KeyPerformanceIndicator, type KruisProfielCode } from '../../types/heatpump';
 import type { OverallScore } from '../../types/decision';
 import { useDecisionSupport } from '../../hooks/useDecisionSupport';
@@ -127,10 +127,9 @@ const DecisionSupportCard = ({
           <Typography variant="body2" sx={{ mb: 1.5 }}>
             Op basis van de geselecteerde filters is het aanbevolen inregelprofiel voor deze woningen: Profiel {profileCode}.
           </Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            size="small" 
+          <Button
+            size="sm"
+            data-testid="apply-profile-btn"
             onClick={() => console.log('Applying profile')}
           >
             Pas Profiel {profileCode} toe op apparaten

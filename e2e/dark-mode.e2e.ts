@@ -158,4 +158,26 @@ test.describe('Dark-modus — unificatie MUI + Tailwind', () => {
     await expect(page.locator('html')).toHaveClass(/dark/);
     await expect(page.getByTestId('theme-toggle')).toBeVisible();
   });
+
+  test('shadcn Button: default = TNO-merkblauw (rebrand #1E3A5F → #123EB7), modus-bewust', async ({ page }) => {
+    await seedBeheerderRole(page);
+    await page.goto('/');
+    await expect(page.getByTestId('decision-card')).toBeVisible({ timeout: 15000 });
+
+    // De default (contained) shadcn Button in de DecisionSupportCard rendert het
+    // ECHTE TNO-merkblauw via --primary — NIET meer het oude MUI-primary #1E3A5F.
+    // Modus-bewust (J3): licht #123EB7 (primary-600), donker #6C8FE8 (primary-400).
+    // Eerste component met de echte merkkleur; bewijs dat de shadcn→TNO
+    // token-mapping werkt (bg-primary → hsl(var(--primary))).
+    const applyBtn = page.getByTestId('apply-profile-btn');
+    await expect(applyBtn).toBeVisible();
+
+    // Licht: bg = #123EB7 = rgb(18, 62, 183).
+    await expect(applyBtn).toHaveCSS('background-color', 'rgb(18, 62, 183)');
+
+    // Toggle → dark: bg = #6C8FE8 = rgb(108, 143, 232).
+    await page.getByTestId('theme-toggle').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(applyBtn).toHaveCSS('background-color', 'rgb(108, 143, 232)');
+  });
 });

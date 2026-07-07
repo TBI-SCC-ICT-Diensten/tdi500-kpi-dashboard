@@ -9,7 +9,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
@@ -17,7 +16,8 @@ import Grid from '@mui/material/Grid';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useTheme } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
+import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import HomeIcon from '@mui/icons-material/Home';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Spinner from '../components/common/Spinner';
@@ -102,13 +102,12 @@ const BagLookupPage = () => {
             inputProps={{ 'data-testid': 'bag-huisnummer-input' }}
           />
           <Button
-            variant="contained"
-            startIcon={<SearchIcon />}
             onClick={handleSearch}
             disabled={loading || !postcode.trim() || !huisnummer.trim()}
-            sx={{ height: 40, alignSelf: 'center' }}
+            className="h-10 self-center"
             data-testid="bag-submit"
           >
+            <Search />
             Ophalen
           </Button>
         </Box>
