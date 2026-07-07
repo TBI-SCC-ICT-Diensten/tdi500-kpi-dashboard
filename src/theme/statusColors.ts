@@ -59,6 +59,9 @@ export type StatusColorKey = keyof typeof STATUS_COLORS;
  *   • SOLIDE DOT (kale statusstip, geen tekst) → STATUS_DOT_CLASSES — NIET de
  *     chip-representatie hergebruiken: die is op wit-tekst-contrast afgestemd
  *     (offline dónkerder in dark), een stip moet juist lichter in dark.
+ *   • SOLIDE ICON (kaal status-icoon, inline SVG op currentColor, op een kaal
+ *     vlak) → STATUS_ICON_CLASSES — de levendige main-stap (-600), net als de
+ *     dot MODUS-INVARIANT.
  * ════════════════════════════════════════════════════════════════════════ */
 
 /** Semantisch statusvocabulaire — zelfde sleutels als STATUS_COLORS. */
@@ -125,6 +128,21 @@ export const STATUS_DOT_CLASSES: Record<StatusSemantic, string> = {
   offline: 'bg-slate-500 dark:bg-slate-400',
 };
 
+/** SOLIDE ICON: kaal status-icoon (inline SVG op currentColor) op een kaal
+ *  vlak — de levendige main-stap (-600, via de tekstkleur → currentColor).
+ *  MODUS-INVARIANT net als de dot (levendig -600 leest op licht én donker);
+ *  alleen de neutrale offline-tier wordt lichter in dark. Onderscheid met
+ *  TEXT-SAFE (-700, kleine TEKST) en de tint-tekst (-800, op tintvlak): een
+ *  ~18px-icoon is een grafisch element (WCAG 3:1-drempel), dus de levendige
+ *  -600 mag. Eerste consument: DecisionFactorRow; KpiOverviewPanel's StatusIcon
+ *  hergebruikt 'm later. */
+export const STATUS_ICON_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'text-success-600',
+  warning: 'text-warning-600',
+  danger:  'text-danger-600',
+  offline: 'text-slate-500 dark:text-slate-400',
+};
+
 /** Pompstatus → status-semantiek — één bron van waarheid, geconsumeerd door
  *  StatusPill én StatusDot. De default-tak vangt offline/unknown én eventuele
  *  onbekende runtime-waarden (het oude `?? '#4B5563'`-fallbackgedrag). */
@@ -136,5 +154,19 @@ export const pumpStatusToSemantic = (
     case 'warning': return 'warning';
     case 'error': return 'danger';
     default: return 'offline';
+  }
+};
+
+/** Beslis-factorscore → status-semantiek. De factorscore (types/decision.ts)
+ *  is een GESLOTEN drietal (good/acceptable/poor) — géén offline-tier, anders
+ *  dan de pomp- en ernst-bucketers. Geconsumeerd door DecisionFactorRow:
+ *  good→healthy, acceptable→warning, poor→danger. */
+export const decisionScoreToSemantic = (
+  score: 'good' | 'acceptable' | 'poor'
+): StatusSemantic => {
+  switch (score) {
+    case 'good': return 'healthy';
+    case 'acceptable': return 'warning';
+    default: return 'danger'; // poor
   }
 };

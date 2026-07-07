@@ -6,13 +6,11 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import AssistantIcon from '@mui/icons-material/Assistant';
 import { DEFAULT_KRUISPROFIEL_CODE, type KeyPerformanceIndicator, type KruisProfielCode } from '../../types/heatpump';
-import type { OverallScore, DecisionScore } from '../../types/decision';
+import type { OverallScore } from '../../types/decision';
 import { useDecisionSupport } from '../../hooks/useDecisionSupport';
+import DecisionFactorRow from './DecisionFactorRow';
 
 interface DecisionSupportCardProps {
   kpis?: KeyPerformanceIndicator[];
@@ -25,20 +23,6 @@ const scoreLabel: Record<OverallScore, string> = {
   acceptable: 'Acceptabel',
   poor: 'Onvoldoende',
   'insufficient-data': 'Onvoldoende data',
-};
-
-const FactorIcon = ({ score }: { score: DecisionScore['score'] }) => {
-  if (score === 'good')
-    return <CheckCircleOutlineIcon sx={{ fontSize: 18, color: '#3b6d11' }} />;
-  if (score === 'acceptable')
-    return <WarningAmberIcon sx={{ fontSize: 18, color: '#ba7517' }} />;
-  return <ErrorOutlineIcon sx={{ fontSize: 18, color: '#a32d2d' }} />;
-};
-
-const factorScoreLabel: Record<DecisionScore['score'], string> = {
-  good: 'Goed',
-  acceptable: 'Acceptabel',
-  poor: 'Onvoldoende',
 };
 
 const DecisionSupportCard = ({
@@ -107,53 +91,7 @@ const DecisionSupportCard = ({
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {details.map((detail) => (
-              <Box
-                key={detail.factor}
-                sx={{
-                  p: 1.5,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  bgcolor: 'background.paper',
-                }}
-              >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between',
-                  alignItems: 'center', mb: 0.5 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <FactorIcon score={detail.score} />
-                    <Typography variant="body2" fontWeight={600}>
-                      {detail.factor}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="caption" color="text.secondary">
-                      {detail.value}{detail.unit ? ` ${detail.unit}` : ''}
-                    </Typography>
-                    <Chip
-                      label={factorScoreLabel[detail.score]}
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        fontSize: '0.65rem',
-                        height: 20,
-                        borderColor:
-                          detail.score === 'good' ? '#3b6d11' :
-                          detail.score === 'acceptable' ? '#ba7517' : '#a32d2d',
-                        color:
-                          detail.score === 'good' ? '#3b6d11' :
-                          detail.score === 'acceptable' ? '#ba7517' : '#a32d2d',
-                      }}
-                    />
-                  </Box>
-                </Box>
-                <Typography variant="caption" color="text.secondary"
-                  sx={{ display: 'block', mb: 0.25 }}>
-                  Drempel: {detail.threshold}
-                </Typography>
-                <Typography variant="caption" color="text.primary">
-                  {detail.explanation}
-                </Typography>
-              </Box>
+              <DecisionFactorRow key={detail.factor} detail={detail} />
             ))}
           </Box>
         </Box>
