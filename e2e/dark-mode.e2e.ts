@@ -65,6 +65,45 @@ test.describe('Dark-modus — unificatie MUI + Tailwind', () => {
     await expect(offlineDot).toHaveCSS('background-color', 'rgb(148, 163, 184)');
   });
 
+  test('DecisionFactorRow: chip text-safe -700→-300, icoon canoniek -600 modus-invariant', async ({ page }) => {
+    await seedBeheerderRole(page);
+    await page.goto('/');
+    await expect(page.getByTestId('decision-card')).toBeVisible({ timeout: 15000 });
+
+    // Canonieke waarden na divergentie-1: chip-tekst = text-safe (-700 licht /
+    // -300 dark), icoon = levendige main (-600, modus-invariant net als de dot).
+    // De factor-score is een 3-tal (good/acceptable/poor) → nooit offline.
+    const SAFE_LIGHT: Record<string, string> = {
+      healthy: 'rgb(21, 128, 61)', warning: 'rgb(180, 83, 9)', danger: 'rgb(185, 28, 28)',
+    };
+    const SAFE_DARK: Record<string, string> = {
+      healthy: 'rgb(134, 239, 172)', warning: 'rgb(252, 211, 77)', danger: 'rgb(252, 165, 165)',
+    };
+    const ICON_MAIN: Record<string, string> = {
+      healthy: 'rgb(22, 163, 74)', warning: 'rgb(217, 119, 6)', danger: 'rgb(220, 38, 38)',
+    };
+
+    // Eerste factor-rij; lees de semantiek en toets ertegen (robuust voor
+    // welke score de mock ook oplevert).
+    const row = page.locator('[data-testid="decision-factor"]').first();
+    await expect(row).toBeVisible();
+    const semantic = (await row.getAttribute('data-semantic')) as 'healthy' | 'warning' | 'danger';
+    expect(['healthy', 'warning', 'danger']).toContain(semantic);
+
+    const chip = row.locator('.rounded-full');
+    const icon = row.locator('svg');
+
+    // Licht: chip-tekst de text-safe -700 (AA op wit), icoon de levendige -600.
+    await expect(chip).toHaveCSS('color', SAFE_LIGHT[semantic]);
+    await expect(icon).toHaveCSS('color', ICON_MAIN[semantic]);
+
+    // Toggle → dark: chip-tekst -300 (leesbaar op donker), icoon ONGEWIJZIGD -600.
+    await page.getByTestId('theme-toggle').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(chip).toHaveCSS('color', SAFE_DARK[semantic]);
+    await expect(icon).toHaveCSS('color', ICON_MAIN[semantic]);
+  });
+
   test('dark blijft na reload: class aanwezig bij eerste load (persistentie + first-paint sync)', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('theme-toggle').click();
