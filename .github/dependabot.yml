@@ -68,6 +68,16 @@ updates:
       # new major. See closed PR #184.
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
+      # apexcharts is slated for wholesale REMOVAL in the upcoming Apex ->
+      # shadcn/ui charts migration. ALL version bumps are suppressed (not just
+      # major): any bump is effort on a dependency being deleted. Listing the
+      # three version-update types explicitly keeps SECURITY updates
+      # unaffected, so real vulnerability PRs still surface. See closed PR #190.
+      - dependency-name: "apexcharts"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
 
   # Azure Functions backend (azure-api/package.json + package-lock.json) — the
   # BYOF production API. Separate entry so its build/runtime deps (esbuild,
