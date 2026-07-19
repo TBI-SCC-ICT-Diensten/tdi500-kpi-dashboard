@@ -62,6 +62,12 @@ updates:
       # v4 migration. See closed PR #183.
       - dependency-name: "tailwind-merge"
         update-types: ["version-update:semver-major"]
+      # ESLint majors are blocked by eslint-plugin-jsx-a11y: its latest release
+      # (6.10.2, Oct 2024) peers eslint ^3..^9 — npm ci fails with ERESOLVE on
+      # ESLint 10. Re-evaluate when jsx-a11y (or a replacement) supports the
+      # new major. See closed PR #184.
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
 
   # Azure Functions backend (azure-api/package.json + package-lock.json) — the
   # BYOF production API. Separate entry so its build/runtime deps (esbuild,
