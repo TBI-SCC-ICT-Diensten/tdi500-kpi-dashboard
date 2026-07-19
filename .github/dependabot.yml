@@ -52,6 +52,16 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-router-dom"
         update-types: ["version-update:semver-major"]
+      # Tailwind v4 is a deliberate, separate migration (CSS-first config, no
+      # corePlugins.preflight; shadcn/ui 2.3.0 is pinned on v3) — not a routine
+      # bump. See closed PR #182.
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+      # tailwind-merge v3 targets Tailwind v4 class semantics; on Tailwind v3
+      # twMerge/cn() would resolve classes wrong. Stays v2 until the Tailwind
+      # v4 migration. See closed PR #183.
+      - dependency-name: "tailwind-merge"
+        update-types: ["version-update:semver-major"]
 
   # Azure Functions backend (azure-api/package.json + package-lock.json) — the
   # BYOF production API. Separate entry so its build/runtime deps (esbuild,
