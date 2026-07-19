@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import Chip from '@mui/material/Chip';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -56,10 +55,10 @@ const DecisionSupportCard = ({
         severity={
           overallScore === 'good' ? 'success' :
           overallScore === 'acceptable' ? 'warning' :
-          overallScore === 'poor' ? 'error' : 'info'
+          overallScore === 'poor' ? 'danger' : 'info'
         }
         variant="filled"
-        sx={{ mb: 1.5, alignItems: 'center' }}
+        className="mb-3 items-center"
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
           <Typography variant="subtitle2" fontWeight={700}>
@@ -122,8 +121,8 @@ const DecisionSupportCard = ({
 
       {/* Contingent Profile Recommendation */}
       {profileCode && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <AlertTitle sx={{ fontWeight: 600 }}>Aanbevolen Inregelprofiel</AlertTitle>
+        <Alert severity="info" className="mb-4">
+          <AlertTitle>Aanbevolen Inregelprofiel</AlertTitle>
           <Typography variant="body2" sx={{ mb: 1.5 }}>
             Op basis van de geselecteerde filters is het aanbevolen inregelprofiel voor deze woningen: Profiel {profileCode}.
           </Typography>
@@ -138,7 +137,7 @@ const DecisionSupportCard = ({
       )}
 
       {/* Ethical disclaimer — always visible */}
-      <Alert severity="warning" sx={{ fontSize: '0.78rem' }}>
+      <Alert severity="warning" className="text-xs">
         Dit advies is gebaseerd op beschikbare meetdata en dient als
         ondersteuning, niet als definitief oordeel. De installateur
         blijft verantwoordelijk voor de uiteindelijke beslissing.

@@ -8,7 +8,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Alert from '@mui/material/Alert';
+import { Alert } from '@/components/ui/alert';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -53,7 +53,7 @@ const BagLookupPage = () => {
   return (
     <Box>
       {role === 'beheerder' && (
-        <Alert severity="info" sx={{ mb: 3, fontSize: '0.85rem' }}>
+        <Alert severity="info" className="mb-6 text-sm">
           Deze pagina is primair voor installateurs. Je bekijkt hem
           momenteel als beheerder — schakel naar installateursmodus
           voor het volledige inregelen-perspectief.
@@ -118,7 +118,7 @@ const BagLookupPage = () => {
       )}
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} data-testid="bag-error">{error}</Alert>
+        <Alert severity="danger" className="mb-6" data-testid="bag-error">{error}</Alert>
       )}
 
       {/* Step 2: BAG result */}
@@ -210,7 +210,6 @@ const BagLookupPage = () => {
           {insulation && (
             <Alert
               severity={insulation.confidence === 'hoog' ? 'info' : 'warning'}
-              sx={{ mb: 0 }}
               icon={false}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
@@ -242,7 +241,7 @@ const BagLookupPage = () => {
 
           {bagResult.bouwjaar == null && !bagResult.energielabel && (
             <Box sx={{ mt: 2 }}>
-              <Alert severity="warning" sx={{ mb: 2 }}>
+              <Alert severity="warning" className="mb-4">
                 Bouwjaar niet beschikbaar via PDOK voor dit adres.
                 Voer het bouwjaar handmatig in, of raadpleeg EP-online.nl.
               </Alert>
@@ -395,7 +394,7 @@ const BagLookupPage = () => {
             ))}
           </Grid>
 
-          <Alert severity="info" sx={{ mt: 2, fontSize: '0.78rem' }}>
+          <Alert severity="info" className="mt-4 text-xs">
             {bagResult?.energielabel
               ? `Kruisprofiel bepaald op basis van energielabel ${bagResult.energielabel} — dit is de meest nauwkeurige methode.`
               : 'Dit zijn de standaard inregelinstellingen op basis van het geschatte woningprofiel (bouwjaar). Controleer het energielabel via EP-online voor een definitieve kruisprofiel-toewijzing.'}

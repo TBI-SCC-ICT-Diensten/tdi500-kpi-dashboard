@@ -191,11 +191,62 @@ test.describe('Dark-modus — unificatie MUI + Tailwind', () => {
     // Licht: bg = wit = MUI background.paper (#FFFFFF).
     await expect(card).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 
+    // REGRESSIE-GUARD (de assertie die #180 miste): de rand moet écht RENDEREN.
+    // Tailwind's border-classes zetten alleen border-WIDTH; border-style:solid
+    // komt normaal uit Preflight (hier uit, #171) — zonder style stort de
+    // computed width naar 0 en is de rand gespecificeerd maar onzichtbaar.
+    // De Card draagt daarom zelf border-solid (component-scoped reset).
+    await expect(card).toHaveCSS('border-top-style', 'solid');
+    await expect(card).toHaveCSS('border-top-width', '1px');
+
     // Toggle → dark: bg = slate-800 #1E293B = rgb(30,41,59) = MUI background.paper.
     // NIET slate-900 rgb(15,23,42) (= de pagina): de #178-var-fix die de
     // dark-elevatie-contrast herstelt (--card was slate-900, nu slate-800).
     await page.getByTestId('theme-toggle').click();
     await expect(page.locator('html')).toHaveClass(/dark/);
     await expect(card).toHaveCSS('background-color', 'rgb(30, 41, 59)');
+    await expect(card).toHaveCSS('border-top-style', 'solid');
+    await expect(card).toHaveCSS('border-top-width', '1px');
+  });
+
+  test('KPI-kaartshell (gestructureerde Card): surface + border-border-kader + links-only -600-accent, licht + dark', async ({ page }) => {
+    await seedBeheerderRole(page);
+    await page.goto('/');
+    await expect(page.getByTestId('decision-card')).toBeVisible({ timeout: 15000 });
+
+    // De -600-mains, modus-INVARIANT (zoals dot/icoon) — links-only accent.
+    const ACCENT_MAIN: Record<string, string> = {
+      healthy: 'rgb(22, 163, 74)', warning: 'rgb(217, 119, 6)', danger: 'rgb(220, 38, 38)',
+    };
+
+    // Eerste KPI-kaart; lees de semantiek van de geneste chip en toets ertegen
+    // (robuust voor welke status de mock ook oplevert).
+    const card = page.locator('[data-testid^="kpi-card-"]').first();
+    await expect(card).toBeVisible();
+    const semantic = (await card
+      .locator('[data-semantic]')
+      .getAttribute('data-semantic')) as 'healthy' | 'warning' | 'danger';
+    expect(['healthy', 'warning', 'danger']).toContain(semantic);
+    const content = card.locator('> div').first();
+
+    // Licht: bg wit (--card), kader --border (de op hele procenten afgeronde
+    // HSL-kanalen renderen 1 RGB-stap naast de slate-hex: 225,231,239 ≈
+    // slate-200 — #178-tokengedrag, geen regressie), accent 4px -600, padding
+    // de MUI-fideliteit p-4 pb-3 (16px + 12px — niet shadcn's p-6).
+    await expect(card).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+    await expect(card).toHaveCSS('border-top-color', 'rgb(225, 231, 239)');
+    await expect(card).toHaveCSS('border-left-width', '4px');
+    await expect(card).toHaveCSS('border-left-color', ACCENT_MAIN[semantic]);
+    await expect(content).toHaveCSS('padding-top', '16px');
+    await expect(content).toHaveCSS('padding-bottom', '12px');
+
+    // Toggle → dark: bg slate-800 (= MUI paper), kader --border dark (52,66,86
+    // ≈ slate-700, zelfde afrondingsstap), accent ONGEWIJZIGD -600
+    // (modus-invariant).
+    await page.getByTestId('theme-toggle').click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(card).toHaveCSS('background-color', 'rgb(30, 41, 59)');
+    await expect(card).toHaveCSS('border-top-color', 'rgb(52, 66, 86)');
+    await expect(card).toHaveCSS('border-left-color', ACCENT_MAIN[semantic]);
   });
 });
