@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import ReactApexChart from 'react-apexcharts';
+import { Card } from '@/components/ui/card';
 import { useTheme } from '@mui/material/styles';
 import type { HeatPumpSystem } from '../../types/heatpump';
 import EmptyState from '../common/EmptyState';
@@ -22,7 +22,7 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
 
   if (pumpsWithEnergy.length === 0) {
     return (
-      <Paper data-testid="chart-energy-comparison" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #6366F1' }}>
+      <Card data-testid="chart-energy-comparison" className="border-l-[3px] border-l-indigo-500 p-4">
         <Typography variant="overline" color="text.secondary"
           sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
           Energieverbruik vergelijking
@@ -31,7 +31,7 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
           message="Geen energiedata beschikbaar"
           subMessage="De warmtepompen retourneren momenteel geen energieverbruiksdata."
         />
-      </Paper>
+      </Card>
     );
   }
 
@@ -79,7 +79,7 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
   const series = [{ name: 'Energieverbruik (kWh)', data: values }];
 
   return (
-    <Paper data-testid="chart-energy-comparison" variant="outlined" sx={{ p: 2, borderLeft: '3px solid #6366F1' }}>
+    <Card data-testid="chart-energy-comparison" className="border-l-[3px] border-l-indigo-500 p-4">
       <Typography variant="overline" color="text.secondary"
         sx={{ display: 'block', mb: 1, letterSpacing: 1.5 }}>
         Energieverbruik vergelijking
@@ -94,7 +94,7 @@ const EnergyComparison = ({ heatPumps }: EnergyComparisonProps) => {
         type="bar"
         height={200}
       />
-    </Paper>
+    </Card>
   );
 };
 

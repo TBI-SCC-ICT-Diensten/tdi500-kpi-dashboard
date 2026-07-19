@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const NotFoundPage = () => {
       <Typography color="text.secondary" sx={{ mb: 2 }}>
         Pagina niet gevonden
       </Typography>
-      <Button variant="contained" onClick={() => navigate('/')}>
+      <Button onClick={() => navigate('/')}>
         Terug naar Dashboard
       </Button>
     </Box>

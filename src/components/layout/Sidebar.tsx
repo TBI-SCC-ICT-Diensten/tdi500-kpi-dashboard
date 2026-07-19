@@ -6,11 +6,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { Separator } from '@/components/ui/separator';
 import { useTheme, alpha } from '@mui/material/styles';
+import { LayoutDashboard, HardHat, MapPin } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDashboardContext } from '../../context/DashboardContext';
 import { useRole } from '../../context/RoleContext';
@@ -42,14 +40,14 @@ const NAV_ITEMS: NavItem[] = [
   {
     path: '/',
     label: 'Dashboard',
-    icon: DashboardIcon,
+    icon: LayoutDashboard,
     matchExact: true,
     visibleFor: ['beheerder'],
   },
   {
     path: '/contingent',
     label: 'Contingent detail',
-    icon: HomeRepairServiceIcon,
+    icon: HardHat,
     matchPrefix: '/contingent',
     visibleFor: ['beheerder'],
   },
@@ -57,7 +55,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     path: '/bag-lookup',
     label: 'Inregelen',
-    icon: LocationOnIcon,
+    icon: MapPin,
     matchExact: true,
     visibleFor: ['installateur'],
   },
@@ -84,7 +82,7 @@ const Sidebar = ({ width, mobileOpen, onClose }: SidebarProps) => {
         </Typography>
       </Box>
 
-      <Divider />
+      <Separator />
 
       <List sx={{ pt: 1, px: 1 }}>
         {NAV_ITEMS
@@ -119,7 +117,7 @@ const Sidebar = ({ width, mobileOpen, onClose }: SidebarProps) => {
                   minWidth: 34,
                   color: isActive ? 'primary.main' : 'text.secondary',
                 }}>
-                  <Icon fontSize="small" />
+                  <Icon size={20} />
                 </ListItemIcon>
                 <ListItemText
                   primary={label}

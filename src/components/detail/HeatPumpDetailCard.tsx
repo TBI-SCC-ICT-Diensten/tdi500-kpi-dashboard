@@ -2,71 +2,18 @@ import React, { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Chip from '@mui/material/Chip';
-import Divider from '@mui/material/Divider';
 import Collapse from '@mui/material/Collapse';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
+import ErrorCodeRow from './ErrorCodeRow';
+import StatusPill, { type PumpStatus } from '../common/StatusPill';
 import { PROPERTY_LABEL_MAP } from '../../types/units';
 import type { HeatPumpSystem, SupplyTemperatureClass } from '../../types/heatpump';
-import type { Oplostermijn } from '../../utils/oplostermijn';
 import { useHeatPumpDetail } from '../../hooks/useHeatPumpDetail';
 import { STATUS_COLORS } from '../../theme/statusColors';
-
-/**
- * Kleur voor het oplostermijn-label: 'open' is neutraal/amber, terwijl
- * 'direct' en 'overschreden' urgent (rood) zijn — consistent met de
- * ernst-badges hierboven.
- */
-const oplostermijnKleur = (status: Oplostermijn['status']): string =>
-  status === 'open' ? STATUS_COLORS.warning : STATUS_COLORS.danger;
-
-type PumpStatus = 'active' | 'warning' | 'error' | 'offline' | 'unknown';
-
-const statusDotColor: Record<PumpStatus, string> = {
-  active: STATUS_COLORS.healthy,
-  warning: STATUS_COLORS.warning,
-  error: STATUS_COLORS.danger,
-  offline: STATUS_COLORS.offline,
-  unknown: STATUS_COLORS.offline,
-};
-
-const statusLabel: Record<PumpStatus, string> = {
-  active: 'Actief',
-  warning: 'Waarschuwing',
-  error: 'Fout',
-  offline: 'Offline',
-  unknown: 'Onbekend',
-};
-
-const getSeveritySx = (severity: string, isDark: boolean) => {
-  const s = severity.toLowerCase();
-  if (s === 'critical' || s === 'high' || s === 'error') {
-    return {
-      bg:     isDark ? 'rgba(220,38,38,0.15)'  : '#FEE2E2',
-      text:   isDark ? '#FCA5A5'               : '#991B1B',
-      border: STATUS_COLORS.danger,
-    };
-  }
-  if (s === 'warning') {
-    return {
-      bg:     isDark ? 'rgba(217,119,6,0.15)'  : '#FEF3C7',
-      text:   isDark ? '#FCD34D'               : '#92400E',
-      border: STATUS_COLORS.warning,
-    };
-  }
-  return {
-    bg:     isDark ? 'rgba(148,163,184,0.10)' : '#F1F5F9',
-    text:   isDark ? '#94A3B8'               : '#475569',
-    border: isDark ? '#475569'               : '#94A3B8',
-  };
-};
 
 interface Props {
   heatPump: HeatPumpSystem;
@@ -96,7 +43,7 @@ const HeatPumpDetailCard = ({
   };
 
   return (
-    <Paper data-testid="contingent-pump-card" variant="outlined" sx={{ p: 2 }}>
+    <Card data-testid="contingent-pump-card" className="p-4">
 
       {/* ── Header: manufacturer/model (prominent) + status dot ─── */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between',
@@ -112,15 +59,10 @@ const HeatPumpDetailCard = ({
             {heatPump.id}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25, flexShrink: 0 }}>
-          <Box sx={{
-            width: 8, height: 8, borderRadius: '50%',
-            bgcolor: statusDotColor[status],
-            flexShrink: 0,
-          }} />
-          <Typography variant="caption" color="text.secondary">
-            {statusLabel[status]}
-          </Typography>
+        {/* Puur-Tailwind leaf in een MUI-parent (migratiepatroon: geen adapter
+            nodig — Emotion- en Tailwind-classes bestaan naast elkaar). */}
+        <Box sx={{ mt: 0.25, flexShrink: 0 }}>
+          <StatusPill status={status} />
         </Box>
       </Box>
 
@@ -132,7 +74,7 @@ const HeatPumpDetailCard = ({
         </Typography>
       )}
 
-      <Divider sx={{ mb: 1.5, mt: heatPump.building || heatPump.room ? 0 : 1 }} />
+      <Separator className={`mb-3${heatPump.building || heatPump.room ? '' : ' mt-2'}`} />
 
       {/* ── Device specs collapsible ─────────────────────────────── */}
       {hasSpecs && (
@@ -143,7 +85,7 @@ const HeatPumpDetailCard = ({
             onClick={() => setSpecsExpanded(p => !p)}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <InfoOutlinedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <Info size={14} className="text-slate-600 dark:text-slate-400" />
               <Typography variant="caption" fontWeight={600}
                 color="text.secondary"
                 sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -152,8 +94,8 @@ const HeatPumpDetailCard = ({
             </Box>
             <IconButton size="small" disableRipple>
               {specsExpanded
-                ? <ExpandLessIcon fontSize="small" />
-                : <ExpandMoreIcon fontSize="small" />}
+                ? <ChevronUp size={20} />
+                : <ChevronDown size={20} />}
             </IconButton>
           </Box>
           <Collapse in={specsExpanded}>
@@ -192,7 +134,7 @@ const HeatPumpDetailCard = ({
                 ))}
             </Box>
           </Collapse>
-          <Divider sx={{ mt: 1.5 }} />
+          <Separator className="mt-3" />
         </Box>
       )}
 
@@ -285,55 +227,15 @@ const HeatPumpDetailCard = ({
         </Typography>
       )}
 
-      {/* ── Error codes ───────────────────────────────────────────── */}
+      {/* ── Error codes — puur-Tailwind rijen (ErrorCodeRow, #172-sjabloon) ── */}
       {errorCodes.length > 0 && (
         <Box sx={{ mt: 1, mb: 0.5 }}>
-          {errorCodes.map(({ errorCode: ec, termijn }) => {
-            const sev = getSeveritySx(ec.severity, isDark);
-            const termijnKleur = oplostermijnKleur(termijn.status);
-            return (
-              <Box key={ec.code}
-                data-testid="pump-error-code"
-                sx={{
-                  display: 'flex', alignItems: 'flex-start', gap: 0.75,
-                  p: '6px 10px', mb: 0.5,
-                  bgcolor: sev.bg,
-                  borderLeft: `3px solid ${sev.border}`,
-                  borderRadius: '0 4px 4px 0',
-                }}>
-                <WarningAmberIcon sx={{ fontSize: 13, mt: 0.2,
-                  color: sev.text, flexShrink: 0 }} />
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant="caption" fontWeight={700}
-                    sx={{ fontFamily: 'monospace', color: sev.text }}>
-                    {ec.code}
-                  </Typography>
-                  {ec.message && (
-                    <Typography variant="caption"
-                      sx={{ display: 'block', fontSize: '0.7rem', color: sev.text }}>
-                      {ec.message}
-                    </Typography>
-                  )}
-                  <Chip
-                    data-testid="pump-oplostermijn"
-                    label={termijn.label}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      mt: 0.5, height: 18, fontSize: '0.6rem', fontWeight: 600,
-                      borderColor: termijnKleur, color: termijnKleur,
-                    }} />
-                </Box>
-                <Tooltip title={`Ernst: ${ec.severity}`} placement="top">
-                  <Chip label={ec.severity} size="small"
-                    sx={{
-                      ml: 'auto', height: 16, fontSize: '0.6rem',
-                      bgcolor: sev.border, color: '#fff', flexShrink: 0,
-                    }} />
-                </Tooltip>
-              </Box>
-            );
-          })}
+          {errorCodes.map((ecWithTermijn) => (
+            <ErrorCodeRow
+              key={ecWithTermijn.errorCode.code}
+              errorCodeWithTermijn={ecWithTermijn}
+            />
+          ))}
           <Typography variant="caption" color="text.disabled"
             sx={{ display: 'block', mt: 0.25, fontSize: '0.66rem' }}>
             Oplostermijn op basis van de ernst van de storing.
@@ -344,7 +246,7 @@ const HeatPumpDetailCard = ({
       {/* ── Command panel ─────────────────────────────────────────── */}
       <HeatPumpCommandPanel heatPump={heatPump} />
 
-    </Paper>
+    </Card>
   );
 };
 

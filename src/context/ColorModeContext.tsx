@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo } from 'react';
+import { createContext, useContext, useState, useMemo, useLayoutEffect } from 'react';
 import type { ReactNode } from 'react';
 
 export type ColorMode = 'light' | 'dark';
@@ -27,6 +27,16 @@ const getInitialMode = (): ColorMode => {
 
 export const ColorModeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<ColorMode>(getInitialMode);
+
+  // Dark-unificatie: dezelfde mode-state stuurt óók Tailwind's class-based
+  // dark mode (tailwind.config.js darkMode:'class'). MUI leest zijn modus
+  // uitsluitend uit de ThemeProvider — de <html>-class is inert voor MUI en
+  // activeert alleen de dark:-varianten van gemigreerde componenten.
+  // useLayoutEffect (niet useEffect): de class staat er vóór de paint, dus
+  // een dark-persisted sessie rendert Tailwind-dark vanaf het eerste frame.
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle('dark', mode === 'dark');
+  }, [mode]);
 
   const value = useMemo(() => ({
     mode,

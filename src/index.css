@@ -1,0 +1,69 @@
+/* Tailwind-lagen (coexistentie-fase). Preflight staat UIT
+   (tailwind.config.js corePlugins.preflight:false) — MUI's CssBaseline levert
+   de reset, dus `@tailwind base` emiteert vrijwel niets. Alle drie de
+   directives staan er voor correctheid; utilities verschijnen pas zodra een
+   component Tailwind-klassen gebruikt. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── shadcn/ui semantische CSS-variabelen → TNO-tokens ────────────────────────
+   HSL-KANAALFORMAAT (v3-era shadcn: `H S% L%`, geen hsl()-wrapper, geen oklch).
+   Geconsumeerd als hsl(var(--x)) in tailwind.config.js.
+
+   ALLEEN de variabelen — BEWUST GEEN shadcn `*{border-border}` / `body{...}`
+   base-block: dat body{bg-background} zou de pagina-achtergrond van slate-50 →
+   wit kappen (regressie); MUI's CssBaseline bezit de reset tijdens coexistentie.
+   Preflight blijft UIT tot het MUI-endgame.
+
+   --primary is MODUS-BEWUST: licht #123EB7 (primary-600), donker #6C8FE8
+   (primary-400) — config J3: #123EB7 zakt weg op slate-900, dus donker de
+   lichtere stap met donkere tekst. De HSL-waarden zijn op precisie afgesteld
+   zodat ze exact terugronden naar de merk-hexen (rgb 18,62,183 / 108,143,232).
+   De TNO-ramps + het accent-groen in tailwind.config.js blijven ONGEMOEID. */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;          /* slate-900 */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 224 82.1% 39.4%;         /* #123EB7 = primary-600 */
+    --primary-foreground: 0 0% 100%;    /* wit */
+    --secondary: 224 100% 26%;          /* #002484 = secondary-800 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96%;               /* slate-100 */
+    --muted-foreground: 215 16% 47%;    /* slate-500 */
+    --accent: 210 40% 96%;              /* neutrale hover (slate) — NIET het TNO-groen */
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 72.2% 50.6%;       /* #DC2626 = danger-600 */
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;              /* slate-200 */
+    --input: 214 32% 91%;
+    --ring: 224 82.1% 39.4%;            /* primary */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 11%;           /* slate-900 */
+    --foreground: 210 40% 98%;          /* slate-50 */
+    --card: 217 33% 17.5%;              /* slate-800 #1E293B = MUI background.paper (NIET -900 = de pagina; anders geen dark-elevatie). 17.5% => exact rgb(30,41,59) */
+    --card-foreground: 210 40% 98%;
+    --popover: 217 33% 17.5%;           /* slate-800 = MUI background.paper */
+    --popover-foreground: 210 40% 98%;
+    --primary: 223 73% 66.7%;           /* #6C8FE8 = primary-400 (J3) */
+    --primary-foreground: 222 47% 11%;  /* slate-900 (contrastText) */
+    --secondary: 224 100% 26%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 217 33% 17%;               /* slate-800 */
+    --muted-foreground: 215 20% 65%;    /* slate-400 */
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 25% 27%;              /* slate-700 */
+    --input: 215 25% 27%;
+    --ring: 223 73% 66.7%;
+  }
+}

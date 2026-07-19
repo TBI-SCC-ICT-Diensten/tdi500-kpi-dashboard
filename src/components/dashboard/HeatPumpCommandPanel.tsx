@@ -12,9 +12,9 @@ import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import { Button } from '@/components/ui/button';
 import Alert from '@mui/material/Alert';
-import Divider from '@mui/material/Divider';
+import { Separator } from '@/components/ui/separator';
 import CircularProgress from '@mui/material/CircularProgress';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -23,9 +23,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import TuneIcon from '@mui/icons-material/Tune';
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { useHeatPumpCommand } from '../../hooks/useHeatPumpCommand';
 import type { HeatPumpSystem } from '../../types/heatpump';
 import { COMMAND_RANGES } from '../../config/commandRanges';
@@ -62,7 +60,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
 
   return (
     <Box sx={{ mt: 1.5 }}>
-      <Divider sx={{ mb: 1 }} />
+      <Separator className="mb-2" />
       <Box
         sx={{
           display: 'flex',
@@ -74,14 +72,14 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
         onClick={() => setExpanded((prev) => !prev)}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <TuneIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+          <SlidersHorizontal size={16} className="text-slate-600 dark:text-slate-400" />
           <Typography variant="caption" fontWeight={600} color="text.secondary"
             sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
             Inregelinstellingen
           </Typography>
         </Box>
         <IconButton size="small" disableRipple>
-          {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+          {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </IconButton>
       </Box>
 
@@ -111,8 +109,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               helperText={`${COMMAND_RANGES.setpoint.min}–${COMMAND_RANGES.setpoint.max}°C`}
             />
             <Button
-              variant="contained"
-              size="small"
+              size="sm"
               onClick={handleSetpointSubmit}
               disabled={
                 isOffline ||
@@ -120,7 +117,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
                 !setpointValue.trim() ||
                 rateLimitCooldown > 0
               }
-              sx={{ height: 40, minWidth: 80 }}
+              className="h-10 min-w-20"
             >
               {setpointStatus === 'pending'
                 ? <CircularProgress size={16} color="inherit" />
@@ -143,7 +140,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             </Alert>
           )}
 
-          <Divider sx={{ my: 1.5 }} />
+          <Separator className="my-3" />
 
           {/* Heating Curve */}
           <Typography variant="caption" color="text.secondary"
@@ -177,8 +174,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               helperText="bijv. −0,6"
             />
             <Button
-              variant="contained"
-              size="small"
+              size="sm"
               onClick={handleCurveSubmit}
               disabled={
                 isOffline ||
@@ -187,7 +183,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
                 !curveSlope.trim() ||
                 rateLimitCooldown > 0
               }
-              sx={{ height: 40, minWidth: 80 }}
+              className="h-10 min-w-20"
             >
               {curveStatus === 'pending'
                 ? <CircularProgress size={16} color="inherit" />
@@ -248,8 +244,8 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           <DialogContentText>{confirm?.message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirm(null)}>Annuleren</Button>
-          <Button variant="contained" onClick={() => confirm?.onConfirm()}>
+          <Button variant="ghost" onClick={() => setConfirm(null)}>Annuleren</Button>
+          <Button onClick={() => confirm?.onConfirm()}>
             Bevestigen
           </Button>
         </DialogActions>

@@ -1,12 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
+import { Card } from '@/components/ui/card';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import { ArrowLeft, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import useDashboardData from '../hooks/useDashboardData';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
@@ -30,10 +29,11 @@ const ContingentDetailPage = () => {
     return (
       <Box>
         <Button
-          startIcon={<ArrowBackIcon />}
+          variant="ghost"
           onClick={() => navigate('/')}
-          sx={{ mb: 2 }}
+          className="mb-4"
         >
+          <ArrowLeft />
           Terug naar dashboard
         </Button>
         <EmptyState
@@ -47,10 +47,11 @@ const ContingentDetailPage = () => {
   return (
     <Box>
       <Button
-        startIcon={<ArrowBackIcon />}
+        variant="ghost"
         onClick={() => navigate('/')}
-        sx={{ mb: 2 }}
+        className="mb-4"
       >
+        <ArrowLeft />
         Terug naar dashboard
       </Button>
 
@@ -79,14 +80,14 @@ const ContingentDetailPage = () => {
           { label: 'Warmtepompen', value: `${contingent.heatPumps.length} installaties` },
         ].map(({ label, value }) => (
           <Grid item xs={6} sm={3} key={label}>
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Card className="p-4">
               <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 500 }}>
                 {label}
               </Typography>
               <Typography variant="body1" fontWeight={600} sx={{ mt: 0.5 }}>
                 {value}
               </Typography>
-            </Paper>
+            </Card>
           </Grid>
         ))}
       </Grid>
@@ -96,7 +97,7 @@ const ContingentDetailPage = () => {
                    mb: 2, px: 1.5, py: 1, borderRadius: 1,
                    border: '1px solid', borderColor: 'divider',
                    bgcolor: 'action.hover' }}>
-          <WbSunnyIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+          <Sun size={16} className="text-warning-600" />
           <Typography variant="caption" color="text.secondary">
             Buitentemperatuur:{' '}
             <strong style={{ color: 'inherit' }}>

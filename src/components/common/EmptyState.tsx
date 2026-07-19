@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import InboxIcon from '@mui/icons-material/Inbox';
+import { Inbox } from 'lucide-react';
 
 interface EmptyStateProps {
   message?: string;
@@ -25,7 +25,7 @@ const EmptyState = ({
       color: 'text.secondary',
     }}
   >
-    <InboxIcon sx={{ fontSize: 56, opacity: 0.3 }} />
+    <Inbox size={56} className="opacity-30" />
     <Typography variant="body1" fontWeight={500}>
       {message}
     </Typography>

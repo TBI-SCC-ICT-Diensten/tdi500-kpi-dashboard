@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
+import { Button } from '@/components/ui/button';
 import Chip from '@mui/material/Chip';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -14,18 +14,7 @@ import CopGauge from '../components/charts/CopGauge';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
 import { useRole } from '../context/RoleContext';
-import { STATUS_COLORS } from '../theme/statusColors';
-
-const STATUS_DOT: Record<string, string> = {
-  active:  STATUS_COLORS.healthy,
-  warning: STATUS_COLORS.warning,
-  error:   STATUS_COLORS.danger,
-  // Off-palette grijs (#4B5563 = grijs-600) — wijkt af van de canonieke
-  // STATUS_COLORS.offline (#6B7280). Bewust NIET geunificeerd: dat zou de
-  // gerenderde kleur wijzigen (deze PR is een no-op). Zie PR-notitie.
-  offline: '#4B5563',
-  unknown: '#4B5563',
-};
+import StatusDot from '../components/common/StatusDot';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -187,11 +176,9 @@ const DashboardPage = () => {
                               justifyContent: 'space-between', py: 0.75,
                               borderBottom: '1px solid', borderColor: 'divider' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Box sx={{
-                            width: 8, height: 8, borderRadius: '50%',
-                            bgcolor: STATUS_DOT[pump.status] ?? '#4B5563',
-                            flexShrink: 0,
-                          }} />
+                          {/* Puur-Tailwind leaf in de MUI-rij (#172-sjabloon);
+                              offline/unknown nu canoniek slate (divergentie-2). */}
+                          <StatusDot status={pump.status} />
                           <Typography variant="caption"
                             sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
                             {pump.id}
@@ -204,11 +191,11 @@ const DashboardPage = () => {
                     ))}
 
                     <Button
-                      size="small"
+                      variant="link"
+                      size="sm"
                       data-testid="contingent-detail-link"
                       onClick={() => navigate(`/contingent/${selectedContingent.id}`)}
-                      sx={{ mt: 1, fontSize: '0.75rem', color: 'primary.main',
-                            textTransform: 'none', p: 0, minWidth: 0 }}
+                      className="mt-2 h-auto min-w-0 p-0 text-xs"
                     >
                       Naar detail →
                     </Button>
