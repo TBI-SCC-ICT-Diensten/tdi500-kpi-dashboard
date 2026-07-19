@@ -191,11 +191,21 @@ test.describe('Dark-modus — unificatie MUI + Tailwind', () => {
     // Licht: bg = wit = MUI background.paper (#FFFFFF).
     await expect(card).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 
+    // REGRESSIE-GUARD (de assertie die #180 miste): de rand moet écht RENDEREN.
+    // Tailwind's border-classes zetten alleen border-WIDTH; border-style:solid
+    // komt normaal uit Preflight (hier uit, #171) — zonder style stort de
+    // computed width naar 0 en is de rand gespecificeerd maar onzichtbaar.
+    // De Card draagt daarom zelf border-solid (component-scoped reset).
+    await expect(card).toHaveCSS('border-top-style', 'solid');
+    await expect(card).toHaveCSS('border-top-width', '1px');
+
     // Toggle → dark: bg = slate-800 #1E293B = rgb(30,41,59) = MUI background.paper.
     // NIET slate-900 rgb(15,23,42) (= de pagina): de #178-var-fix die de
     // dark-elevatie-contrast herstelt (--card was slate-900, nu slate-800).
     await page.getByTestId('theme-toggle').click();
     await expect(page.locator('html')).toHaveClass(/dark/);
     await expect(card).toHaveCSS('background-color', 'rgb(30, 41, 59)');
+    await expect(card).toHaveCSS('border-top-style', 'solid');
+    await expect(card).toHaveCSS('border-top-width', '1px');
   });
 });
