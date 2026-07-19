@@ -13,7 +13,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { Button } from '@/components/ui/button';
-import Alert from '@mui/material/Alert';
+import { Alert } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import CircularProgress from '@mui/material/CircularProgress';
 import Collapse from '@mui/material/Collapse';
@@ -86,7 +86,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
       <Collapse in={expanded}>
         <Box sx={{ pt: 1.5 }}>
           {isOffline && (
-            <Alert severity="warning" sx={{ mb: 1.5, py: 0.5, fontSize: '0.75rem' }}>
+            <Alert severity="warning" className="mb-3 py-2.5 text-xs">
               Warmtepomp offline — commando's kunnen niet worden verstuurd.
             </Alert>
           )}
@@ -128,14 +128,14 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           </Box>
 
           {setpointStatus === 'success' && (
-            <Alert severity={setpointMock ? 'info' : 'success'} sx={{ mb: 1, py: 0.25, fontSize: '0.72rem' }}>
+            <Alert severity={setpointMock ? 'info' : 'success'} className="mb-2 py-2 text-xs">
               {setpointMock
                 ? 'Mock-modus — geen echte schrijfactie verzonden (gesimuleerd).'
                 : 'Setpoint succesvol ingesteld.'}
             </Alert>
           )}
           {setpointError && (
-            <Alert severity="error" sx={{ mb: 1, py: 0.25, fontSize: '0.72rem' }}>
+            <Alert severity="danger" className="mb-2 py-2 text-xs">
               {setpointError}
             </Alert>
           )}
@@ -194,14 +194,14 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
           </Box>
 
           {curveStatus === 'success' && (
-            <Alert severity={curveMock ? 'info' : 'success'} sx={{ mt: 0.5, py: 0.25, fontSize: '0.72rem' }}>
+            <Alert severity={curveMock ? 'info' : 'success'} className="mt-1 py-2 text-xs">
               {curveMock
                 ? 'Mock-modus — geen echte schrijfactie verzonden (gesimuleerd).'
                 : 'Stooklijn succesvol ingesteld.'}
             </Alert>
           )}
           {curveError && (
-            <Alert severity="error" sx={{ mt: 0.5, py: 0.25, fontSize: '0.72rem' }}>
+            <Alert severity="danger" className="mt-1 py-2 text-xs">
               {curveError}
             </Alert>
           )}
@@ -230,7 +230,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             </Box>
           )}
 
-          <Alert severity={isMock ? 'warning' : 'info'} sx={{ mt: 1.5, py: 0.5, fontSize: '0.72rem' }}>
+          <Alert severity={isMock ? 'warning' : 'info'} className="mt-3 py-2.5 text-xs">
             {isMock
               ? "Mock-modus actief — commando's worden gesimuleerd en niet naar de warmtepomp verstuurd."
               : "Commando's worden direct via SPARQL UPDATE naar de Hupie API verstuurd. Wijzigingen zijn direct actief op de warmtepomp."}

@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Tooltip from '@mui/material/Tooltip';
-import Alert from '@mui/material/Alert';
+import { Alert } from '@/components/ui/alert';
 import { Info, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -157,7 +157,7 @@ const AanbevolenInstellingen = ({ kruisProfielCode }: Props) => {
       <Alert
         severity="info"
         icon={<Info size="1em" />}
-        sx={{ mb: 2, fontSize: '0.78rem' }}
+        className="mb-4 text-xs"
       >
         "Niet opgegeven" betekent dat deze fabrikant geen standaardwaarde
         heeft aangeleverd voor dit parameter in dit kruisprofiel (in TNO
