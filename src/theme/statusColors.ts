@@ -59,6 +59,8 @@ export type StatusColorKey = keyof typeof STATUS_COLORS;
  *     de `-700`-stap — de mains halen AA niet op wit bij die grootte
  *     → STATUS_TEXT_SAFE_CLASSES.
  *   • ACCENT-RAND (3px linker-rand op een tintvlak) → STATUS_ACCENT_BORDER_CLASSES.
+ *   • CARD-ACCENT (4px linker-rand op een VOL-omrande kaart; alléén de linker
+ *     border-color) → STATUS_CARD_ACCENT_CLASSES.
  *   • SOLIDE CHIP (gevuld vlak in de main-kleur, witte tekst)
  *     → STATUS_SOLID_CHIP_CLASSES.
  *   • SOLIDE DOT (kale statusstip, geen tekst) → STATUS_DOT_CLASSES — NIET de
@@ -126,6 +128,20 @@ export const STATUS_SOLID_CHIP_CLASSES: Record<StatusSemantic, string> = {
   warning: 'bg-warning-600 text-white',
   danger:  'bg-danger-600 text-white',
   offline: 'bg-slate-400 dark:bg-slate-600 text-white',
+};
+
+/** CARD-ACCENT (links-ONLY): de 4px linker-statusrand (`border-l-4`) op een
+ *  VOL-omrande surface (de shadcn Card draagt al `border border-border`).
+ *  Alléén de linker border-color (`border-l-*-600`) — de all-side
+ *  STATUS_ACCENT_BORDER_CLASSES zou hier het hele 1px-kader meekleuren; op de
+ *  kale accent-RIJ (alleen linker randbreedte) is all-side juist onschadelijk.
+ *  Zelfde -600-mains als de STATUS_COLORS-hex (visuele no-op t.o.v. de oude
+ *  sx-borderLeft). Eerste consument: de KPI-kaartshell in KpiOverviewPanel. */
+export const STATUS_CARD_ACCENT_CLASSES: Record<StatusSemantic, string> = {
+  healthy: 'border-l-success-600',
+  warning: 'border-l-warning-600',
+  danger:  'border-l-danger-600',
+  offline: 'border-l-slate-400 dark:border-l-slate-600',
 };
 
 /** Ernst-bucketing (storingen) → status-semantiek. Ernst is een OPEN
