@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
+import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import Chip from '@mui/material/Chip';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -51,7 +51,7 @@ const DashboardPage = () => {
       </Box>
 
       {role === 'installateur' && (
-        <Alert severity="info" sx={{ mb: 2.5, fontSize: '0.85rem' }}>
+        <Alert severity="info" className="mb-5 text-sm">
           Deze pagina is primair voor beheerders. Je bekijkt hem
           momenteel als installateur — schakel naar beheerdermodus
           voor het volledige monitoring-perspectief.
@@ -63,7 +63,7 @@ const DashboardPage = () => {
       )}
 
       {!isLoading && error && (
-        <Alert severity="error" sx={{ mb: 3 }} data-testid="error-alert">
+        <Alert severity="danger" className="mb-6" data-testid="error-alert">
           {error}
         </Alert>
       )}
