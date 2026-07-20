@@ -58,3 +58,20 @@ describe('AanbevolenInstellingen', () => {
     expect(button).toBeDisabled();
   });
 });
+
+/**
+ * Cluster C7 (Tier-1-run): MUI Tooltip → native title op de bestaande
+ * span-wrapper (ErrorCodeRow-precedent #173). De span bestond al voor MUI's
+ * disabled-button-events; het native title-attribuut werkt om dezelfde reden.
+ */
+describe('AanbevolenInstellingen — C7-migratie (native title)', () => {
+  it('de span-wrapper draagt het native title-attribuut; geen MUI Tooltip meer', () => {
+    renderFor('B2');
+    const button = screen.getByRole('button', { name: /toepassen op warmtepomp/i });
+    const wrapper = button.closest('span[title]');
+    expect(wrapper).not.toBeNull();
+    expect(wrapper!.getAttribute('title')).toMatch(/In ontwikkeling/);
+    expect(document.querySelector('.MuiTooltip-popper')).toBeNull();
+    expect(button).toBeDisabled();
+  });
+});
