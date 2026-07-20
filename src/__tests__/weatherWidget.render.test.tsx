@@ -70,3 +70,23 @@ describe('WeatherWidget — weather→COP advisory (characterization)', () => {
     expect(await screen.findByText(/Weerdata tijdelijk niet beschikbaar/)).toBeInTheDocument();
   });
 });
+
+/**
+ * Cluster C6 (Tier-1-run): CircularProgress → owned Spinner (LoaderCircle +
+ * animate-spin, role=progressbar). TDD-eerst.
+ */
+describe('WeatherWidget — C6-migratie (owned Spinner)', () => {
+  beforeEach(() => vi.mocked(fetchWeather).mockReset());
+
+  it('laadstand toont de owned Spinner (svg, progressbar-rol, animate-spin) — geen MUI', () => {
+    // De EERSTE synchrone render is de laadstand (de fetch-resolve is een
+    // microtask verderop) — geen hangende promise nodig, die blokkeert
+    // vitest's teardown.
+    vi.mocked(fetchWeather).mockResolvedValue(null);
+    renderWidget();
+    const spinner = screen.getByRole('progressbar');
+    expect(spinner.tagName.toLowerCase()).toBe('svg');
+    expect(spinner.getAttribute('class')).toContain('animate-spin');
+    expect(document.querySelector('.MuiCircularProgress-root')).toBeNull();
+  });
+});
