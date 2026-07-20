@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import Typography from '@mui/material/Typography';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Tooltip from '@mui/material/Tooltip';
 import { Alert } from '@/components/ui/alert';
 import { Info, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -165,14 +164,15 @@ const AanbevolenInstellingen = ({ kruisProfielCode }: Props) => {
         fabrikant-documentatie voor een concrete waarde.
       </Alert>
 
-      <Tooltip title="In ontwikkeling — toepassen op warmtepomp volgt in een volgende iteratie.">
-        <span>
-          <Button disabled>
-            <Upload />
-            Toepassen op warmtepomp
-          </Button>
-        </span>
-      </Tooltip>
+      {/* C7: native title op de bestaande span (ErrorCodeRow-precedent #173).
+          De span was er al voor MUI's disabled-button-events — het native
+          title-attribuut werkt om precies dezelfde reden. */}
+      <span title="In ontwikkeling — toepassen op warmtepomp volgt in een volgende iteratie.">
+        <Button disabled>
+          <Upload />
+          Toepassen op warmtepomp
+        </Button>
+      </span>
     </Box>
   );
 };
