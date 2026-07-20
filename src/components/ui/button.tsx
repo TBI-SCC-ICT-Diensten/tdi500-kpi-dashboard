@@ -18,7 +18,9 @@ import { cn } from '@/lib/utils';
  *     COMPONENT-lokale reset lekken de UA-button-stijlen (rand/achtergrond/font)
  *     door. GEEN globale button{}-reset of Preflight — die zouden MUI's eigen
  *     <button>s raken. Element-resets voor shadcn-primitives zijn
- *     component-scoped tot het Preflight-endgame.
+ *     component-scoped tot het Preflight-endgame. De PADDING-helft van die
+ *     reset zit per maat-variant: elke maat die zelf padding zet dekt de
+ *     UA-'1px 6px' af, en size=icon (die geen padding zet) draagt daarom p-0.
  *  2. accent→slate hover — de stock ghost/outline gebruiken hover:bg-accent;
  *     hier ge-slate-d (hover:bg-slate-100 / dark:bg-overlay-8). J2: het
  *     TNO-accent-groen is chrome-only, nooit een interactie-kleur.
@@ -47,7 +49,12 @@ const buttonVariants = cva(
         default: 'h-10 px-4 py-2',
         sm: 'h-9 px-3',
         lg: 'h-11 px-8',
-        icon: 'h-10 w-10',
+        /* p-0 hoort bij de scoped reset (1): de icon-maat is vierkant en zet
+           zelf geen padding, dus zonder Preflight lekt hier de UA-'1px 6px'
+           door en knijpt de content-box (30px-knop met 6px zij-padding laat
+           18px over voor een 20px-icoon). De primitive levert de reset zodat
+           call-sites hem niet elk apart hoeven te herhalen. */
+        icon: 'h-10 w-10 p-0',
       },
     },
     defaultVariants: {
