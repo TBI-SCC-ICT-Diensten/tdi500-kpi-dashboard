@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Collapse from '@mui/material/Collapse';
+import { Collapsible } from '@/components/ui/collapsible';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import IconButton from '@mui/material/IconButton';
 import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 import HeatPumpCommandPanel from '../dashboard/HeatPumpCommandPanel';
 import ErrorCodeRow from './ErrorCodeRow';
@@ -92,13 +91,19 @@ const HeatPumpDetailCard = ({
                 Apparaatinformatie
               </Typography>
             </Box>
-            <IconButton size="small" disableRipple>
+            {/* Decoratief: de RIJ is het kliktarget (C4-patroon) —
+                p-[5px] = de oude 30px-IconButton-box. */}
+            <span
+              data-chevron
+              aria-hidden="true"
+              className="inline-flex shrink-0 p-[5px] text-slate-600 dark:text-slate-400"
+            >
               {specsExpanded
                 ? <ChevronUp size={20} />
                 : <ChevronDown size={20} />}
-            </IconButton>
+            </span>
           </Box>
-          <Collapse in={specsExpanded}>
+          <Collapsible open={specsExpanded} data-testid="specs-collapsible">
             <Box sx={{
               bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'grey.50',
               border: '1px solid',
@@ -133,7 +138,7 @@ const HeatPumpDetailCard = ({
                   </Box>
                 ))}
             </Box>
-          </Collapse>
+          </Collapsible>
           <Separator className="mt-3" />
         </Box>
       )}
