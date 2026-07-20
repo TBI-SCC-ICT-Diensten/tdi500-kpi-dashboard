@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import HeatPumpDetailCard from '../components/detail/HeatPumpDetailCard';
 import type { HeatPumpSystem } from '../types/heatpump';
@@ -74,5 +74,58 @@ describe('HeatPumpDetailCard — COP-delta scoring (characterization)', () => {
       </ThemeProvider>
     );
     expect(screen.getByTestId('pump-oplostermijn')).toBeInTheDocument();
+  });
+});
+
+/**
+ * Cluster C5 (Tier-1-run): het Apparaatinformatie-accordion — Collapse →
+ * owned Collapsible (grid-rows) en de decoratieve chevron-IconButton → kaal
+ * icoon-span (de rij is het kliktarget; C4-patroon). TDD-eerst.
+ */
+describe('HeatPumpDetailCard — C5-migratie (Collapsible + icoonspan)', () => {
+  const pumpWithSpecs = (): HeatPumpSystem => ({
+    id: 'hp-specs',
+    uri: 'u',
+    status: 'active',
+    measurements: [],
+    errorCodes: [],
+    deviceSpecs: {
+      manufacturer: 'TestFab',
+      model: 'TF-1',
+      serialNumber: 'SN123',
+      firmwareVersion: '1.0',
+    },
+  });
+  const renderSpecs = () =>
+    render(
+      <ThemeProvider theme={theme}>
+        <HeatPumpDetailCard heatPump={pumpWithSpecs()} />
+      </ThemeProvider>
+    );
+
+  /* Scope: de specs-SECTIE (header-rij + collapsible). Het geneste
+   * HeatPumpCommandPanel draagt zijn eigen accordion (cluster C4, aparte
+   * file-disjuncte PR) en blijft hier buiten de asserties. */
+  const specsSection = () =>
+    (document.querySelector('[data-testid="specs-collapsible"]') as HTMLElement).parentElement!;
+
+  it('de chevron is een decoratief span (geen button, geen MUI IconButton in de sectie)', () => {
+    renderSpecs();
+    const section = specsSection();
+    expect(section.querySelector('.MuiIconButton-root')).toBeNull();
+    const chevron = section.querySelector('[data-chevron]');
+    expect(chevron).not.toBeNull();
+    expect(chevron!.tagName).toBe('SPAN');
+    expect(chevron!.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('Collapsible: dicht = grid-rows-[0fr] met de specs GEMOUNT; klik op de rij opent naar 1fr', () => {
+    renderSpecs();
+    const collapsible = document.querySelector('[data-testid="specs-collapsible"]') as HTMLElement;
+    expect(collapsible.className).toContain('grid-rows-[0fr]');
+    expect(screen.getByText('TestFab')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(/apparaatinformatie/i));
+    expect(collapsible.className).toContain('grid-rows-[1fr]');
+    expect(specsSection().querySelector('.MuiCollapse-root')).toBeNull();
   });
 });
