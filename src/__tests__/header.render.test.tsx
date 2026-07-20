@@ -84,6 +84,16 @@ describe('Header — cluster C1 (flat header + owned primitieven)', () => {
     expect(clicks).toBe(1);
   });
 
+  it('de icoonknoppen erven de padding-reset van de primitive (geen call-site-p-0 meer)', () => {
+    renderHeader(() => {});
+    // De p-0 zat als workaround op beide call-sites; hij hoort bij de
+    // size=icon-variant zelf. Blijft hij hier zichtbaar, dan levert de
+    // primitive hem — de knoppen renderen ongewijzigd (40px resp. 30px rond).
+    [screen.getByLabelText('menu'), screen.getByTestId('theme-toggle')].forEach((btn) =>
+      expect(btn).toHaveClass('p-0')
+    );
+  });
+
   it('nul MUI-interactieprimitieven over; Typography/Box blijven (Tier 2)', () => {
     const { container } = renderHeader();
     ['.MuiChip-root', '.MuiIconButton-root', '.MuiToggleButton-root', '.MuiToggleButtonGroup-root', '.MuiTooltip-popper'].forEach(

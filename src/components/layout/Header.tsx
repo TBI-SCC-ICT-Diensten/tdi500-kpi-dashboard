@@ -52,7 +52,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           size="icon"
           aria-label="menu"
           onClick={onMenuClick}
-          className="md:hidden mr-2 shrink-0 p-0 rounded-full text-slate-600 dark:text-slate-400 [&_svg]:size-6"
+          className="md:hidden mr-2 shrink-0 rounded-full text-slate-600 dark:text-slate-400 [&_svg]:size-6"
         >
           <Menu />
         </Button>
@@ -111,7 +111,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           aria-label="Thema wisselen"
           data-testid="theme-toggle"
           title={mode === 'dark' ? 'Licht thema' : 'Donker thema'}
-          className="h-[30px] w-[30px] shrink-0 p-0 rounded-full text-slate-600 dark:text-slate-400 [&_svg]:size-5"
+          className="h-[30px] w-[30px] shrink-0 rounded-full text-slate-600 dark:text-slate-400 [&_svg]:size-5"
         >
           {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
         </Button>

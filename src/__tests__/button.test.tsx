@@ -41,6 +41,33 @@ describe('shadcn Button (TNO-getokend, pilot)', () => {
     expect(screen.getByRole('button', { name: 'Ga' })).toBeDisabled();
   });
 
+  it('size=icon reset de UA-padding op de primitive (p-0 in de variant)', () => {
+    render(<Button size="icon" aria-label="Sluiten" />);
+    const btn = screen.getByRole('button', { name: 'Sluiten' });
+    // Preflight staat UIT en de #178-reset dekte appearance/rand/font, niet de
+    // padding: een kale native <button> lekt de UA-'1px 6px'. De icon-maat is
+    // vierkant (h-10 w-10) en heeft dus nul padding nodig — de primitive levert
+    // hem, zodat call-sites geen p-0-override meer hoeven te herhalen.
+    expect(btn).toHaveClass('p-0', 'h-10', 'w-10');
+  });
+
+  it('de p-0-reset is GESCOPED op size=icon — andere maten houden hun padding', () => {
+    const { rerender } = render(<Button>Standaard</Button>);
+    const std = screen.getByRole('button', { name: 'Standaard' });
+    expect(std).toHaveClass('px-4', 'py-2');
+    expect(std.className).not.toContain('p-0');
+
+    rerender(<Button size="sm">Klein</Button>);
+    const sm = screen.getByRole('button', { name: 'Klein' });
+    expect(sm).toHaveClass('px-3');
+    expect(sm.className).not.toContain('p-0');
+
+    rerender(<Button size="lg">Groot</Button>);
+    const lg = screen.getByRole('button', { name: 'Groot' });
+    expect(lg).toHaveClass('px-8');
+    expect(lg.className).not.toContain('p-0');
+  });
+
   it('rendert een start-icoon (kind) naast het label', () => {
     render(
       <Button>

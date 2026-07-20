@@ -38,6 +38,20 @@ lessen:
   regelbox — dezelfde font-size kan dus 6px+ hoogteverschil geven. Remedie:
   expliciete `leading-*` om de gemeten hoogte te reproduceren.
 
+### Reproduceer de GERENDERDE werkelijkheid, niet de bron-intentie
+
+De `sx` van het MUI-origineel is een *voornemen*, geen uitkomst. Er staat dode
+styling in die nooit heeft gegolden: de afgifte-pills in #210 droegen
+`borderColor: 'divider !important'`, maar MUI rendert die rand in
+**currentColor** — gemeten 0.54-zwart, niet de 0.12 van `divider`. De sx kwam er
+nooit doorheen. Wie hem letterlijk naar classes vertaalt, migreert een rand die
+op `develop` nooit zichtbaar was — en noemt het verschil dan een regressie in de
+nieuwe component.
+
+Lees de sx dus als vindplaats (wélke property doet mee), maar laat de **meting**
+beslissen wat de waarde is: wat de browser TOONT op `develop` is de spec. Bij
+verschil tussen sx en `getComputedStyle` wint altijd de computed style.
+
 ### Fideliteits-overrides zijn de gesanctioneerde remedie
 
 Waar de stock-shadcn-default de gemeten MUI-geometrie niet reproduceert, wint de
@@ -98,6 +112,19 @@ offline-tier gebruikt daarom vrij slate-400/-500/-600.
 - Kleine status-tekst (≤0.7rem) op een kaal vlak: de `-700`-stap
   (`STATUS_TEXT_SAFE_CLASSES`) — de mains halen daar geen AA op wit.
 
+### Sizing — vaste-breedte-iconen in een flexrij krijgen `shrink-0`
+
+MUI maat een IconButton *intrinsiek*: de padding rond het icoon gaf hem een
+min-content-bodem, waardoor flex hem niet verder kon indrukken. Een
+Tailwind-breedte (`w-10`, `h-[30px]`) is alleen een *preferred size* — in een
+`flex`-rij met een groeiende buur (een lange titel, een brede chip) krimpt hij
+gewoon mee en wordt het icoon ovaal. De gemeten breedte klopt daardoor bij
+ruime viewports en pas bij smalle niet: een klassieke stille regressie.
+
+Vaste-breedte-elementen in een flexrij dragen dus `shrink-0` (#208: beide
+Header-icoonknoppen). Meet de geometrie bij **smalle** viewports mee, niet
+alleen bij 1280 — daar wordt de krimp pas zichtbaar.
+
 ---
 
 ## 3. Owned shadcn-primitives — de vaste project-edits
@@ -114,6 +141,13 @@ allemaal geland in Button (#178), Card (#180/#198) en Alert (#201):
      bewust weggelaten, #178) → border-color = currentColor = tekstkleur;
    - Preflight staat UIT, dus zonder expliciet `border-solid` is de UA-default
      `border-style: none` en stort de breedte naar **0** (de #198-bug).
+
+   **Enkelzijdige randen zijn de derde variant van dezelfde val** (#208): bij
+   een `border-b` zet `border-solid` álle vier de zijden op solid, waarna zonder
+   Preflight de UA-initial `medium` (**3px**) materialiseert op de zijden die je
+   *niet* gezet hebt — de header mat 68px in plaats van 65px. `border-0` moet er
+   dus **EERST** staan, om alle zijden op 0 te zetten vóór je er één weer
+   aanzet. Patroon: `border-0 border-b border-solid border-<kleur>`.
 4. **accent → slate-hovers** (J2): het TNO-accentgroen `#519872` is
    chrome-only, nooit een interactiekleur. Stock `hover:bg-accent` wordt
    `hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-overlay-8
@@ -121,6 +155,12 @@ allemaal geland in Button (#178), Card (#180/#198) en Alert (#201):
 5. **Element-resets component-scoped, nooit globaal** — de Button draagt zijn
    eigen `appearance-none border border-transparent`; géén globale
    `button{}`-reset of Preflight (die zouden MUI's eigen elementen raken).
+   **Een scoped reset moet wél compleet zijn**: #178 dekte appearance/rand/font
+   maar niet de padding, en een native `<button>` lekt zonder Preflight de
+   UA-`1px 6px`. Elke maat-variant die zelf padding zet dekt dat af; `size=icon`
+   zet er geen en draagt daarom `p-0` **in de variant** (Fase 2). De reset hoort
+   op de primitive, niet als herhaalde override op elke call-site — anders erft
+   de vólgende consument de bug opnieuw.
 6. **Geen `font-sans` op div-gebaseerde primitives** tijdens de coexistentie —
    een div heeft geen UA-reset nodig, en Lato zou splijten met de
    Inter-Typography-kinderen (Card/Alert volgen dit; de Button — een native
@@ -182,9 +222,13 @@ Elke migratie-PR haalt **alle** poorten en rapporteert ze in de PR-tekst:
 
 1. **Unit**: `npm test` (vitest) volledig groen; nieuwe tests voor het
    gemigreerde component.
-2. **Lint**: `npm run lint` exact op de baseline **43 errors / 8 warnings** —
+2. **Lint**: `npm run lint` exact op de baseline **40 errors / 8 warnings** —
    nul nieuwe. Structurele frictie lost een scoped config-override op (het
    `src/components/ui/**`-precedent uit #178), geen baseline-verschuiving.
+   NB: de baseline stond tot en met #205 op 43/8; de getypeerde migraties van
+   #206–#214 hebben drie bestaande `no-unsafe-argument`-errors laten vervallen
+   (de MUI-props die ze opleverden zijn weg). **40/8 is dus de nieuwe vloer** —
+   een PR die op 43/8 uitkomt heeft er drie *toegevoegd*.
 3. **Build**: `npm run build` (tsc + vite) groen.
 4. **dist-CSS-grep**: élke nieuwe class-literal aantoonbaar gegenereerd in de
    gebouwde CSS (het JIT-veto-sluitstuk).
