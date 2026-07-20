@@ -1,21 +1,37 @@
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Menu, Wifi, FlaskConical, Moon, Sun, Wrench, LineChart } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Chip } from '../ui/chip';
+import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import { useDataSource } from '../../hooks/useDataSource';
 import { useColorMode } from '../../context/ColorModeContext';
 import { useRole } from '../../context/RoleContext';
+
+/**
+ * Cluster C1 (Tier-1-run): AppBar/Toolbar → flat <header>, IconButtons →
+ * ghost-icon-Buttons, datasource-Chip → interactieve owned Chip, rol-
+ * ToggleButtonGroup → owned ToggleGroup, Tooltip → native title.
+ * Typography/Box blijven MUI (Tier 2). Gemeten tegen develop (licht+donker):
+ * toolbar 64px/px-24/gap-16; chip 24px met 13px-label (→ text-sm-override
+ * op de 2xs-basis); toggle-items 22.8px (py-0.5 + text-xs + leading-[1.4]);
+ * themaknop 30px rond; menuknop 40px rond, alléén <md (900, C0-breakpoints).
+ * Bewuste rebrands (precedenten): selectie-tekst old-MUI #1E3A5F → TNO
+ * text-primary (#178); divider-randen → border-border-token (#180);
+ * action.selected → slate-200/overlay-12-rolmap; interactieve elementen
+ * Lato via de scoped reset (#178).
+ */
 
 interface HeaderProps {
   /** Opens the temporary sidebar drawer; only rendered below md. */
   onMenuClick?: () => void;
 }
+
+/* Rol-item: gemeten fideliteits-overrides op de segmented-basis (h-auto want
+ * de gemeten hoogte volgt uit py+leading) + de TNO-selectietekst. */
+const ROLE_ITEM_CLASSES =
+  'h-auto px-2.5 py-0.5 text-xs leading-[1.4] font-bold ' +
+  'aria-pressed:text-primary dark:aria-pressed:text-primary';
 
 const Header = ({ onMenuClick }: HeaderProps) => {
   // The data-source read/toggle now lives in useDataSource (no direct service
@@ -24,22 +40,22 @@ const Header = ({ onMenuClick }: HeaderProps) => {
   const { mode, toggleColorMode } = useColorMode();
   const { role, setRole } = useRole();
 
+  /* border-0 EERST in de header-class: border-solid zet álle zijden solid, en
+     zonder Preflight materialiseert de UA-initial 'medium' (3px) op de
+     niet-gezette zijden — de #198-les gespiegeld voor enkelzijdige randen
+     (de geometrie-meting ving 'm: header 68px i.p.v. 65px). */
   return (
-    <AppBar
-      position="static"
-      color="transparent"
-      elevation={0}
-      sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}
-    >
-      <Toolbar sx={{ gap: 2 }}>
-        <IconButton
+    <header className="border-0 border-b border-solid border-border bg-card">
+      <div className="flex min-h-16 items-center gap-4 px-4 sm:px-6">
+        <Button
+          variant="ghost"
+          size="icon"
           aria-label="menu"
-          edge="start"
           onClick={onMenuClick}
-          sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 1, color: 'text.secondary' }}
+          className="md:hidden mr-2 shrink-0 p-0 rounded-full text-slate-600 dark:text-slate-400 [&_svg]:size-6"
         >
           <Menu />
-        </IconButton>
+        </Button>
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h6" fontWeight={700} color="primary.main" sx={{ lineHeight: 1.2 }}>
             Installateursportaal
@@ -50,68 +66,57 @@ const Header = ({ onMenuClick }: HeaderProps) => {
         </Box>
         <Chip
           data-testid="datasource-chip"
+          color={source === 'live' ? 'healthy' : 'warning'}
           icon={source === 'live' ? <Wifi size={18} /> : <FlaskConical size={18} />}
-          label={source === 'live' ? 'Hupie API (live)' : 'Mock data'}
-          size="small"
-          color={source === 'live' ? 'success' : 'warning'}
           onClick={handleToggle}
-          clickable
-          sx={{ cursor: 'pointer' }}
-        />
-        <ToggleButtonGroup
+          className="text-sm"
+        >
+          {source === 'live' ? 'Hupie API (live)' : 'Mock data'}
+        </Chip>
+        <ToggleGroup
           value={role}
-          exclusive
-          size="small"
-          onChange={(_, next) => {
+          onValueChange={(next) => {
             if (next === 'installateur' || next === 'beheerder') {
               setRole(next);
             }
           }}
           aria-label="Rolselectie"
-          sx={{
-            '& .MuiToggleButton-root': {
-              textTransform: 'none',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              px: 1.25,
-              py: 0.25,
-              lineHeight: 1.4,
-              color: 'text.secondary',
-              borderColor: 'divider',
-            },
-            '& .MuiToggleButton-root.Mui-selected': {
-              color: 'primary.main',
-              bgcolor: 'action.selected',
-            },
-          }}
         >
-          <ToggleButton value="installateur" aria-label="Installateur" data-testid="role-installateur">
+          <ToggleGroupItem
+            value="installateur"
+            aria-label="Installateur"
+            data-testid="role-installateur"
+            className={ROLE_ITEM_CLASSES}
+          >
             <Wrench size={14} className="mr-1" />
             Installateur
-          </ToggleButton>
-          <ToggleButton value="beheerder" aria-label="Beheerder" data-testid="role-beheerder">
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="beheerder"
+            aria-label="Beheerder"
+            data-testid="role-beheerder"
+            className={ROLE_ITEM_CLASSES}
+          >
             <LineChart size={14} className="mr-1" />
             Beheerder
-          </ToggleButton>
-        </ToggleButtonGroup>
-        <Tooltip title={mode === 'dark' ? 'Licht thema' : 'Donker thema'}>
-          {/* aria-label: icoon-knop had geen toegankelijke NAAM (de Tooltip is
-              een beschrijving) — a11y-fix; de testid is de stabiele selector
-              voor de dark-mode e2e. */}
-          <IconButton
-            size="small"
-            onClick={toggleColorMode}
-            aria-label="Thema wisselen"
-            data-testid="theme-toggle"
-            sx={{ color: 'text.secondary' }}
-          >
-            {mode === 'dark'
-              ? <Sun size={20} />
-              : <Moon size={20} />}
-          </IconButton>
-        </Tooltip>
-      </Toolbar>
-    </AppBar>
+          </ToggleGroupItem>
+        </ToggleGroup>
+        {/* aria-label: icoon-knop heeft geen toegankelijke NAAM uit het icoon
+            (de title is een beschrijving) — a11y behouden; de testid is de
+            stabiele selector voor de dark-mode e2e. */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleColorMode}
+          aria-label="Thema wisselen"
+          data-testid="theme-toggle"
+          title={mode === 'dark' ? 'Licht thema' : 'Donker thema'}
+          className="h-[30px] w-[30px] shrink-0 p-0 rounded-full text-slate-600 dark:text-slate-400 [&_svg]:size-5"
+        >
+          {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </Button>
+      </div>
+    </header>
   );
 };
 
