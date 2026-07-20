@@ -15,9 +15,8 @@ import TextField from '@mui/material/TextField';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import CircularProgress from '@mui/material/CircularProgress';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
+import { Spinner } from '@/components/ui/spinner';
+import { Collapsible } from '@/components/ui/collapsible';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -78,12 +77,18 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
             Inregelinstellingen
           </Typography>
         </Box>
-        <IconButton size="small" disableRipple>
+        {/* Decoratief: de RIJ is het kliktarget — een span i.p.v. een dode
+            button is eerlijker a11y. p-[5px] = de oude 30px-IconButton-box. */}
+        <span
+          data-chevron
+          aria-hidden="true"
+          className="inline-flex shrink-0 p-[5px] text-slate-600 dark:text-slate-400"
+        >
           {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </IconButton>
+        </span>
       </Box>
 
-      <Collapse in={expanded}>
+      <Collapsible open={expanded} data-testid="command-collapsible">
         <Box sx={{ pt: 1.5 }}>
           {isOffline && (
             <Alert severity="warning" className="mb-3 py-2.5 text-xs">
@@ -120,7 +125,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               className="h-10 min-w-20"
             >
               {setpointStatus === 'pending'
-                ? <CircularProgress size={16} color="inherit" />
+                ? <Spinner size={16} />
                 : rateLimitCooldown > 0
                 ? `Wacht ${rateLimitCooldown}s`
                 : 'Instellen'}
@@ -186,7 +191,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               className="h-10 min-w-20"
             >
               {curveStatus === 'pending'
-                ? <CircularProgress size={16} color="inherit" />
+                ? <Spinner size={16} />
                 : rateLimitCooldown > 0
                 ? `Wacht ${rateLimitCooldown}s`
                 : 'Instellen'}
@@ -236,7 +241,7 @@ const HeatPumpCommandPanel = ({ heatPump }: Props) => {
               : "Commando's worden direct via SPARQL UPDATE naar de Hupie API verstuurd. Wijzigingen zijn direct actief op de warmtepomp."}
           </Alert>
         </Box>
-      </Collapse>
+      </Collapsible>
 
       <Dialog open={confirm !== null} onClose={() => setConfirm(null)}>
         <DialogTitle>{confirm?.title}</DialogTitle>
