@@ -9,7 +9,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Card } from '@/components/ui/card';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Spinner } from '@/components/ui/spinner';
 import { Thermometer, Wind, Droplet, Info } from 'lucide-react';
 import { useWeather } from '../../hooks/useWeather';
 import type { SupplyTemperatureClass } from '../../types/heatpump';
@@ -31,7 +31,9 @@ const WeatherWidget = ({ rdCoordinates, supplyTemperatureClass }: Props) => {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 2 }}>
-        <CircularProgress size={16} />
+        {/* C6: owned Spinner op text-primary (de oude default-primary-arc,
+            TNO-gerebrand per #178). */}
+        <Spinner size={16} className="text-primary" />
         <Typography variant="caption" color="text.secondary">
           Weerdata ophalen...
         </Typography>
