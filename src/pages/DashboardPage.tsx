@@ -2,9 +2,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import Chip from '@mui/material/Chip';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { Chip } from '@/components/ui/chip';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useDashboardData from '../hooks/useDashboardData';
 import KpiOverviewPanel from '../components/dashboard/KpiOverviewPanel';
@@ -15,6 +14,12 @@ import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
 import { useRole } from '../context/RoleContext';
 import StatusDot from '../components/common/StatusDot';
+
+/* Kruisprofiel-items: gemeten stock-MUI-small-metriek als fideliteits-
+ * overrides op de segmented-basis (13px/lh 1.75/px+py 7/uppercase; gewicht
+ * 500→700 per J4; donker-ongeselecteerd wit→slate-50 stock-pariteit). */
+const KRUISPROFIEL_ITEM_CLASSES =
+  'h-auto px-[7px] py-[7px] text-sm font-medium leading-[1.75] uppercase dark:text-slate-50';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -94,18 +99,17 @@ const DashboardPage = () => {
                   sx={{ display: 'block', mb: 0.5 }}>
                   Isolatieniveau
                 </Typography>
-                <ToggleButtonGroup
+                <ToggleGroup
                   value={currentIsolatie}
-                  exclusive
-                  size="small"
-                  onChange={(_, val) => {
+                  onValueChange={(val) => {
                     if (val) handleKruisProfielChange(val, currentAanvoer);
                   }}
+                  aria-label="Isolatieniveau"
                 >
-                  <ToggleButton value="A" data-testid="kruisprofiel-isolatie-a">A — Goed</ToggleButton>
-                  <ToggleButton value="B" data-testid="kruisprofiel-isolatie-b">B — Matig</ToggleButton>
-                  <ToggleButton value="C" data-testid="kruisprofiel-isolatie-c">C — Slecht</ToggleButton>
-                </ToggleButtonGroup>
+                  <ToggleGroupItem value="A" data-testid="kruisprofiel-isolatie-a" className={KRUISPROFIEL_ITEM_CLASSES}>A — Goed</ToggleGroupItem>
+                  <ToggleGroupItem value="B" data-testid="kruisprofiel-isolatie-b" className={KRUISPROFIEL_ITEM_CLASSES}>B — Matig</ToggleGroupItem>
+                  <ToggleGroupItem value="C" data-testid="kruisprofiel-isolatie-c" className={KRUISPROFIEL_ITEM_CLASSES}>C — Slecht</ToggleGroupItem>
+                </ToggleGroup>
               </Box>
 
               {/* X-axis: Supply temperature */}
@@ -114,28 +118,24 @@ const DashboardPage = () => {
                   sx={{ display: 'block', mb: 0.5 }}>
                   Afgiftesysteem
                 </Typography>
-                <ToggleButtonGroup
+                <ToggleGroup
                   value={currentAanvoer}
-                  exclusive
-                  size="small"
-                  onChange={(_, val) => {
+                  onValueChange={(val) => {
                     if (val) handleKruisProfielChange(currentIsolatie, val);
                   }}
+                  aria-label="Afgiftesysteem"
                 >
-                  <ToggleButton value="1" data-testid="kruisprofiel-afgifte-vloer">Vloer (≤ 30°C)</ToggleButton>
-                  <ToggleButton value="2" data-testid="kruisprofiel-afgifte-radiator">Radiator (30–55°C)</ToggleButton>
-                  <ToggleButton value="3" data-testid="kruisprofiel-afgifte-hetelucht">Hete lucht (≥ 55°C)</ToggleButton>
-                </ToggleButtonGroup>
+                  <ToggleGroupItem value="1" data-testid="kruisprofiel-afgifte-vloer" className={KRUISPROFIEL_ITEM_CLASSES}>Vloer (≤ 30°C)</ToggleGroupItem>
+                  <ToggleGroupItem value="2" data-testid="kruisprofiel-afgifte-radiator" className={KRUISPROFIEL_ITEM_CLASSES}>Radiator (30–55°C)</ToggleGroupItem>
+                  <ToggleGroupItem value="3" data-testid="kruisprofiel-afgifte-hetelucht" className={KRUISPROFIEL_ITEM_CLASSES}>Hete lucht (≥ 55°C)</ToggleGroupItem>
+                </ToggleGroup>
               </Box>
 
               {/* Active profile badge */}
               <Box sx={{ display: 'flex', alignItems: 'center', pt: 2.5 }}>
-                <Chip
-                  label={`Profiel ${currentIsolatie}${currentAanvoer}`}
-                  color="primary"
-                  size="small"
-                  sx={{ fontWeight: 700 }}
-                />
+                <Chip color="primary" className="text-sm font-bold">
+                  {`Profiel ${currentIsolatie}${currentAanvoer}`}
+                </Chip>
               </Box>
             </Box>
           </Box>

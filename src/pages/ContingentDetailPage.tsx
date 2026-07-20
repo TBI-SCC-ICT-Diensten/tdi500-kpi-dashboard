@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Card } from '@/components/ui/card';
 import Grid from '@mui/material/Grid';
-import Chip from '@mui/material/Chip';
+import { Chip } from '@/components/ui/chip';
 import { ArrowLeft, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useDashboardData from '../hooks/useDashboardData';
@@ -60,12 +60,10 @@ const ContingentDetailPage = () => {
           {contingent.name}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-          <Chip
-            label={`Profiel ${contingent.kruisProfiel.code}`}
-            color="primary"
-            size="small"
-            sx={{ fontWeight: 600 }}
-          />
+          {/* J4: het oude gewicht 600 → font-semibold (=700; Lato heeft geen 600). */}
+          <Chip color="primary" className="text-sm font-semibold">
+            {`Profiel ${contingent.kruisProfiel.code}`}
+          </Chip>
           <Typography variant="body2" color="text.secondary">
             {contingent.kruisProfiel.description}
           </Typography>
