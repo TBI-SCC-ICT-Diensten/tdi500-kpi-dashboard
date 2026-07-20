@@ -29,6 +29,12 @@ module.exports = {
   corePlugins: { preflight: false },  // coexistence: MUI CssBaseline provides the reset
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
+    /* ── BREAKPOINTS — MUI-pariteit (playbook §4). MUI's sm/md/lg = 600/900/
+          1200; Tailwind-stock (640/768/1024) zou elke responsive migratie
+          stilletjes laten verschuiven. Top-level VERVANGT de stock-set:
+          xl/2xl vervallen bewust — src/ bevat nul xl:/2xl:-prefixes en MUI's
+          xl (1536px) komt pas terug als een site hem aantoonbaar nodig heeft. */
+    screens: { sm: '600px', md: '900px', lg: '1200px' },
     extend: {
       colors: {
         /* ── PRIMARY · TNO blue — ramp generated from #123EB7 (at 600) ─── */
