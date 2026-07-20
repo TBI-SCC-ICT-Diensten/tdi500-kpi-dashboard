@@ -104,3 +104,50 @@ describe('BagLookupPage', () => {
     expect(screen.getByRole('button', { name: /hete lucht/i })).toBeInTheDocument();
   });
 });
+
+/**
+ * Cluster C3 (Tier-1-run): de twee insulation-chips → owned Chip (solid-status
+ * + outlined) en de afgifte-ToggleButtonGroup → owned ToggleGroup variant
+ * 'pills'. TDD-eerst; class-smoke, geen uitputtendheid (playbook §5).
+ */
+describe('BagLookupPage — C3-migratie (owned Chip + pills-ToggleGroup)', () => {
+  const lookup = async () => {
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/postcode/i), { target: { value: '3027SN' } });
+    fireEvent.change(screen.getByLabelText(/huisnummer/i), { target: { value: '100' } });
+    fireEvent.click(screen.getByRole('button', { name: /ophalen/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/^Klasse [ABC]$/)).toBeInTheDocument();
+    });
+  };
+
+  it('de Klasse-chip is de owned solid-status-chip (span, pil, seam-solid)', async () => {
+    await lookup();
+    const chip = screen.getByText(/^Klasse [ABC]$/);
+    expect(chip.tagName).toBe('SPAN');
+    expect(chip.className).toContain('rounded-full');
+    expect(chip.className).toContain('text-2xs');
+    expect(chip.className).toMatch(/bg-success-600|bg-warning-600|bg-danger-600/);
+    expect(document.querySelector('.MuiChip-root')).toBeNull();
+  });
+
+  it('de Betrouwbaarheid-chip is outlined: transparant met -600-rand en -700 tekst', async () => {
+    await lookup();
+    const chip = screen.getByText(/^Betrouwbaarheid:/);
+    expect(chip.tagName).toBe('SPAN');
+    expect(chip.className).toContain('bg-transparent');
+    expect(chip.className).toMatch(/border-(success|warning)-600|border-slate-300/);
+  });
+
+  it('de afgifte-keuze is een pills-ToggleGroup: role=group, aria-pressed, rounded-lg', async () => {
+    await lookup();
+    const group = screen.getByRole('group', { name: /afgiftesysteem/i });
+    expect(group).toBeInTheDocument();
+    const vloer = screen.getByRole('button', { name: /vloerverwarming/i });
+    expect(vloer).toHaveAttribute('aria-pressed', 'false');
+    expect(vloer.className).toContain('rounded-lg');
+    expect(document.querySelector('.MuiToggleButton-root')).toBeNull();
+    fireEvent.click(vloer);
+    expect(vloer).toHaveAttribute('aria-pressed', 'true');
+  });
+});

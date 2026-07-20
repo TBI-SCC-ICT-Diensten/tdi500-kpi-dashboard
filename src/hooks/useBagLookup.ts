@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type React from 'react';
 import {
   fetchBagData,
   deriveInsulation,
@@ -14,6 +13,11 @@ import { getErrorMessage } from '../utils/getErrorMessage';
 import type { KruisProfielCode, KruisProfiel, SupplyTemperatureClass } from '../types/heatpump';
 
 export type Afgiftesysteem = 'vloerverwarming' | 'radiator' | 'hete lucht';
+
+const AFGIFTESYSTEMEN: readonly Afgiftesysteem[] = ['vloerverwarming', 'radiator', 'hete lucht'];
+
+const isAfgiftesysteem = (value: string): value is Afgiftesysteem =>
+  (AFGIFTESYSTEMEN as readonly string[]).includes(value);
 
 /**
  * View hook for BagLookupPage: owns the full lookup flow (address → BAG → EP-online),
@@ -53,13 +57,15 @@ export const useBagLookup = () => {
     }
   };
 
-  const handleAfgifteChange = (
-    _: React.MouseEvent<HTMLElement>,
-    value: Afgiftesysteem | null
-  ): void => {
-    setAfgiftesysteem(value);
-    if (value && insulation) {
-      setKruisProfielCode(deriveKruisProfielCode(insulation.level, value));
+  /* Signatuur zonder MUI-event (C3): de owned ToggleGroup levert alleen de
+   * waarde; string|null wordt hier naar het gesloten
+   * Afgiftesysteem-vocabulaire vernauwd. */
+  const handleAfgifteChange = (value: string | null): void => {
+    const next = value === null ? null : isAfgiftesysteem(value) ? value : undefined;
+    if (next === undefined) return;
+    setAfgiftesysteem(next);
+    if (next && insulation) {
+      setKruisProfielCode(deriveKruisProfielCode(insulation.level, next));
     } else {
       setKruisProfielCode(null);
     }

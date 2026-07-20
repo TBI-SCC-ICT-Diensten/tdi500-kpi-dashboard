@@ -9,10 +9,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { Alert } from '@/components/ui/alert';
-import Chip from '@mui/material/Chip';
+import { Chip } from '@/components/ui/chip';
 import Grid from '@mui/material/Grid';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useTheme } from '@mui/material/styles';
 import { Search, Home, CircleCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -30,11 +29,22 @@ const afgifteLabels: Record<Afgiftesysteem, string> = {
   'hete lucht': 'Hete lucht (≥ 55°C)',
 };
 
+/* Betrouwbaarheid → chipkleur (owned Chip-vocabulaire; 'laag' volgt de
+ * neutrale offline/slate-tier — het oude MUI 'default'). */
 const confidenceColor = {
-  hoog: 'success' as const,
+  hoog: 'healthy' as const,
   middel: 'warning' as const,
-  laag: 'default' as const,
+  laag: 'offline' as const,
 };
+
+/* Afgifte-pills: gemeten stock-MUI-medium-metriek als fideliteits-overrides
+ * op de pills-basis (14px/lh 1.75/py 11; gewicht 500→700 per J4). De rand is
+ * currentColor — zo rendert het MUI-origineel daadwerkelijk (de sx-divider
+ * kwam er nooit doorheen); geselecteerd overschrijft de pills-variant naar
+ * primary. Donker-ongeselecteerd stock-wit → slate-50. */
+const AFGIFTE_ITEM_CLASSES =
+  'h-auto py-[11px] text-[0.875rem] font-medium leading-[1.75] ' +
+  'border-current aria-pressed:border-primary dark:text-slate-50';
 
 const BagLookupPage = () => {
   const theme = useTheme();
@@ -216,19 +226,16 @@ const BagLookupPage = () => {
                 <Typography variant="caption" fontWeight={700}>
                   Isolatieniveau (Y-as kruisprofiel):
                 </Typography>
+                {/* 0.7rem → text-2xs (de vastgelegde chipmaat-consolidatie). */}
                 <Chip
-                  label={`Klasse ${insulation.level}`}
-                  size="small"
-                  color={insulation.level === 'A' ? 'success' : insulation.level === 'B' ? 'warning' : 'error'}
-                  sx={{ fontWeight: 700, fontSize: '0.7rem' }}
-                />
-                <Chip
-                  label={`Betrouwbaarheid: ${insulation.confidence}`}
-                  size="small"
-                  color={confidenceColor[insulation.confidence]}
-                  variant="outlined"
-                  sx={{ fontSize: '0.65rem' }}
-                />
+                  color={insulation.level === 'A' ? 'healthy' : insulation.level === 'B' ? 'warning' : 'danger'}
+                  className="font-bold"
+                >
+                  {`Klasse ${insulation.level}`}
+                </Chip>
+                <Chip variant="outlined" color={confidenceColor[insulation.confidence]}>
+                  {`Betrouwbaarheid: ${insulation.confidence}`}
+                </Chip>
               </Box>
               <Typography variant="body2">{insulation.reason}</Typography>
               {insulation.confidence !== 'hoog' && (
@@ -273,34 +280,18 @@ const BagLookupPage = () => {
             Het afgiftesysteem is niet beschikbaar via de BAG. Selecteer het type verwarmingsafgifte van deze woning.
           </Typography>
 
-          <ToggleButtonGroup
+          <ToggleGroup
             value={afgiftesysteem}
-            exclusive
-            onChange={handleAfgifteChange}
-            sx={{ flexWrap: 'wrap', gap: 1 }}
+            onValueChange={handleAfgifteChange}
+            variant="pills"
+            aria-label="Afgiftesysteem"
           >
             {(Object.keys(afgifteLabels) as Afgiftesysteem[]).map((key) => (
-              <ToggleButton
-                key={key}
-                value={key}
-                sx={{
-                  textTransform: 'none',
-                  px: 2,
-                  border: '1px solid !important',
-                  borderRadius: '8px !important',
-                  borderColor: 'divider !important',
-                  '&.Mui-selected': {
-                    bgcolor: 'primary.main',
-                    color: 'primary.contrastText',
-                    borderColor: 'primary.main !important',
-                    '&:hover': { bgcolor: 'primary.dark' },
-                  },
-                }}
-              >
+              <ToggleGroupItem key={key} value={key} className={AFGIFTE_ITEM_CLASSES}>
                 {afgifteLabels[key]}
-              </ToggleButton>
+              </ToggleGroupItem>
             ))}
-          </ToggleButtonGroup>
+          </ToggleGroup>
         </Card>
       )}
 
