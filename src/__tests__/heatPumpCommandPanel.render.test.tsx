@@ -143,3 +143,50 @@ describe('HeatPumpCommandPanel — mock-mode signal', () => {
     expect(await screen.findByText(/geen echte schrijfactie/i)).toBeInTheDocument();
   });
 });
+
+/**
+ * Cluster C4 (Tier-1-run): Collapse → owned Collapsible (grid-rows), de
+ * decoratieve chevron-IconButton → kaal icoon-span (de RIJ is het
+ * kliktarget — eerlijker a11y: geen dode button), CircularProgress →
+ * owned Spinner (in de al-shadcn Buttons, currentColor). Het MUI-Dialog
+ * blijft (Tier 3). TDD-eerst; class-smoke (playbook §5).
+ */
+describe('HeatPumpCommandPanel — C4-migratie (Collapsible + icoonspan + Spinner)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setDataSource('mock');
+  });
+  afterEach(() => setDataSource('live'));
+
+  it('de chevron is een decoratief span (geen button, geen MUI IconButton)', () => {
+    renderPanel();
+    expect(document.querySelector('.MuiIconButton-root')).toBeNull();
+    const chevron = document.querySelector('[data-chevron]');
+    expect(chevron).not.toBeNull();
+    expect(chevron!.tagName).toBe('SPAN');
+    expect(chevron!.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('Collapsible: dicht = grid-rows-[0fr] met de inhoud GEMOUNT (MUI-pariteit); open = 1fr', () => {
+    renderPanel();
+    const collapsible = document.querySelector('[data-testid="command-collapsible"]') as HTMLElement;
+    expect(collapsible.className).toContain('grid-rows-[0fr]');
+    // MUI Collapse unmount niet — de formulieren bestaan al in dichte stand.
+    expect(screen.getByText(/temperatuur setpoint/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByText(/inregelinstellingen/i));
+    expect(collapsible.className).toContain('grid-rows-[1fr]');
+    expect(document.querySelector('.MuiCollapse-root')).toBeNull();
+  });
+
+  it('pending: de owned Spinner (role=progressbar, animate-spin) draait in de submit-Button', async () => {
+    vi.mocked(setTemperatureSetpoint).mockImplementation(() => new Promise(() => {}));
+    renderPanel();
+    fireEvent.click(screen.getByText(/inregelinstellingen/i));
+    const submitBtn = screen.getAllByRole('button', { name: /instellen/i })[0];
+    fireEvent.click(submitBtn!);
+    const spinner = await screen.findByRole('progressbar');
+    expect(spinner.tagName.toLowerCase()).toBe('svg');
+    expect(spinner.getAttribute('class')).toContain('animate-spin');
+    expect(document.querySelector('.MuiCircularProgress-root')).toBeNull();
+  });
+});
